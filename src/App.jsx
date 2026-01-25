@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 function App() {
   const [activeWindow, setActiveWindow] = useState('about')
@@ -9,20 +9,30 @@ function App() {
     projects: { open: true, minimized: false, maximized: false },
     contact: { open: true, minimized: false, maximized: false }
   })
-  const [windowPositions, setWindowPositions] = useState({
+  const [windowOrder, setWindowOrder] = useState(['about', 'experience', 'projects', 'contact'])
+  const [, forceUpdate] = useState(0)
+
+  // Use refs for positions and sizes to avoid re-renders during drag/resize
+  const windowPositions = useRef({
     about: { x: 50, y: 60 },
     experience: { x: 500, y: 60 },
     projects: { x: 50, y: 340 },
     contact: { x: 500, y: 340 }
   })
-  const [windowOrder, setWindowOrder] = useState(['about', 'experience', 'projects', 'contact'])
-  const dragRef = useRef(null)
-  const dragOffset = useRef({ x: 0, y: 0 })
+  const windowSizes = useRef({
+    about: { w: 420, h: 450 },
+    experience: { w: 420, h: 280 },
+    projects: { w: 420, h: 220 },
+    contact: { w: 420, h: 280 }
+  })
+
+  const windowRefs = useRef({})
+  const dragState = useRef(null)
+  const resizeState = useRef(null)
 
   const bringToFront = (id) => {
     setWindowOrder(prev => [...prev.filter(w => w !== id), id])
     setActiveWindow(id)
-    // If minimized, restore it
     if (windowStates[id].minimized) {
       setWindowStates(prev => ({
         ...prev,
@@ -63,36 +73,114 @@ function App() {
     bringToFront(id)
   }
 
-  const handleMouseDown = (e, windowId) => {
-    if (e.target.closest('.window-content') || e.target.closest('.traffic-lights')) return
+  // Drag handlers using direct DOM manipulation for performance
+  const handleDragStart = (e, windowId) => {
+    if (e.target.closest('.window-content') || e.target.closest('.traffic-lights') || e.target.closest('.resize-handle')) return
     e.preventDefault()
-    dragRef.current = windowId
-    const pos = windowPositions[windowId]
-    dragOffset.current = {
-      x: e.clientX - pos.x,
-      y: e.clientY - pos.y
+
+    const pos = windowPositions.current[windowId]
+    dragState.current = {
+      id: windowId,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: pos.x,
+      origY: pos.y
     }
+
     bringToFront(windowId)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
+    document.addEventListener('mousemove', handleDragMove)
+    document.addEventListener('mouseup', handleDragEnd)
   }
 
-  const handleMouseMove = useCallback((e) => {
-    if (!dragRef.current) return
-    setWindowPositions(prev => ({
-      ...prev,
-      [dragRef.current]: {
-        x: e.clientX - dragOffset.current.x,
-        y: e.clientY - dragOffset.current.y
-      }
-    }))
-  }, [])
+  const handleDragMove = (e) => {
+    if (!dragState.current) return
+    const { id, startX, startY, origX, origY } = dragState.current
+    const newX = origX + (e.clientX - startX)
+    const newY = origY + (e.clientY - startY)
 
-  const handleMouseUp = useCallback(() => {
-    dragRef.current = null
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
-  }, [handleMouseMove])
+    windowPositions.current[id] = { x: newX, y: newY }
+
+    // Direct DOM update for smooth dragging
+    const el = windowRefs.current[id]
+    if (el) {
+      el.style.left = `${newX}px`
+      el.style.top = `${newY}px`
+    }
+  }
+
+  const handleDragEnd = () => {
+    dragState.current = null
+    document.removeEventListener('mousemove', handleDragMove)
+    document.removeEventListener('mouseup', handleDragEnd)
+  }
+
+  // Resize handlers
+  const handleResizeStart = (e, windowId, direction) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const size = windowSizes.current[windowId]
+    const pos = windowPositions.current[windowId]
+
+    resizeState.current = {
+      id: windowId,
+      direction,
+      startX: e.clientX,
+      startY: e.clientY,
+      origW: size.w,
+      origH: size.h,
+      origX: pos.x,
+      origY: pos.y
+    }
+
+    bringToFront(windowId)
+    document.addEventListener('mousemove', handleResizeMove)
+    document.addEventListener('mouseup', handleResizeEnd)
+  }
+
+  const handleResizeMove = (e) => {
+    if (!resizeState.current) return
+    const { id, direction, startX, startY, origW, origH, origX, origY } = resizeState.current
+
+    const deltaX = e.clientX - startX
+    const deltaY = e.clientY - startY
+
+    let newW = origW
+    let newH = origH
+    let newX = origX
+    let newY = origY
+
+    // Handle different resize directions
+    if (direction.includes('e')) newW = Math.max(300, origW + deltaX)
+    if (direction.includes('w')) {
+      newW = Math.max(300, origW - deltaX)
+      newX = origX + (origW - newW)
+    }
+    if (direction.includes('s')) newH = Math.max(200, origH + deltaY)
+    if (direction.includes('n')) {
+      newH = Math.max(200, origH - deltaY)
+      newY = origY + (origH - newH)
+    }
+
+    windowSizes.current[id] = { w: newW, h: newH }
+    windowPositions.current[id] = { x: newX, y: newY }
+
+    // Direct DOM update for smooth resizing
+    const el = windowRefs.current[id]
+    if (el) {
+      el.style.width = `${newW}px`
+      el.style.height = `${newH}px`
+      el.style.left = `${newX}px`
+      el.style.top = `${newY}px`
+    }
+  }
+
+  const handleResizeEnd = () => {
+    resizeState.current = null
+    document.removeEventListener('mousemove', handleResizeMove)
+    document.removeEventListener('mouseup', handleResizeEnd)
+    forceUpdate(n => n + 1) // Sync state after resize
+  }
 
   const skills = ["Java", "Python", "JavaScript", "AWS", "Spring Boot", "React", "Docker", "SQL", "Git", "Redis", "PostgreSQL", "DataDog"]
 
@@ -117,7 +205,6 @@ function App() {
     { name: "TungBot", tech: "Python", url: "https://github.com/tungcodeforfun/TungBot" }
   ]
 
-  // Apple-style app icons with gradients
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
@@ -194,19 +281,24 @@ function App() {
 
   const renderWindow = (id, title, content) => {
     const state = windowStates[id]
-    if (!state.open) return null
-    if (state.minimized) return null
+    if (!state.open || state.minimized) return null
+
+    const pos = windowPositions.current[id]
+    const size = windowSizes.current[id]
 
     return (
       <div
         key={id}
+        ref={el => windowRefs.current[id] = el}
         className={`macos-window ${activeWindow === id ? 'active' : ''} ${state.maximized ? 'maximized' : ''}`}
         style={state.maximized ? {} : {
-          left: windowPositions[id].x,
-          top: windowPositions[id].y,
+          left: pos.x,
+          top: pos.y,
+          width: size.w,
+          height: size.h,
           zIndex: windowOrder.indexOf(id)
         }}
-        onMouseDown={(e) => handleMouseDown(e, id)}
+        onMouseDown={(e) => handleDragStart(e, id)}
       >
         <div className="window-header">
           <div className="traffic-lights">
@@ -227,6 +319,19 @@ function App() {
         <div className="window-content">
           {content}
         </div>
+        {/* Resize handles */}
+        {!state.maximized && (
+          <>
+            <div className="resize-handle resize-n" onMouseDown={(e) => handleResizeStart(e, id, 'n')} />
+            <div className="resize-handle resize-s" onMouseDown={(e) => handleResizeStart(e, id, 's')} />
+            <div className="resize-handle resize-e" onMouseDown={(e) => handleResizeStart(e, id, 'e')} />
+            <div className="resize-handle resize-w" onMouseDown={(e) => handleResizeStart(e, id, 'w')} />
+            <div className="resize-handle resize-ne" onMouseDown={(e) => handleResizeStart(e, id, 'ne')} />
+            <div className="resize-handle resize-nw" onMouseDown={(e) => handleResizeStart(e, id, 'nw')} />
+            <div className="resize-handle resize-se" onMouseDown={(e) => handleResizeStart(e, id, 'se')} />
+            <div className="resize-handle resize-sw" onMouseDown={(e) => handleResizeStart(e, id, 'sw')} />
+          </>
+        )}
       </div>
     )
   }

@@ -113,12 +113,15 @@ body {
   -webkit-backdrop-filter: blur(40px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
-  width: 420px;
+  min-width: 300px;
+  min-height: 200px;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.4),
     0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
-  transition: box-shadow 0.2s, width 0.3s, height 0.3s, top 0.3s, left 0.3s, border-radius 0.3s;
+  transition: box-shadow 0.2s;
   user-select: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .macos-window.active {
@@ -220,8 +223,78 @@ body {
   padding: 20px;
   cursor: default;
   user-select: text;
-  max-height: 350px;
+  flex: 1;
   overflow-y: auto;
+}
+
+/* Resize Handles */
+.resize-handle {
+  position: absolute;
+  z-index: 10;
+}
+
+.resize-n {
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.resize-s {
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.resize-e {
+  right: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.resize-w {
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.resize-ne {
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  cursor: nesw-resize;
+}
+
+.resize-nw {
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+}
+
+.resize-se {
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+}
+
+.resize-sw {
+  bottom: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  cursor: nesw-resize;
 }
 
 /* About Window */
