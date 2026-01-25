@@ -14,6 +14,15 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
+  // Panel resize state - Reference: blog.openreplay.com/resizable-split-panes-from-scratch/
+  const [panelWidths, setPanelWidths] = useState({
+    notesSidebar: 180,
+    notesList: 220,
+    messagesSidebar: 260,
+    contactsSidebar: 220
+  })
+  const panelResizeState = useRef({ isResizing: false, panel: null, startX: 0, startWidth: 0 })
+
   // Window sizes - sized to fit multi-panel app layouts comfortably
   // Using 16:10 aspect ratio (standard Mac display ratio)
   const windowWidth = 960
@@ -103,6 +112,46 @@ function App() {
       [id]: { open: true, minimized: false, maximized: false }
     }))
     bringToFront(id)
+  }
+
+  // Panel resizer handlers - Reference: tinloof.com/blog/how-to-make-your-own-splitpane-react-component-with-0-dependencies
+  const panelConstraints = {
+    notesSidebar: { min: 100, max: 300 },
+    notesList: { min: 150, max: 400 },
+    messagesSidebar: { min: 180, max: 400 },
+    contactsSidebar: { min: 150, max: 350 }
+  }
+
+  const handlePanelResizeStart = (e, panel) => {
+    e.preventDefault()
+    e.stopPropagation()
+    panelResizeState.current = {
+      isResizing: true,
+      panel,
+      startX: e.clientX,
+      startWidth: panelWidths[panel]
+    }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    document.addEventListener('mousemove', handlePanelResizeMove)
+    document.addEventListener('mouseup', handlePanelResizeEnd)
+  }
+
+  const handlePanelResizeMove = (e) => {
+    if (!panelResizeState.current.isResizing) return
+    const { panel, startX, startWidth } = panelResizeState.current
+    const delta = e.clientX - startX
+    const { min, max } = panelConstraints[panel]
+    const newWidth = Math.max(min, Math.min(max, startWidth + delta))
+    setPanelWidths(prev => ({ ...prev, [panel]: newWidth }))
+  }
+
+  const handlePanelResizeEnd = () => {
+    panelResizeState.current = { isResizing: false, panel: null, startX: 0, startWidth: 0 }
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+    document.removeEventListener('mousemove', handlePanelResizeMove)
+    document.removeEventListener('mouseup', handlePanelResizeEnd)
   }
 
   // Drag handlers using direct DOM manipulation for performance
@@ -509,7 +558,7 @@ function App() {
     about: (
       <div className="notes-layout">
         {/* Sidebar - Folders */}
-        <div className="notes-sidebar">
+        <div className="notes-sidebar" style={{ width: panelWidths.notesSidebar }}>
           <div className="notes-sidebar-header">iCloud</div>
           <div className="notes-folder-list">
             <div className="notes-folder-item active">
@@ -542,8 +591,14 @@ function App() {
           </div>
         </div>
 
+        {/* Resizer between sidebar and list */}
+        <div
+          className="panel-resizer"
+          onMouseDown={(e) => handlePanelResizeStart(e, 'notesSidebar')}
+        />
+
         {/* Notes List - Middle Panel */}
-        <div className="notes-list-panel">
+        <div className="notes-list-panel" style={{ width: panelWidths.notesList }}>
           <div className="notes-list-header">All Notes</div>
           <div className="notes-list">
             {notesData.map((note) => (
@@ -559,6 +614,12 @@ function App() {
             ))}
           </div>
         </div>
+
+        {/* Resizer between list and content */}
+        <div
+          className="panel-resizer"
+          onMouseDown={(e) => handlePanelResizeStart(e, 'notesList')}
+        />
 
         {/* Note Content - Main Panel */}
         <div className="notes-content-panel">
@@ -599,7 +660,7 @@ function App() {
     experience: (
       <div className="messages-layout">
         {/* Conversation List Sidebar */}
-        <div className="messages-sidebar">
+        <div className="messages-sidebar" style={{ width: panelWidths.messagesSidebar }}>
           <div className="messages-sidebar-header">
             <input type="text" className="messages-search" placeholder="Search" readOnly />
             <button className="messages-compose-btn">
@@ -623,6 +684,12 @@ function App() {
             </div>
           </div>
         </div>
+
+        {/* Resizer */}
+        <div
+          className="panel-resizer"
+          onMouseDown={(e) => handlePanelResizeStart(e, 'messagesSidebar')}
+        />
 
         {/* Chat Panel */}
         <div className="messages-chat-panel">
@@ -763,7 +830,7 @@ function App() {
     contact: (
       <div className="contacts-layout">
         {/* Contacts Sidebar */}
-        <div className="contacts-sidebar">
+        <div className="contacts-sidebar" style={{ width: panelWidths.contactsSidebar }}>
           <div className="contacts-sidebar-header">
             <input type="text" className="contacts-search" placeholder="Search" readOnly />
           </div>
@@ -777,6 +844,12 @@ function App() {
             </div>
           </div>
         </div>
+
+        {/* Resizer */}
+        <div
+          className="panel-resizer"
+          onMouseDown={(e) => handlePanelResizeStart(e, 'contactsSidebar')}
+        />
 
         {/* Contact Detail Card */}
         <div className="contacts-detail-panel">

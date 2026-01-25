@@ -263,16 +263,52 @@ body {
   min-height: 0;
 }
 
+/* Resizable Panel Divider */
+/* Reference: blog.openreplay.com/resizable-split-panes-from-scratch/ */
+/* Reference: tinloof.com/blog/how-to-make-your-own-splitpane-react-component-with-0-dependencies */
+.panel-resizer {
+  width: 1px;
+  background: transparent;
+  cursor: col-resize;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.panel-resizer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  right: -4px;
+  z-index: 10;
+}
+
+.panel-resizer:hover,
+.panel-resizer.resizing {
+  background: var(--system-blue, #007AFF);
+}
+
+/* Dark theme resizer */
+.macos-window:not(.notes-theme):not(.messages-theme):not(.contacts-theme) .panel-resizer:hover,
+.macos-window:not(.notes-theme):not(.messages-theme):not(.contacts-theme) .panel-resizer.resizing {
+  background: var(--system-blue);
+}
+
 /* Notes Sidebar - folders panel */
 .notes-sidebar {
   width: 180px;
-  min-width: 180px;
+  min-width: 100px;
+  max-width: 300px;
   background: var(--notes-sidebar-bg);
   border-right: 1px solid var(--notes-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-bottom-left-radius: 10px; /* Match window corner */
+  flex-shrink: 0;
+  position: relative;
 }
 
 .notes-sidebar-header {
@@ -337,12 +373,14 @@ body {
 /* Notes List - middle panel */
 .notes-list-panel {
   width: 220px;
-  min-width: 220px;
+  min-width: 150px;
+  max-width: 400px;
   background: #fff;
   border-right: 1px solid var(--notes-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .notes-list-header {
@@ -643,13 +681,15 @@ body {
 /* Messages sidebar - conversation list */
 .messages-sidebar {
   width: 260px;
-  min-width: 260px;
+  min-width: 180px;
+  max-width: 400px;
   background: rgba(246, 246, 246, 0.98);
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-bottom-left-radius: 10px;
+  flex-shrink: 0;
 }
 
 .messages-sidebar-header {
@@ -1209,13 +1249,15 @@ body {
 /* Contacts sidebar - contact list */
 .contacts-sidebar {
   width: 220px;
-  min-width: 220px;
+  min-width: 150px;
+  max-width: 350px;
   background: rgba(246, 246, 246, 0.98);
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-bottom-left-radius: 10px;
+  flex-shrink: 0;
 }
 
 .contacts-sidebar-header {
