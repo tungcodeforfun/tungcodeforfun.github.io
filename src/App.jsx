@@ -3,11 +3,17 @@ import { useState, useRef, useCallback } from 'react'
 
 function App() {
   const [activeWindow, setActiveWindow] = useState('about')
+  const [windowStates, setWindowStates] = useState({
+    about: { open: true, minimized: false, maximized: false },
+    experience: { open: true, minimized: false, maximized: false },
+    projects: { open: true, minimized: false, maximized: false },
+    contact: { open: true, minimized: false, maximized: false }
+  })
   const [windowPositions, setWindowPositions] = useState({
     about: { x: 50, y: 60 },
-    experience: { x: 150, y: 80 },
-    projects: { x: 250, y: 100 },
-    contact: { x: 350, y: 120 }
+    experience: { x: 500, y: 60 },
+    projects: { x: 50, y: 340 },
+    contact: { x: 500, y: 340 }
   })
   const [windowOrder, setWindowOrder] = useState(['about', 'experience', 'projects', 'contact'])
   const dragRef = useRef(null)
@@ -16,10 +22,49 @@ function App() {
   const bringToFront = (id) => {
     setWindowOrder(prev => [...prev.filter(w => w !== id), id])
     setActiveWindow(id)
+    // If minimized, restore it
+    if (windowStates[id].minimized) {
+      setWindowStates(prev => ({
+        ...prev,
+        [id]: { ...prev[id], minimized: false, open: true }
+      }))
+    }
+  }
+
+  const closeWindow = (e, id) => {
+    e.stopPropagation()
+    setWindowStates(prev => ({
+      ...prev,
+      [id]: { ...prev[id], open: false }
+    }))
+  }
+
+  const minimizeWindow = (e, id) => {
+    e.stopPropagation()
+    setWindowStates(prev => ({
+      ...prev,
+      [id]: { ...prev[id], minimized: true }
+    }))
+  }
+
+  const maximizeWindow = (e, id) => {
+    e.stopPropagation()
+    setWindowStates(prev => ({
+      ...prev,
+      [id]: { ...prev[id], maximized: !prev[id].maximized }
+    }))
+  }
+
+  const openWindow = (id) => {
+    setWindowStates(prev => ({
+      ...prev,
+      [id]: { open: true, minimized: false, maximized: false }
+    }))
+    bringToFront(id)
   }
 
   const handleMouseDown = (e, windowId) => {
-    if (e.target.closest('.window-content')) return
+    if (e.target.closest('.window-content') || e.target.closest('.traffic-lights')) return
     e.preventDefault()
     dragRef.current = windowId
     const pos = windowPositions[windowId]
@@ -72,29 +117,68 @@ function App() {
     { name: "TungBot", tech: "Python", url: "https://github.com/tungcodeforfun/TungBot" }
   ]
 
+  // Apple-style app icons with gradients
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+        <svg viewBox="0 0 120 120" className="app-icon">
+          <defs>
+            <linearGradient id="contactsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#a8a8a8" />
+              <stop offset="100%" stopColor="#8a8a8a" />
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#contactsGrad)" />
+          <circle cx="60" cy="42" r="18" fill="#fff" />
+          <ellipse cx="60" cy="95" rx="32" ry="25" fill="#fff" />
         </svg>
       ),
       experience: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="2" y="7" width="20" height="14" rx="2"/>
-          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        <svg viewBox="0 0 120 120" className="app-icon">
+          <defs>
+            <linearGradient id="calendarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#ff5f57" />
+              <stop offset="30%" stopColor="#ff5f57" />
+              <stop offset="30%" stopColor="#fff" />
+              <stop offset="100%" stopColor="#f0f0f0" />
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#calendarGrad)" />
+          <text x="60" y="85" textAnchor="middle" fontSize="50" fontWeight="300" fill="#333">
+            {new Date().getDate()}
+          </text>
+          <text x="60" y="24" textAnchor="middle" fontSize="11" fontWeight="600" fill="#fff">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()}
+          </text>
         </svg>
       ),
       projects: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 7c0-1.1.9-2 2-2h4l2 2h8c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V7z"/>
+        <svg viewBox="0 0 120 120" className="app-icon">
+          <defs>
+            <linearGradient id="finderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#6bd5ff" />
+              <stop offset="100%" stopColor="#1f9ceb" />
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#finderGrad)" />
+          <rect x="25" y="45" width="70" height="50" rx="4" fill="#fff" opacity="0.95" />
+          <rect x="25" y="28" width="30" height="20" rx="3" fill="#fff" opacity="0.95" />
+          <circle cx="45" cy="70" r="6" fill="#1f9ceb" />
+          <circle cx="75" cy="70" r="6" fill="#1f9ceb" />
+          <path d="M45 82 Q60 95 75 82" stroke="#1f9ceb" strokeWidth="4" fill="none" />
         </svg>
       ),
       contact: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="2" y="4" width="20" height="16" rx="2"/>
-          <path d="M22 6l-10 7L2 6"/>
+        <svg viewBox="0 0 120 120" className="app-icon">
+          <defs>
+            <linearGradient id="mailGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#5ac8fa" />
+              <stop offset="100%" stopColor="#007aff" />
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#mailGrad)" />
+          <rect x="18" y="35" width="84" height="55" rx="6" fill="#fff" />
+          <path d="M22 40 L60 70 L98 40" stroke="#007aff" strokeWidth="3" fill="none" />
         </svg>
       )
     }
@@ -102,18 +186,61 @@ function App() {
   }
 
   const dockItems = [
-    { id: 'about', label: 'About' },
-    { id: 'experience', label: 'Experience' },
-    { id: 'projects', label: 'Projects' },
-    { id: 'contact', label: 'Contact' }
+    { id: 'about', label: 'Contacts' },
+    { id: 'experience', label: 'Calendar' },
+    { id: 'projects', label: 'Finder' },
+    { id: 'contact', label: 'Mail' }
   ]
+
+  const renderWindow = (id, title, content) => {
+    const state = windowStates[id]
+    if (!state.open) return null
+    if (state.minimized) return null
+
+    return (
+      <div
+        key={id}
+        className={`macos-window ${activeWindow === id ? 'active' : ''} ${state.maximized ? 'maximized' : ''}`}
+        style={state.maximized ? {} : {
+          left: windowPositions[id].x,
+          top: windowPositions[id].y,
+          zIndex: windowOrder.indexOf(id)
+        }}
+        onMouseDown={(e) => handleMouseDown(e, id)}
+      >
+        <div className="window-header">
+          <div className="traffic-lights">
+            <button className="light red" onClick={(e) => closeWindow(e, id)}>
+              <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
+            </button>
+            <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
+              <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
+            </button>
+            <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
+              <svg viewBox="0 0 12 12">
+                <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
+              </svg>
+            </button>
+          </div>
+          <span className="window-title">{title}</span>
+        </div>
+        <div className="window-content">
+          {content}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="macos-desktop">
       {/* Menu Bar */}
       <div className="menu-bar">
         <div className="menu-left">
-          <span className="apple-logo"></span>
+          <span className="apple-logo">
+            <svg viewBox="0 0 17 20" fill="currentColor">
+              <path d="M15.5 14.7c-.3.7-.5 1-.9 1.6-.6.9-1.4 2-2.4 2-.9 0-1.1-.6-2.3-.6-1.2 0-1.5.6-2.4.6-.9 0-1.7-1-2.3-1.9C3.7 14.3 3 11.5 3 9c0-3.2 2.1-4.9 4.1-4.9 1 0 1.9.7 2.5.7.6 0 1.6-.7 2.8-.7.8 0 2.4.3 3.3 2.3-2.9 1.6-2.4 5.6.8 6.6zM11.7 2.5c.5-.6.8-1.5.7-2.5-.7.1-1.6.5-2.1 1.2-.5.5-.9 1.4-.8 2.4.8.1 1.6-.4 2.2-1.1z"/>
+            </svg>
+          </span>
           <span className="menu-item active">Tung Nguyen</span>
           <span className="menu-item">File</span>
           <span className="menu-item">Edit</span>
@@ -128,25 +255,8 @@ function App() {
 
       {/* Windows Container */}
       <div className="windows-container">
-        {/* About Window */}
-        <div
-          className={`macos-window ${activeWindow === 'about' ? 'active' : ''}`}
-          style={{
-            left: windowPositions.about.x,
-            top: windowPositions.about.y,
-            zIndex: windowOrder.indexOf('about')
-          }}
-          onMouseDown={(e) => handleMouseDown(e, 'about')}
-        >
-          <div className="window-header">
-            <div className="traffic-lights">
-              <span className="light red"></span>
-              <span className="light yellow"></span>
-              <span className="light green"></span>
-            </div>
-            <span className="window-title">About Me</span>
-          </div>
-          <div className="window-content about-window">
+        {renderWindow('about', 'About Me', (
+          <div className="about-window">
             <div className="about-header">
               <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" className="about-avatar" />
               <div className="about-info">
@@ -173,113 +283,80 @@ function App() {
               </div>
             </div>
           </div>
-        </div>
+        ))}
 
-        {/* Experience Window */}
-        <div
-          className={`macos-window ${activeWindow === 'experience' ? 'active' : ''}`}
-          style={{
-            left: windowPositions.experience.x,
-            top: windowPositions.experience.y,
-            zIndex: windowOrder.indexOf('experience')
-          }}
-          onMouseDown={(e) => handleMouseDown(e, 'experience')}
-        >
-          <div className="window-header">
-            <div className="traffic-lights">
-              <span className="light red"></span>
-              <span className="light yellow"></span>
-              <span className="light green"></span>
-            </div>
-            <span className="window-title">Experience</span>
-          </div>
-          <div className="window-content">
-            <div className="experience-list">
-              {experience.map((job, i) => (
-                <div key={i} className="experience-item">
-                  <div className="exp-header">
-                    <h3>{job.title}</h3>
-                    <span className="exp-period">{job.period}</span>
-                  </div>
-                  <p className="exp-company">{job.company}</p>
-                  <p className="exp-desc">{job.desc}</p>
+        {renderWindow('experience', 'Experience', (
+          <div className="experience-list">
+            {experience.map((job, i) => (
+              <div key={i} className="experience-item">
+                <div className="exp-header">
+                  <h3>{job.title}</h3>
+                  <span className="exp-period">{job.period}</span>
                 </div>
-              ))}
-            </div>
+                <p className="exp-company">{job.company}</p>
+                <p className="exp-desc">{job.desc}</p>
+              </div>
+            ))}
           </div>
-        </div>
+        ))}
 
-        {/* Projects Window */}
-        <div
-          className={`macos-window ${activeWindow === 'projects' ? 'active' : ''}`}
-          style={{
-            left: windowPositions.projects.x,
-            top: windowPositions.projects.y,
-            zIndex: windowOrder.indexOf('projects')
-          }}
-          onMouseDown={(e) => handleMouseDown(e, 'projects')}
-        >
-          <div className="window-header">
-            <div className="traffic-lights">
-              <span className="light red"></span>
-              <span className="light yellow"></span>
-              <span className="light green"></span>
-            </div>
-            <span className="window-title">Projects</span>
+        {renderWindow('projects', 'Projects', (
+          <div className="finder-list">
+            {projects.map((proj, i) => (
+              <a key={i} href={proj.url} target="_blank" rel="noopener noreferrer" className="finder-item">
+                <span className="finder-icon">
+                  <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M6 6h12l2 2h6a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#64b5f6" />
+                    <rect x="4" y="10" width="24" height="16" rx="2" fill="#90caf9" />
+                  </svg>
+                </span>
+                <div className="finder-info">
+                  <span className="finder-name">{proj.name}</span>
+                  <span className="finder-tech">{proj.tech}</span>
+                </div>
+                <span className="finder-arrow">
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                  </svg>
+                </span>
+              </a>
+            ))}
           </div>
-          <div className="window-content">
-            <div className="finder-list">
-              {projects.map((proj, i) => (
-                <a key={i} href={proj.url} target="_blank" rel="noopener noreferrer" className="finder-item">
-                  <span className="finder-icon">📄</span>
-                  <div className="finder-info">
-                    <span className="finder-name">{proj.name}</span>
-                    <span className="finder-tech">{proj.tech}</span>
-                  </div>
-                  <span className="finder-arrow">→</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
+        ))}
 
-        {/* Contact Window */}
-        <div
-          className={`macos-window ${activeWindow === 'contact' ? 'active' : ''}`}
-          style={{
-            left: windowPositions.contact.x,
-            top: windowPositions.contact.y,
-            zIndex: windowOrder.indexOf('contact')
-          }}
-          onMouseDown={(e) => handleMouseDown(e, 'contact')}
-        >
-          <div className="window-header">
-            <div className="traffic-lights">
-              <span className="light red"></span>
-              <span className="light yellow"></span>
-              <span className="light green"></span>
-            </div>
-            <span className="window-title">Contact</span>
-          </div>
-          <div className="window-content contact-window">
+        {renderWindow('contact', 'Contact', (
+          <div className="contact-window">
             <h2>Let's Connect</h2>
             <p>Open to new opportunities and collaborations</p>
             <div className="contact-links">
               <a href="mailto:tungnguyen1651@gmail.com" className="contact-btn">
-                <span className="btn-icon">✉️</span>
+                <span className="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 6l-10 7L2 6" />
+                  </svg>
+                </span>
                 <span>tungnguyen1651@gmail.com</span>
               </a>
               <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
-                <span className="btn-icon">💻</span>
+                <span className="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                </span>
                 <span>github.com/tungcodeforfun</span>
               </a>
               <a href="https://linkedin.com/in/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
-                <span className="btn-icon">💼</span>
+                <span className="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </span>
                 <span>LinkedIn</span>
               </a>
             </div>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Dock */}
@@ -289,11 +366,10 @@ function App() {
             <button
               key={item.id}
               className={`dock-item ${activeWindow === item.id ? 'active' : ''}`}
-              onClick={() => bringToFront(item.id)}
+              onClick={() => openWindow(item.id)}
             >
               <span className="dock-icon"><DockIcon type={item.id} /></span>
-              <span className="dock-label">{item.label}</span>
-              {activeWindow === item.id && <span className="dock-indicator"></span>}
+              {(windowStates[item.id].open && !windowStates[item.id].minimized) && <span className="dock-indicator"></span>}
             </button>
           ))}
         </div>
