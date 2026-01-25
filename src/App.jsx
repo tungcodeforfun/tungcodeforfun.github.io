@@ -62,9 +62,9 @@ function App() {
   const windowPositions = useRef(getInitialPositions())
   const windowSizes = useRef({
     about: { w: 680, h: 450 },
-    experience: { w: 420, h: 280 },
-    projects: { w: 420, h: 280 },
-    contact: { w: 420, h: 300 }
+    experience: { w: 620, h: 420 },
+    projects: { w: 420, h: 320 },
+    contact: { w: 480, h: 400 }
   })
 
   // Handle resize for mobile detection
@@ -321,72 +321,114 @@ function App() {
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
-        // Notes app icon - Apple style with system yellow
+        // Notes app icon - macOS Big Sur style
+        // Reference: schemecolor.com/apple-notes-color-scheme - #FFD52E yellow
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="notesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FFEB3B" />
-              <stop offset="100%" stopColor="#FFC107" />
+              <stop offset="0%" stopColor="#FFE55B" />
+              <stop offset="100%" stopColor="#FFD52E" />
             </linearGradient>
+            <filter id="notesShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.15"/>
+            </filter>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#notesGrad)" />
-          <rect x="24" y="22" width="72" height="76" rx="6" fill="#fff" />
-          <rect x="32" y="34" width="44" height="3" rx="1.5" fill="#c9a000" />
-          <rect x="32" y="44" width="56" height="3" rx="1.5" fill="#c9a000" />
-          <rect x="32" y="54" width="48" height="3" rx="1.5" fill="#c9a000" />
-          <rect x="32" y="64" width="52" height="3" rx="1.5" fill="#c9a000" />
-          <rect x="32" y="74" width="36" height="3" rx="1.5" fill="#c9a000" />
-          <rect x="32" y="84" width="24" height="3" rx="1.5" fill="#c9a000" />
+          <g filter="url(#notesShadow)">
+            <rect x="26" y="20" width="68" height="80" rx="4" fill="#fff" />
+            <rect x="26" y="20" width="68" height="12" rx="4" fill="#FFF9E6" />
+          </g>
+          {/* Note lines */}
+          <line x1="34" y1="42" x2="86" y2="42" stroke="#E8DCC8" strokeWidth="1.5" />
+          <line x1="34" y1="52" x2="86" y2="52" stroke="#E8DCC8" strokeWidth="1.5" />
+          <line x1="34" y1="62" x2="86" y2="62" stroke="#E8DCC8" strokeWidth="1.5" />
+          <line x1="34" y1="72" x2="86" y2="72" stroke="#E8DCC8" strokeWidth="1.5" />
+          <line x1="34" y1="82" x2="86" y2="82" stroke="#E8DCC8" strokeWidth="1.5" />
+          {/* Text preview */}
+          <rect x="34" y="38" width="40" height="2" rx="1" fill="#C4A44A" />
+          <rect x="34" y="48" width="48" height="2" rx="1" fill="#D4C4A0" />
+          <rect x="34" y="58" width="35" height="2" rx="1" fill="#D4C4A0" />
+          <rect x="34" y="68" width="42" height="2" rx="1" fill="#D4C4A0" />
         </svg>
       ),
       experience: (
-        // Messages app icon - Apple system green
+        // Messages app icon - macOS Big Sur style with white bubble
+        // Reference: logos-world.net/messages-logo - green square, white bubble
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="messagesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#5AD65E" />
-              <stop offset="100%" stopColor="#34C759" />
+              <stop offset="0%" stopColor="#65D969" />
+              <stop offset="100%" stopColor="#2DC13E" />
             </linearGradient>
+            <filter id="bubbleShadow" x="-10%" y="-10%" width="120%" height="130%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.2"/>
+            </filter>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#messagesGrad)" />
-          <ellipse cx="60" cy="52" rx="38" ry="32" fill="#fff" />
-          <path d="M32 70 Q28 82, 22 88 Q36 84, 42 78" fill="#fff" />
+          <g filter="url(#bubbleShadow)">
+            {/* Speech bubble */}
+            <ellipse cx="60" cy="54" rx="36" ry="28" fill="#fff" />
+            {/* Bubble tail */}
+            <path d="M30 68 Q24 80 18 90 Q32 82 38 74 Q34 72 30 68" fill="#fff" />
+          </g>
         </svg>
       ),
       projects: (
-        // Finder app icon - Apple system blue
+        // Finder app icon - macOS Big Sur two-tone blue face
+        // Reference: macworld.com - two-tone blue, cubist-inspired design
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="finderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor={appleColors.teal} />
-              <stop offset="100%" stopColor={appleColors.blue} />
+            <linearGradient id="finderGradLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#42A5F5" />
+              <stop offset="100%" stopColor="#1E88E5" />
+            </linearGradient>
+            <linearGradient id="finderGradRight" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#90CAF9" />
+              <stop offset="100%" stopColor="#64B5F6" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="url(#finderGrad)" />
-          <rect x="28" y="24" width="64" height="72" rx="8" fill="#fff" />
-          <ellipse cx="46" cy="50" rx="8" ry="9" fill={appleColors.blue} />
-          <ellipse cx="74" cy="50" rx="8" ry="9" fill={appleColors.blue} />
-          <path d="M42 72 Q60 86 78 72" stroke={appleColors.blue} strokeWidth="6" fill="none" strokeLinecap="round" />
-          <rect x="28" y="24" width="64" height="6" rx="3" fill="#e8e8e8" />
+          <rect width="120" height="120" rx="26" fill="#1E88E5" />
+          {/* Face - left half (darker blue) */}
+          <path d="M60 16 L60 104 L20 104 Q10 104 10 94 L10 26 Q10 16 20 16 Z" fill="url(#finderGradLeft)" />
+          {/* Face - right half (lighter blue) */}
+          <path d="M60 16 L60 104 L100 104 Q110 104 110 94 L110 26 Q110 16 100 16 Z" fill="url(#finderGradRight)" />
+          {/* Eyes */}
+          <ellipse cx="42" cy="50" rx="6" ry="10" fill="#fff" />
+          <ellipse cx="78" cy="50" rx="6" ry="10" fill="#fff" />
+          {/* Nose line */}
+          <line x1="60" y1="44" x2="60" y2="68" stroke="#1565C0" strokeWidth="3" strokeLinecap="round" />
+          {/* Smile */}
+          <path d="M36 76 Q60 92 84 76" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" />
         </svg>
       ),
       contact: (
-        // Contacts app icon - with Apple system colors
+        // Contacts app icon - macOS Big Sur address book style
+        // Reference: Apple HIG - book with colored tabs
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="contactsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#a8a8a8" />
-              <stop offset="100%" stopColor="#787878" />
+            <linearGradient id="contactsBookGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8B7355" />
+              <stop offset="5%" stopColor="#A08060" />
+              <stop offset="100%" stopColor="#C4A87C" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="url(#contactsGrad)" />
-          <rect x="28" y="18" width="68" height="84" rx="6" fill="#fff" />
-          <circle cx="62" cy="46" r="16" fill="#d0d0d0" />
-          <ellipse cx="62" cy="82" rx="24" ry="14" fill="#d0d0d0" />
-          <rect x="20" y="32" width="10" height="10" rx="2" fill={appleColors.red} />
-          <rect x="20" y="48" width="10" height="10" rx="2" fill={appleColors.orange} />
-          <rect x="20" y="64" width="10" height="10" rx="2" fill={appleColors.green} />
-          <rect x="20" y="80" width="10" height="10" rx="2" fill={appleColors.blue} />
+          <rect width="120" height="120" rx="26" fill="#E8E0D5" />
+          {/* Book spine */}
+          <rect x="16" y="16" width="14" height="88" rx="2" fill="url(#contactsBookGrad)" />
+          {/* Book pages */}
+          <rect x="30" y="18" width="74" height="84" rx="4" fill="#fff" />
+          <rect x="32" y="20" width="70" height="80" rx="3" fill="#FAFAFA" />
+          {/* Page lines */}
+          <line x1="30" y1="30" x2="30" y2="90" stroke="#D0C8C0" strokeWidth="0.5" />
+          <line x1="32" y1="30" x2="32" y2="90" stroke="#E8E0D8" strokeWidth="0.5" />
+          {/* Silhouette */}
+          <circle cx="67" cy="48" r="14" fill="#C8C8C8" />
+          <ellipse cx="67" cy="78" rx="20" ry="12" fill="#C8C8C8" />
+          {/* Colored tabs on the right edge */}
+          <rect x="102" y="24" width="8" height="14" rx="2" fill="#FF3B30" />
+          <rect x="102" y="42" width="8" height="14" rx="2" fill="#FF9500" />
+          <rect x="102" y="60" width="8" height="14" rx="2" fill="#34C759" />
+          <rect x="102" y="78" width="8" height="14" rx="2" fill="#007AFF" />
         </svg>
       )
     }
@@ -413,7 +455,6 @@ function App() {
 
     const pos = windowPositions.current[id]
     const size = windowSizes.current[id]
-    const isMessages = id === 'experience'
 
     return (
       <div
@@ -429,72 +470,25 @@ function App() {
         }}
         onMouseDown={(e) => handleDragStart(e, id)}
       >
-        {isMessages ? (
-          <div className="window-header messages-header">
-            <div className="traffic-lights">
-              <button className="light red" onClick={(e) => closeWindow(e, id)}>
-                <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
-              </button>
-              <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
-                <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
-              </button>
-              <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
-                <svg viewBox="0 0 12 12">
-                  <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
-                </svg>
-              </button>
-            </div>
-            <div className="messages-contact">
-              <div className="messages-avatar">
-                <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" />
-              </div>
-              <span className="messages-name">Tung Nguyen</span>
-            </div>
-            <button className="messages-video-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+        <div className="window-header">
+          <div className="traffic-lights">
+            <button className="light red" onClick={(e) => closeWindow(e, id)}>
+              <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
+            </button>
+            <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
+              <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
+            </button>
+            <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
+              <svg viewBox="0 0 12 12">
+                <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
               </svg>
             </button>
           </div>
-        ) : (
-          <div className="window-header">
-            <div className="traffic-lights">
-              <button className="light red" onClick={(e) => closeWindow(e, id)}>
-                <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
-              </button>
-              <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
-                <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
-              </button>
-              <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
-                <svg viewBox="0 0 12 12">
-                  <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
-                </svg>
-              </button>
-            </div>
-            <span className="window-title">{title}</span>
-          </div>
-        )}
+          <span className="window-title">{title}</span>
+        </div>
         <div className="window-content">
           {content}
         </div>
-        {isMessages && (
-          <div className="messages-input-bar">
-            <button className="messages-plus-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 4v16m-8-8h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-              </svg>
-            </button>
-            <div className="messages-input">
-              <span>iMessage</span>
-            </div>
-            <button className="messages-mic-btn">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-              </svg>
-            </button>
-          </div>
-        )}
         {/* Resize handles */}
         {!state.maximized && (
           <>
@@ -613,36 +607,86 @@ function App() {
       </div>
     ),
     experience: (
-      <div className="experience-list">
-        {experience.map((job) => (
-          <div
-            key={job.id}
-            className={`experience-item expandable ${expandedItems[job.id] ? 'expanded' : ''}`}
-            onClick={() => toggleExpand(job.id)}
-          >
-            <div className="exp-header">
-              <h3>{job.title}</h3>
-              <span className="exp-period">{job.period}</span>
-            </div>
-            <p className="exp-company">{job.company}</p>
-            <p className="exp-desc">{job.desc}</p>
-            <span className="expand-icon">{expandedItems[job.id] ? '−' : '+'}</span>
-            {expandedItems[job.id] && (
-              <div className="exp-details">
-                <ul>
-                  {job.details.map((detail, i) => (
-                    <li key={i}>{detail}</li>
-                  ))}
-                </ul>
-                <div className="exp-skills">
-                  {job.skills.map((skill, i) => (
-                    <span key={i} className="exp-skill-tag">{skill}</span>
-                  ))}
+      <div className="messages-layout">
+        {/* Conversation List Sidebar */}
+        <div className="messages-sidebar">
+          <div className="messages-sidebar-header">
+            <input type="text" className="messages-search" placeholder="Search" readOnly />
+            <button className="messages-compose-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 5v14M5 12h14" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div className="messages-conversation-list">
+            {experience.map((job, index) => (
+              <div
+                key={job.id}
+                className={`messages-conversation-item ${expandedItems[job.id] || index === 0 ? 'active' : ''}`}
+                onClick={() => {
+                  setExpandedItems({})
+                  toggleExpand(job.id)
+                }}
+              >
+                <div className="messages-conv-avatar">
+                  <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="" />
+                </div>
+                <div className="messages-conv-info">
+                  <div className="messages-conv-header">
+                    <span className="messages-conv-name">{job.company}</span>
+                    <span className="messages-conv-time">{job.period.split(' - ')[0]}</span>
+                  </div>
+                  <div className="messages-conv-preview">{job.title}</div>
                 </div>
               </div>
-            )}
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Chat Panel */}
+        <div className="messages-chat-panel">
+          <div className="messages-chat-header">
+            <div className="messages-chat-contact">
+              <div className="messages-chat-avatar">
+                <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="" />
+              </div>
+              <span className="messages-chat-name">Tung Nguyen</span>
+            </div>
+          </div>
+          <div className="messages-chat-body">
+            {experience.map((job) => (
+              <div key={job.id} className="experience-item" style={{
+                background: '#007AFF',
+                color: '#fff',
+                borderRadius: '18px',
+                padding: '10px 14px',
+                marginLeft: 'auto',
+                maxWidth: '80%',
+                marginBottom: '8px'
+              }}>
+                <div style={{ fontWeight: 600, marginBottom: '4px' }}>{job.title}</div>
+                <div style={{ fontSize: '13px', opacity: 0.9 }}>{job.company} · {job.period}</div>
+                <div style={{ fontSize: '13px', marginTop: '8px' }}>{job.desc}</div>
+              </div>
+            ))}
+          </div>
+          <div className="messages-input-bar">
+            <button className="messages-plus-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4v16m-8-8h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              </svg>
+            </button>
+            <div className="messages-input">
+              <span>iMessage</span>
+            </div>
+            <button className="messages-mic-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     ),
     projects: (
@@ -687,35 +731,74 @@ function App() {
       </div>
     ),
     contact: (
-      <div className="contact-window">
-        <h2>Let's Connect</h2>
-        <p>Open to new opportunities and collaborations</p>
-        <div className="contact-links">
-          <a href="mailto:tungnguyen1651@gmail.com" className="contact-btn">
-            <span className="btn-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path d="M22 6l-10 7L2 6" />
-              </svg>
-            </span>
-            <span>tungnguyen1651@gmail.com</span>
-          </a>
-          <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
-            <span className="btn-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-            </span>
-            <span>github.com/tungcodeforfun</span>
-          </a>
-          <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="contact-btn">
-            <span className="btn-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-            </span>
-            <span>LinkedIn</span>
-          </a>
+      <div className="contacts-layout">
+        {/* Contacts Sidebar */}
+        <div className="contacts-sidebar">
+          <div className="contacts-sidebar-header">
+            <input type="text" className="contacts-search" placeholder="Search" readOnly />
+          </div>
+          <div className="contacts-list">
+            <div className="contacts-group-header">T</div>
+            <div className="contacts-list-item active">
+              <div className="contacts-list-avatar">
+                <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="" />
+              </div>
+              <span className="contacts-list-name">Tung Nguyen</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Detail Card */}
+        <div className="contacts-detail-panel">
+          <div className="contacts-card">
+            <div className="contacts-card-avatar">
+              <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="" />
+            </div>
+            <div className="contacts-card-name">Tung Nguyen</div>
+            <div className="contacts-card-title">Senior Software Engineer at Ernst & Young</div>
+
+            <div className="contacts-card-actions">
+              <a href="mailto:tungnguyen1651@gmail.com" className="contacts-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M22 6l-10 7L2 6" />
+                </svg>
+                <span>email</span>
+              </a>
+              <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contacts-action-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span>GitHub</span>
+              </a>
+              <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="contacts-action-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+
+            <div className="contacts-card-section">
+              <div className="contacts-card-label">email</div>
+              <a href="mailto:tungnguyen1651@gmail.com" className="contacts-card-value">tungnguyen1651@gmail.com</a>
+            </div>
+
+            <div className="contacts-card-section">
+              <div className="contacts-card-label">work</div>
+              <span className="contacts-card-value" style={{ color: '#1d1d1f', cursor: 'default' }}>Ernst & Young · New York, NY</span>
+            </div>
+
+            <div className="contacts-card-section">
+              <div className="contacts-card-label">GitHub</div>
+              <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contacts-card-value">github.com/tungcodeforfun</a>
+            </div>
+
+            <div className="contacts-card-section">
+              <div className="contacts-card-label">LinkedIn</div>
+              <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="contacts-card-value">linkedin.com/in/tungngvyen</a>
+            </div>
+          </div>
         </div>
       </div>
     )
