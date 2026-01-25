@@ -76,10 +76,10 @@
   --imessage-blue-dark: #0b93f6;
   --imessage-gray: #e5e5ea;
 
-  /* Apple Notes colors */
-  --notes-yellow: #FFD52E;
-  --notes-bg: #FAFAFA;
-  --notes-border: #E5E5E5;
+  /* Apple Notes colors - Reference: schemecolor.com/apple-notes-color-scheme.php */
+  --notes-yellow: #FFD52E;  /* Gangster Gold - primary accent */
+  --notes-bg: #F9F9F9;      /* Hint of Red - main background */
+  --notes-border: #E5E5E5;  /* Gray Hint - borders */
   --notes-sidebar-bg: #F2F2F7;
   --notes-sidebar-selected: rgba(0, 0, 0, 0.06);
   --notes-text-primary: #1d1d1f;
@@ -899,23 +899,24 @@ body {
   max-width: 100%;
 }
 
-/* iMessage bubble styling - Reference: Apple Messages app */
-/* iMessage blue is #007AFF (system blue) or #0b93f6 for sent bubbles */
+/* iMessage bubble styling - Reference: samuelkraft.com/blog/ios-chat-bubbles-css */
+/* iMessage blue is #0b93f6 for sent bubbles, #e5e5ea for received */
 .messages-theme .experience-item,
 .messages-theme .experience-item.expandable,
 .messages-theme .experience-item.expanded {
   background: var(--imessage-blue-dark);
   border: none;
   color: #fff;
-  border-radius: 18px; /* More accurate iMessage bubble radius */
-  padding: 10px 16px;
+  border-radius: 25px; /* Accurate iOS bubble radius */
+  padding: 10px 20px;
   margin-left: auto;
   margin-right: 0;
-  max-width: 260px;
+  max-width: 255px; /* iOS standard max width */
   position: relative;
   cursor: pointer;
   transition: background 0.15s;
   margin-bottom: 2px;
+  line-height: 24px;
 }
 
 /* Bubble tail using pseudo-elements */
@@ -1024,7 +1025,8 @@ body {
   padding: 2px 8px;
 }
 
-/* Finder Theme - macOS Finder style with sidebar */
+/* Finder Theme - macOS Finder dark mode style */
+/* Reference: Apple HIG, macOS Finder in dark appearance */
 .macos-window.finder-theme,
 .mobile-window.finder-theme {
   background: rgba(30, 30, 31, 0.92);
