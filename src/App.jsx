@@ -14,20 +14,20 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  // Fixed window positions - simple cascade layout
+  // Window positions - spread out like a real workspace
   const defaultPositions = {
-    about: { x: 60, y: 60 },
-    experience: { x: 120, y: 100 },
-    projects: { x: 180, y: 140 },
-    contact: { x: 240, y: 180 }
+    about: { x: 40, y: 50 },        // Top-left area
+    experience: { x: 500, y: 60 },   // Top-right area
+    projects: { x: 80, y: 320 },     // Bottom-left area
+    contact: { x: 460, y: 280 }      // Bottom-right area
   }
 
-  // Fixed window sizes - sized for their content
+  // Window sizes - compact to fit side by side
   const defaultSizes = {
-    about: { w: 680, h: 420 },
-    experience: { w: 580, h: 420 },
-    projects: { w: 540, h: 380 },
-    contact: { w: 520, h: 440 }
+    about: { w: 420, h: 320 },
+    experience: { w: 400, h: 340 },
+    projects: { w: 380, h: 280 },
+    contact: { w: 400, h: 360 }
   }
 
   // Use refs for positions and sizes to avoid re-renders during drag/resize
