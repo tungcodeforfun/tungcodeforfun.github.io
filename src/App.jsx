@@ -841,275 +841,56 @@ function App() {
     contact: 'Contacts'
   }
 
-  // iOS Tab Bar Icons (SF Symbols style)
-  const IOSTabIcon = ({ type, active }) => {
-    const color = active ? '#0a84ff' : '#8e8e93'
-    const icons = {
-      about: (
-        <svg viewBox="0 0 24 24" fill={color}>
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-        </svg>
-      ),
-      experience: (
-        <svg viewBox="0 0 24 24" fill={color}>
-          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
-        </svg>
-      ),
-      projects: (
-        <svg viewBox="0 0 24 24" fill={color}>
-          <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-        </svg>
-      ),
-      contact: (
-        <svg viewBox="0 0 24 24" fill={color}>
-          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
-        </svg>
-      )
-    }
-    return icons[type]
-  }
-
-  // iOS Mobile Content for each tab
-  const iosContents = {
-    about: (
-      <>
-        <div className="ios-profile-header">
-          <img
-            src="https://avatars.githubusercontent.com/u/36649688?v=4"
-            alt="Tung Nguyen"
-            className="ios-profile-avatar"
-          />
-          <div className="ios-profile-name">Tung Nguyen</div>
-          <div className="ios-profile-title">Senior Software Engineer at Ernst & Young</div>
-        </div>
-
-        <div className="ios-grouped-list">
-          <div className="ios-grouped-list-label">About</div>
-          <div className="ios-list">
-            <div className="ios-list-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-              <span className="ios-body">3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure.</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="ios-grouped-list">
-          <div className="ios-grouped-list-label">Education</div>
-          <div className="ios-list">
-            <div className="ios-list-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-              <span className="ios-headline">Virginia Tech</span>
-              <span className="ios-subhead" style={{ color: 'var(--ios-secondary-label)' }}>B.S. Computer Science, 2022</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="ios-grouped-list">
-          <div className="ios-grouped-list-label">Skills</div>
-          <div className="ios-skills-container">
-            {skills.map((skill, i) => (
-              <span key={i} className="ios-skill-tag">{skill}</span>
-            ))}
-          </div>
-        </div>
-      </>
-    ),
-    experience: (
-      <>
-        <div style={{ padding: '8px 16px' }}>
-          {experience.map((job) => (
-            <div
-              key={job.id}
-              className="ios-card"
-              onClick={() => toggleExpand(job.id)}
-              style={{ cursor: 'pointer' }}
-            >
-              <div className="ios-headline" style={{ marginBottom: '4px' }}>{job.title}</div>
-              <div className="ios-subhead" style={{ color: 'var(--ios-system-blue)', marginBottom: '8px' }}>
-                {job.company} · {job.period}
-              </div>
-              <div className="ios-body" style={{ color: 'var(--ios-secondary-label)' }}>{job.desc}</div>
-              {expandedItems[job.id] && (
-                <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '0.5px solid var(--ios-separator)' }}>
-                  <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                    {job.details.map((detail, i) => (
-                      <li key={i} className="ios-subhead" style={{ marginBottom: '6px', color: 'var(--ios-label)' }}>{detail}</li>
-                    ))}
-                  </ul>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '12px' }}>
-                    {job.skills.map((skill, i) => (
-                      <span key={i} className="ios-skill-tag" style={{ fontSize: '13px', padding: '4px 10px' }}>{skill}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </>
-    ),
-    projects: (
-      <>
-        <div className="ios-grouped-list">
-          <div className="ios-grouped-list-label">GitHub Projects</div>
-          <div className="ios-list">
-            {projects.map((proj) => (
-              <a
-                key={proj.id}
-                href={proj.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ios-file-item"
-                style={{ textDecoration: 'none' }}
-              >
-                <div className="ios-file-icon">
-                  <svg viewBox="0 0 24 24" fill="#fff">
-                    <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                  </svg>
-                </div>
-                <div className="ios-file-info">
-                  <div className="ios-file-name">{proj.name}</div>
-                  <div className="ios-file-meta">{proj.tech} · {proj.desc}</div>
-                </div>
-                <div className="ios-file-chevron">
-                  <svg width="8" height="13" viewBox="0 0 8 13" fill="currentColor">
-                    <path d="M1.5 1L7 6.5L1.5 12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                  </svg>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </>
-    ),
-    contact: (
-      <>
-        <div className="ios-profile-header">
-          <img
-            src="https://avatars.githubusercontent.com/u/36649688?v=4"
-            alt="Tung Nguyen"
-            className="ios-profile-avatar"
-          />
-          <div className="ios-profile-name">Tung Nguyen</div>
-          <div className="ios-profile-title">New York, NY</div>
-        </div>
-
-        <div className="ios-contact-actions">
-          <a href="mailto:tungnguyen1651@gmail.com" className="ios-contact-action">
-            <div className="ios-contact-action-icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
-              </svg>
-            </div>
-            <span className="ios-contact-action-label">email</span>
-          </a>
-          <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="ios-contact-action">
-            <div className="ios-contact-action-icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-            </div>
-            <span className="ios-contact-action-label">GitHub</span>
-          </a>
-          <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="ios-contact-action">
-            <div className="ios-contact-action-icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-            </div>
-            <span className="ios-contact-action-label">LinkedIn</span>
-          </a>
-        </div>
-
-        <div className="ios-grouped-list">
-          <div className="ios-grouped-list-label">Contact Info</div>
-          <div className="ios-list">
-            <a href="mailto:tungnguyen1651@gmail.com" className="ios-list-item" style={{ textDecoration: 'none' }}>
-              <div style={{ flex: 1 }}>
-                <div className="ios-caption1" style={{ color: 'var(--ios-secondary-label)' }}>email</div>
-                <div className="ios-body" style={{ color: 'var(--ios-system-blue)' }}>tungnguyen1651@gmail.com</div>
-              </div>
-            </a>
-            <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="ios-list-item" style={{ textDecoration: 'none' }}>
-              <div style={{ flex: 1 }}>
-                <div className="ios-caption1" style={{ color: 'var(--ios-secondary-label)' }}>GitHub</div>
-                <div className="ios-body" style={{ color: 'var(--ios-system-blue)' }}>tungcodeforfun</div>
-              </div>
-            </a>
-            <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="ios-list-item" style={{ textDecoration: 'none' }}>
-              <div style={{ flex: 1 }}>
-                <div className="ios-caption1" style={{ color: 'var(--ios-secondary-label)' }}>LinkedIn</div>
-                <div className="ios-body" style={{ color: 'var(--ios-system-blue)' }}>tungngvyen</div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  const iosTabLabels = {
-    about: 'About',
-    experience: 'Experience',
-    projects: 'Projects',
-    contact: 'Contact'
-  }
-
-  // iOS Mobile layout
+  // Mobile layout
   if (isMobile) {
     return (
-      <div className="ios-app">
-        {/* iOS Status Bar */}
-        <div className="ios-status-bar">
-          <div className="ios-status-bar-left">
-            <span className="ios-status-bar-time">
-              {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+      <div className="macos-desktop mobile">
+        {/* Menu Bar */}
+        <div className="menu-bar">
+          <div className="menu-left">
+            <span className="apple-logo">
+              <svg viewBox="0 0 17 20" fill="currentColor">
+                <path d="M15.5 14.7c-.3.7-.5 1-.9 1.6-.6.9-1.4 2-2.4 2-.9 0-1.1-.6-2.3-.6-1.2 0-1.5.6-2.4.6-.9 0-1.7-1-2.3-1.9C3.7 14.3 3 11.5 3 9c0-3.2 2.1-4.9 4.1-4.9 1 0 1.9.7 2.5.7.6 0 1.6-.7 2.8-.7.8 0 2.4.3 3.3 2.3-2.9 1.6-2.4 5.6.8 6.6zM11.7 2.5c.5-.6.8-1.5.7-2.5-.7.1-1.6.5-2.1 1.2-.5.5-.9 1.4-.8 2.4.8.1 1.6-.4 2.2-1.1z"/>
+              </svg>
             </span>
+            <span className="menu-item active">Tung Nguyen</span>
           </div>
-          <div className="ios-dynamic-island"></div>
-          <div className="ios-status-bar-right">
-            {/* Cellular */}
-            <svg viewBox="0 0 18 12" fill="currentColor">
-              <rect x="0" y="7" width="3" height="5" rx="0.5"/>
-              <rect x="4" y="5" width="3" height="7" rx="0.5"/>
-              <rect x="8" y="3" width="3" height="9" rx="0.5"/>
-              <rect x="12" y="0" width="3" height="12" rx="0.5"/>
-            </svg>
-            {/* WiFi */}
-            <svg viewBox="0 0 16 12" fill="currentColor">
-              <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM8 6c-2.2 0-4.2.9-5.7 2.3l1.4 1.4C4.9 8.6 6.4 8 8 8s3.1.6 4.3 1.7l1.4-1.4C12.2 6.9 10.2 6 8 6zm0-4C4.7 2 1.7 3.3-.3 5.5l1.4 1.4C2.7 5.2 5.2 4 8 4s5.3 1.2 6.9 2.9l1.4-1.4C14.3 3.3 11.3 2 8 2z"/>
-            </svg>
-            {/* Battery */}
-            <svg viewBox="0 0 25 12" fill="currentColor">
-              <rect x="0" y="0" width="22" height="12" rx="2.5" stroke="currentColor" strokeWidth="1" fill="none"/>
-              <rect x="2" y="2" width="18" height="8" rx="1"/>
-              <path d="M23 4v4a2 2 0 002-2 2 2 0 00-2-2z"/>
-            </svg>
+          <div className="menu-right">
+            <span className="menu-item">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
         </div>
 
-        {/* iOS Navigation Bar with Large Title */}
-        <div className="ios-nav-bar">
-          <div className="ios-nav-bar-large-title">{iosTabLabels[activeWindow]}</div>
-        </div>
-
-        {/* iOS Content Area */}
-        <div className="ios-content">
-          {iosContents[activeWindow]}
-        </div>
-
-        {/* iOS Tab Bar */}
-        <div className="ios-tab-bar">
-          {['about', 'experience', 'projects', 'contact'].map((tab) => (
-            <button
-              key={tab}
-              className={`ios-tab-item ${activeWindow === tab ? 'active' : ''}`}
-              onClick={() => setActiveWindow(tab)}
-            >
-              <div className="ios-tab-icon">
-                <IOSTabIcon type={tab} active={activeWindow === tab} />
+        {/* Mobile Content */}
+        <div className="mobile-content">
+          <div className={`mobile-window ${windowThemes[activeWindow]}`}>
+            <div className="window-header">
+              <div className="traffic-lights">
+                <span className="light red"></span>
+                <span className="light yellow"></span>
+                <span className="light green"></span>
               </div>
-              <span className="ios-tab-label">{iosTabLabels[tab]}</span>
-            </button>
-          ))}
+              <span className="window-title">{windowTitles[activeWindow]}</span>
+            </div>
+            <div className="window-content">
+              {windowContents[activeWindow]}
+            </div>
+          </div>
+        </div>
+
+        {/* Dock */}
+        <div className="dock">
+          <div className="dock-container">
+            {dockItems.map((item) => (
+              <button
+                key={item.id}
+                className={`dock-item ${activeWindow === item.id ? 'active' : ''}`}
+                onClick={() => setActiveWindow(item.id)}
+              >
+                <span className="dock-icon"><DockIcon type={item.id} /></span>
+                {activeWindow === item.id && <span className="dock-indicator"></span>}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     )
