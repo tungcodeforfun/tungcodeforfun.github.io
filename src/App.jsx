@@ -14,36 +14,40 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  // Calculate initial positions based on viewport
+  // Calculate initial positions based on viewport - spread out more
   const getInitialPositions = () => {
     const vw = window.innerWidth
     const vh = window.innerHeight
     const menuBarHeight = 28
     const dockHeight = 80
-    const availableHeight = vh - menuBarHeight - dockHeight
-    const windowWidth = Math.min(420, vw - 40)
 
-    if (vw >= 1024) {
-      // Desktop: 2x2 grid layout
-      const gapX = 30
-      const gapY = 20
-      const startX = Math.max(20, (vw - (windowWidth * 2 + gapX)) / 2)
-      const startY = menuBarHeight + 20
+    if (vw >= 1200) {
+      // Large desktop: spread across screen
       return {
-        about: { x: startX, y: startY },
-        experience: { x: startX + windowWidth + gapX, y: startY },
-        projects: { x: startX, y: startY + 280 },
-        contact: { x: startX + windowWidth + gapX, y: startY + 280 }
+        about: { x: 40, y: 50 },
+        experience: { x: vw - 480, y: 50 },
+        projects: { x: 120, y: vh - 380 },
+        contact: { x: vw - 520, y: vh - 400 }
       }
-    } else if (vw >= 768) {
-      // Tablet: staggered cascade
+    } else if (vw >= 1024) {
+      // Desktop: 2x2 with more spacing
+      const gapX = 60
       const startX = 40
       const startY = menuBarHeight + 30
       return {
         about: { x: startX, y: startY },
-        experience: { x: startX + 50, y: startY + 50 },
-        projects: { x: startX + 100, y: startY + 100 },
-        contact: { x: startX + 150, y: startY + 150 }
+        experience: { x: vw - 460, y: startY + 40 },
+        projects: { x: startX + 80, y: startY + 320 },
+        contact: { x: vw - 480, y: startY + 360 }
+      }
+    } else if (vw >= 768) {
+      // Tablet: staggered cascade with more spread
+      const startY = menuBarHeight + 30
+      return {
+        about: { x: 30, y: startY },
+        experience: { x: vw - 450, y: startY + 60 },
+        projects: { x: 60, y: startY + 200 },
+        contact: { x: vw - 420, y: startY + 260 }
       }
     }
     return {
@@ -307,38 +311,38 @@ function App() {
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
+        // Notes app icon
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="contactsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#a8a8a8" />
-              <stop offset="100%" stopColor="#8a8a8a" />
+            <linearGradient id="notesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#fff9c4" />
+              <stop offset="100%" stopColor="#ffeb3b" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="url(#contactsGrad)" />
-          <circle cx="60" cy="42" r="18" fill="#fff" />
-          <ellipse cx="60" cy="95" rx="32" ry="25" fill="#fff" />
+          <rect width="120" height="120" rx="26" fill="url(#notesGrad)" />
+          <rect x="24" y="30" width="72" height="4" rx="2" fill="#a68a00" opacity="0.4" />
+          <rect x="24" y="44" width="72" height="4" rx="2" fill="#a68a00" opacity="0.4" />
+          <rect x="24" y="58" width="72" height="4" rx="2" fill="#a68a00" opacity="0.4" />
+          <rect x="24" y="72" width="50" height="4" rx="2" fill="#a68a00" opacity="0.4" />
+          <rect x="24" y="86" width="60" height="4" rx="2" fill="#a68a00" opacity="0.4" />
         </svg>
       ),
       experience: (
+        // Messages app icon
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="calendarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#ff5f57" />
-              <stop offset="30%" stopColor="#ff5f57" />
-              <stop offset="30%" stopColor="#fff" />
-              <stop offset="100%" stopColor="#f0f0f0" />
+            <linearGradient id="messagesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#5ef87a" />
+              <stop offset="100%" stopColor="#1db954" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="url(#calendarGrad)" />
-          <text x="60" y="85" textAnchor="middle" fontSize="50" fontWeight="300" fill="#333">
-            {new Date().getDate()}
-          </text>
-          <text x="60" y="24" textAnchor="middle" fontSize="11" fontWeight="600" fill="#fff">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()}
-          </text>
+          <rect width="120" height="120" rx="26" fill="url(#messagesGrad)" />
+          <ellipse cx="60" cy="55" rx="38" ry="30" fill="#fff" />
+          <ellipse cx="38" cy="90" rx="12" ry="10" fill="#fff" />
         </svg>
       ),
       projects: (
+        // Finder app icon
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="finderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -355,16 +359,17 @@ function App() {
         </svg>
       ),
       contact: (
+        // Contacts app icon
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="mailGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#5ac8fa" />
-              <stop offset="100%" stopColor="#007aff" />
+            <linearGradient id="contactsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#a8a8a8" />
+              <stop offset="100%" stopColor="#7a7a7a" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="url(#mailGrad)" />
-          <rect x="18" y="35" width="84" height="55" rx="6" fill="#fff" />
-          <path d="M22 40 L60 70 L98 40" stroke="#007aff" strokeWidth="3" fill="none" />
+          <rect width="120" height="120" rx="26" fill="url(#contactsGrad)" />
+          <circle cx="60" cy="45" r="20" fill="#fff" />
+          <ellipse cx="60" cy="100" rx="35" ry="28" fill="#fff" />
         </svg>
       )
     }
@@ -372,11 +377,18 @@ function App() {
   }
 
   const dockItems = [
-    { id: 'about', label: 'Contacts' },
-    { id: 'experience', label: 'Calendar' },
+    { id: 'about', label: 'Notes' },
+    { id: 'experience', label: 'Messages' },
     { id: 'projects', label: 'Finder' },
-    { id: 'contact', label: 'Mail' }
+    { id: 'contact', label: 'Contacts' }
   ]
+
+  const windowThemes = {
+    about: 'notes-theme',
+    experience: 'messages-theme',
+    projects: 'finder-theme',
+    contact: 'contacts-theme'
+  }
 
   const renderWindow = (id, title, content) => {
     const state = windowStates[id]
@@ -389,7 +401,7 @@ function App() {
       <div
         key={id}
         ref={el => windowRefs.current[id] = el}
-        className={`macos-window ${activeWindow === id ? 'active' : ''} ${state.maximized ? 'maximized' : ''}`}
+        className={`macos-window ${windowThemes[id]} ${activeWindow === id ? 'active' : ''} ${state.maximized ? 'maximized' : ''}`}
         style={state.maximized ? {} : {
           left: pos.x,
           top: pos.y,
@@ -603,7 +615,7 @@ function App() {
 
         {/* Mobile Content */}
         <div className="mobile-content">
-          <div className="mobile-window">
+          <div className={`mobile-window ${windowThemes[activeWindow]}`}>
             <div className="window-header">
               <div className="traffic-lights">
                 <span className="light red"></span>
