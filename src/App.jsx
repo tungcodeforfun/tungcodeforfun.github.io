@@ -308,34 +308,44 @@ function App() {
     }
   ]
 
+  // Apple System Colors for icons
+  const appleColors = {
+    blue: '#0A84FF',
+    green: '#30D158',
+    red: '#FF453A',
+    orange: '#FF9F0A',
+    yellow: '#FFD60A',
+    teal: '#64D2FF'
+  }
+
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
-        // Notes app icon - iOS 18 style
+        // Notes app icon - Apple style with system yellow
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="notesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#fff9c4" />
-              <stop offset="100%" stopColor="#fdd835" />
+              <stop offset="0%" stopColor="#FFEB3B" />
+              <stop offset="100%" stopColor="#FFC107" />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#notesGrad)" />
           <rect x="24" y="22" width="72" height="76" rx="6" fill="#fff" />
-          <rect x="32" y="34" width="44" height="3" rx="1.5" fill="#e0a000" />
-          <rect x="32" y="44" width="56" height="3" rx="1.5" fill="#e0a000" />
-          <rect x="32" y="54" width="48" height="3" rx="1.5" fill="#e0a000" />
-          <rect x="32" y="64" width="52" height="3" rx="1.5" fill="#e0a000" />
-          <rect x="32" y="74" width="36" height="3" rx="1.5" fill="#e0a000" />
-          <rect x="32" y="84" width="24" height="3" rx="1.5" fill="#e0a000" />
+          <rect x="32" y="34" width="44" height="3" rx="1.5" fill="#c9a000" />
+          <rect x="32" y="44" width="56" height="3" rx="1.5" fill="#c9a000" />
+          <rect x="32" y="54" width="48" height="3" rx="1.5" fill="#c9a000" />
+          <rect x="32" y="64" width="52" height="3" rx="1.5" fill="#c9a000" />
+          <rect x="32" y="74" width="36" height="3" rx="1.5" fill="#c9a000" />
+          <rect x="32" y="84" width="24" height="3" rx="1.5" fill="#c9a000" />
         </svg>
       ),
       experience: (
-        // Messages app icon - iOS 18 style
+        // Messages app icon - Apple system green
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="messagesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#5eda6a" />
-              <stop offset="100%" stopColor="#25b933" />
+              <stop offset="0%" stopColor="#5AD65E" />
+              <stop offset="100%" stopColor="#34C759" />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#messagesGrad)" />
@@ -344,24 +354,24 @@ function App() {
         </svg>
       ),
       projects: (
-        // Finder app icon - macOS Sonoma style
+        // Finder app icon - Apple system blue
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="finderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#6ed3ff" />
-              <stop offset="100%" stopColor="#0a84ff" />
+              <stop offset="0%" stopColor={appleColors.teal} />
+              <stop offset="100%" stopColor={appleColors.blue} />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#finderGrad)" />
           <rect x="28" y="24" width="64" height="72" rx="8" fill="#fff" />
-          <ellipse cx="46" cy="50" rx="8" ry="9" fill="#0a84ff" />
-          <ellipse cx="74" cy="50" rx="8" ry="9" fill="#0a84ff" />
-          <path d="M42 72 Q60 86 78 72" stroke="#0a84ff" strokeWidth="6" fill="none" strokeLinecap="round" />
+          <ellipse cx="46" cy="50" rx="8" ry="9" fill={appleColors.blue} />
+          <ellipse cx="74" cy="50" rx="8" ry="9" fill={appleColors.blue} />
+          <path d="M42 72 Q60 86 78 72" stroke={appleColors.blue} strokeWidth="6" fill="none" strokeLinecap="round" />
           <rect x="28" y="24" width="64" height="6" rx="3" fill="#e8e8e8" />
         </svg>
       ),
       contact: (
-        // Contacts app icon - iOS 18 style
+        // Contacts app icon - with Apple system colors
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="contactsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -373,10 +383,10 @@ function App() {
           <rect x="28" y="18" width="68" height="84" rx="6" fill="#fff" />
           <circle cx="62" cy="46" r="16" fill="#d0d0d0" />
           <ellipse cx="62" cy="82" rx="24" ry="14" fill="#d0d0d0" />
-          <rect x="20" y="32" width="10" height="10" rx="2" fill="#ff3b30" />
-          <rect x="20" y="48" width="10" height="10" rx="2" fill="#ff9500" />
-          <rect x="20" y="64" width="10" height="10" rx="2" fill="#34c759" />
-          <rect x="20" y="80" width="10" height="10" rx="2" fill="#007aff" />
+          <rect x="20" y="32" width="10" height="10" rx="2" fill={appleColors.red} />
+          <rect x="20" y="48" width="10" height="10" rx="2" fill={appleColors.orange} />
+          <rect x="20" y="64" width="10" height="10" rx="2" fill={appleColors.green} />
+          <rect x="20" y="80" width="10" height="10" rx="2" fill={appleColors.blue} />
         </svg>
       )
     }

@@ -7,17 +7,40 @@
   box-sizing: border-box;
 }
 
+/* Apple System Colors - Reference: gist.github.com/lithammer/e9e68c131297c3158a654c0fdfc4111a */
 :root {
-  --bg-dark: #1e1e1e;
-  --window-bg: rgba(30, 30, 30, 0.85);
+  /* Dark mode system colors */
+  --system-blue: #0A84FF;
+  --system-green: #30D158;
+  --system-red: #FF453A;
+  --system-orange: #FF9F0A;
+  --system-yellow: #FFD60A;
+  --system-pink: #FF375F;
+  --system-purple: #BF5AF2;
+  --system-indigo: #5E5CE6;
+  --system-teal: #64D2FF;
+
+  /* macOS UI colors - Reference: schemecolor.com/macos-window-ui-colors */
+  --traffic-red: #FF605C;
+  --traffic-yellow: #FFBD44;
+  --traffic-green: #00CA4E;
+
+  /* Grays and backgrounds */
+  --bg-dark: #1e1e1f;
+  --window-bg: rgba(30, 30, 31, 0.85);
   --window-border: rgba(255, 255, 255, 0.1);
   --text: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-muted: rgba(255, 255, 255, 0.4);
-  --accent: #0a84ff;
-  --red: #ff5f57;
-  --yellow: #febc2e;
-  --green: #28c840;
+  --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Light mode colors */
+  --light-silver: #E1DFE1;
+  --argent: #C0BFC0;
+  --tech-white: #F5F5F5;
+
+  /* iMessage colors */
+  --imessage-blue: #0b93f6;
+  --imessage-gray: #e5e5ea;
 }
 
 body {
@@ -130,48 +153,61 @@ body {
     0 0 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Notes Theme - Yellow/Cream */
+/* Notes Theme - macOS Notes app style (clean white/light) */
 .macos-window.notes-theme,
 .mobile-window.notes-theme {
-  background: linear-gradient(180deg, #fffde7 0%, #fff9c4 100%);
-  border-color: rgba(200, 180, 100, 0.3);
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 .notes-theme .window-header {
-  background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
-  border-bottom-color: rgba(200, 180, 100, 0.2);
+  background: rgba(246, 246, 246, 0.95);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .notes-theme .window-title {
-  color: #5d4037;
+  color: #1d1d1f;
+  font-weight: 600;
 }
 
 .notes-theme .window-content {
-  color: #3e2723;
+  color: #1d1d1f;
+  background: #fff;
 }
 
 .notes-theme .about-title {
-  color: #e65100;
+  color: var(--system-orange);
+}
+
+.notes-theme .about-info h1 {
+  color: #1d1d1f;
 }
 
 .notes-theme .about-education h3,
 .notes-theme .about-skills h3 {
-  color: #795548;
+  color: #86868b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .notes-theme .skill-tag {
-  background: rgba(121, 85, 72, 0.15);
-  color: #5d4037;
+  background: rgba(0, 0, 0, 0.06);
+  color: #1d1d1f;
 }
 
 .notes-theme .about-bio,
+.notes-theme .about-bio p {
+  color: #1d1d1f;
+}
+
 .notes-theme .about-education p,
 .notes-theme .about-company {
-  color: #4e342e;
+  color: #424245;
 }
 
 .notes-theme .subtle {
-  color: #8d6e63;
+  color: #86868b;
 }
 
 /* Messages Theme - macOS Tahoe style */
@@ -305,7 +341,7 @@ body {
 .messages-theme .experience-item,
 .messages-theme .experience-item.expandable,
 .messages-theme .experience-item.expanded {
-  background: #0b93f6;
+  background: var(--imessage-blue);
   border: none;
   color: #fff;
   border-radius: 25px;
@@ -327,7 +363,7 @@ body {
   right: -7px;
   width: 20px;
   height: 25px;
-  background: #0b93f6;
+  background: var(--imessage-blue);
   border-bottom-left-radius: 16px 14px;
 }
 
@@ -425,54 +461,75 @@ body {
   padding: 2px 8px;
 }
 
-/* Finder Theme - Blue/White (default, already styled) */
+/* Finder Theme - macOS Finder style */
 .macos-window.finder-theme,
 .mobile-window.finder-theme {
-  background: rgba(40, 40, 40, 0.75);
+  background: rgba(30, 30, 31, 0.92);
+  backdrop-filter: blur(30px) saturate(1.5);
+  -webkit-backdrop-filter: blur(30px) saturate(1.5);
 }
 
-/* Contacts Theme - Gray/White */
+.finder-theme .window-header {
+  background: rgba(50, 50, 52, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.finder-theme .window-title {
+  color: var(--text);
+}
+
+.finder-theme .window-content {
+  background: transparent;
+}
+
+/* Contacts Theme - macOS Contacts style */
 .macos-window.contacts-theme,
 .mobile-window.contacts-theme {
-  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
-  border-color: rgba(100, 100, 100, 0.2);
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 .contacts-theme .window-header {
-  background: linear-gradient(180deg, #fff 0%, #f5f5f5 100%);
-  border-bottom-color: rgba(0, 0, 0, 0.1);
+  background: rgba(246, 246, 246, 0.95);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .contacts-theme .window-title {
-  color: #333;
+  color: #1d1d1f;
+  font-weight: 600;
 }
 
 .contacts-theme .window-content {
-  color: #222;
+  color: #1d1d1f;
+  background: #fff;
 }
 
 .contacts-theme .contact-window h2 {
-  color: #1a1a1a;
+  color: #1d1d1f;
 }
 
 .contacts-theme .contact-window > p {
-  color: #666;
+  color: #86868b;
 }
 
 .contacts-theme .contact-btn {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--tech-white);
+  border: 1px solid var(--light-silver);
   color: #333;
 }
 
 .contacts-theme .contact-btn:hover {
-  background: #f5f5f5;
-  border-color: #ccc;
+  background: var(--light-silver);
+  border-color: var(--argent);
 }
 
 .contacts-theme .btn-icon svg {
-  stroke: #007aff;
-  fill: #007aff;
+  stroke: var(--system-blue);
+  fill: var(--system-blue);
+}
+
+.contacts-theme .contact-btn {
+  color: #1d1d1f;
 }
 
 .macos-window.maximized {
@@ -542,10 +599,10 @@ body {
   opacity: 1;
 }
 
-/* Traffic light colors - Reference: github.com/RedEdge967/MacOS-CSS */
-.light.red { background: #FF5D5A; }
-.light.yellow { background: #f5c350; }
-.light.green { background: #65cd57; }
+/* Traffic light colors - Reference: schemecolor.com/macos-window-ui-colors */
+.light.red { background: var(--traffic-red); }
+.light.yellow { background: var(--traffic-yellow); }
+.light.green { background: var(--traffic-green); }
 
 .light:hover {
   filter: brightness(1.1);
@@ -664,7 +721,7 @@ body {
 }
 
 .about-title {
-  color: var(--accent);
+  color: var(--system-blue);
   font-weight: 500;
 }
 
@@ -776,7 +833,7 @@ body {
 
 .exp-period {
   font-size: 12px;
-  color: var(--accent);
+  color: var(--system-blue);
   background: rgba(10, 132, 255, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
@@ -821,7 +878,7 @@ body {
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--accent);
+  color: var(--system-blue);
 }
 
 .exp-skills {
@@ -832,7 +889,7 @@ body {
 
 .exp-skill-tag {
   background: rgba(10, 132, 255, 0.2);
-  color: var(--accent);
+  color: var(--system-blue);
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
@@ -956,14 +1013,14 @@ body {
   content: '›';
   position: absolute;
   left: 0;
-  color: var(--accent);
+  color: var(--system-blue);
 }
 
 .project-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--accent);
+  color: var(--system-blue);
   text-decoration: none;
   font-size: 12px;
   font-weight: 500;
@@ -1266,6 +1323,6 @@ body {
 
 /* Selection */
 ::selection {
-  background: var(--accent);
+  background: var(--system-blue);
   color: white;
 }
