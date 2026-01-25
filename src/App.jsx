@@ -421,11 +421,19 @@ function App() {
       >
         {isMessages ? (
           <div className="window-header messages-header">
-            <button className="messages-back-btn" onClick={(e) => closeWindow(e, id)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
+            <div className="traffic-lights">
+              <button className="light red" onClick={(e) => closeWindow(e, id)}>
+                <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
+              </button>
+              <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
+                <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
+              </button>
+              <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
+                <svg viewBox="0 0 12 12">
+                  <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
+                </svg>
+              </button>
+            </div>
             <div className="messages-contact">
               <div className="messages-avatar">
                 <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" />
