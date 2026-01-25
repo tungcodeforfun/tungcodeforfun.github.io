@@ -311,65 +311,72 @@ function App() {
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
-        // Notes app icon
+        // Notes app icon - iOS 18 style
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="notesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#fff9c4" />
-              <stop offset="100%" stopColor="#ffeb3b" />
+              <stop offset="100%" stopColor="#fdd835" />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#notesGrad)" />
-          <rect x="24" y="30" width="72" height="4" rx="2" fill="#a68a00" opacity="0.4" />
-          <rect x="24" y="44" width="72" height="4" rx="2" fill="#a68a00" opacity="0.4" />
-          <rect x="24" y="58" width="72" height="4" rx="2" fill="#a68a00" opacity="0.4" />
-          <rect x="24" y="72" width="50" height="4" rx="2" fill="#a68a00" opacity="0.4" />
-          <rect x="24" y="86" width="60" height="4" rx="2" fill="#a68a00" opacity="0.4" />
+          <rect x="24" y="22" width="72" height="76" rx="6" fill="#fff" />
+          <rect x="32" y="34" width="44" height="3" rx="1.5" fill="#e0a000" />
+          <rect x="32" y="44" width="56" height="3" rx="1.5" fill="#e0a000" />
+          <rect x="32" y="54" width="48" height="3" rx="1.5" fill="#e0a000" />
+          <rect x="32" y="64" width="52" height="3" rx="1.5" fill="#e0a000" />
+          <rect x="32" y="74" width="36" height="3" rx="1.5" fill="#e0a000" />
+          <rect x="32" y="84" width="24" height="3" rx="1.5" fill="#e0a000" />
         </svg>
       ),
       experience: (
-        // Messages app icon
+        // Messages app icon - iOS 18 style
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="messagesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#5ef87a" />
-              <stop offset="100%" stopColor="#1db954" />
+              <stop offset="0%" stopColor="#5eda6a" />
+              <stop offset="100%" stopColor="#25b933" />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#messagesGrad)" />
-          <ellipse cx="60" cy="55" rx="38" ry="30" fill="#fff" />
-          <ellipse cx="38" cy="90" rx="12" ry="10" fill="#fff" />
+          <ellipse cx="60" cy="52" rx="38" ry="32" fill="#fff" />
+          <path d="M32 70 Q28 82, 22 88 Q36 84, 42 78" fill="#fff" />
         </svg>
       ),
       projects: (
-        // Finder app icon
+        // Finder app icon - macOS Sonoma style
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="finderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#6bd5ff" />
-              <stop offset="100%" stopColor="#1f9ceb" />
+              <stop offset="0%" stopColor="#6ed3ff" />
+              <stop offset="100%" stopColor="#0a84ff" />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#finderGrad)" />
-          <rect x="25" y="45" width="70" height="50" rx="4" fill="#fff" opacity="0.95" />
-          <rect x="25" y="28" width="30" height="20" rx="3" fill="#fff" opacity="0.95" />
-          <circle cx="45" cy="70" r="6" fill="#1f9ceb" />
-          <circle cx="75" cy="70" r="6" fill="#1f9ceb" />
-          <path d="M45 82 Q60 95 75 82" stroke="#1f9ceb" strokeWidth="4" fill="none" />
+          <rect x="28" y="24" width="64" height="72" rx="8" fill="#fff" />
+          <ellipse cx="46" cy="50" rx="8" ry="9" fill="#0a84ff" />
+          <ellipse cx="74" cy="50" rx="8" ry="9" fill="#0a84ff" />
+          <path d="M42 72 Q60 86 78 72" stroke="#0a84ff" strokeWidth="6" fill="none" strokeLinecap="round" />
+          <rect x="28" y="24" width="64" height="6" rx="3" fill="#e8e8e8" />
         </svg>
       ),
       contact: (
-        // Contacts app icon
+        // Contacts app icon - iOS 18 style
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="contactsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#a8a8a8" />
-              <stop offset="100%" stopColor="#7a7a7a" />
+              <stop offset="100%" stopColor="#787878" />
             </linearGradient>
           </defs>
           <rect width="120" height="120" rx="26" fill="url(#contactsGrad)" />
-          <circle cx="60" cy="45" r="20" fill="#fff" />
-          <ellipse cx="60" cy="100" rx="35" ry="28" fill="#fff" />
+          <rect x="28" y="18" width="68" height="84" rx="6" fill="#fff" />
+          <circle cx="62" cy="46" r="16" fill="#d0d0d0" />
+          <ellipse cx="62" cy="82" rx="24" ry="14" fill="#d0d0d0" />
+          <rect x="20" y="32" width="10" height="10" rx="2" fill="#ff3b30" />
+          <rect x="20" y="48" width="10" height="10" rx="2" fill="#ff9500" />
+          <rect x="20" y="64" width="10" height="10" rx="2" fill="#34c759" />
+          <rect x="20" y="80" width="10" height="10" rx="2" fill="#007aff" />
         </svg>
       )
     }

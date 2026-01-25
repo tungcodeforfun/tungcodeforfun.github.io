@@ -174,84 +174,155 @@ body {
   color: #8d6e63;
 }
 
-/* Messages Theme - Green/White */
+/* Messages Theme - iOS Messages style */
 .macos-window.messages-theme,
 .mobile-window.messages-theme {
-  background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
-  border-color: rgba(100, 100, 100, 0.2);
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .messages-theme .window-header {
-  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
-  border-bottom-color: rgba(0, 0, 0, 0.1);
+  background: #f6f6f6;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .messages-theme .window-title {
-  color: #333;
+  color: #000;
+  font-weight: 600;
 }
 
 .messages-theme .window-content {
-  color: #222;
+  background: #fff;
+  padding: 16px;
+}
+
+.messages-theme .experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .messages-theme .experience-item {
-  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  background: #34c759;
   border: none;
   color: #fff;
   border-radius: 18px;
-  margin-left: 40px;
+  border-bottom-right-radius: 4px;
+  padding: 12px 16px;
+  margin-left: 60px;
+  margin-right: 8px;
   position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.messages-theme .experience-item:hover {
+  background: #2fb350;
+  color: #fff;
+}
+
+.messages-theme .experience-item:hover .exp-header h3,
+.messages-theme .experience-item:hover .exp-period,
+.messages-theme .experience-item:hover .exp-company,
+.messages-theme .experience-item:hover .exp-desc {
+  color: #fff;
+}
+
+.messages-theme .experience-item.expanded {
+  background: #2aa147;
+  border-color: transparent;
+  color: #fff;
+}
+
+.messages-theme .experience-item.expanded .exp-header h3,
+.messages-theme .experience-item.expanded .exp-period,
+.messages-theme .experience-item.expanded .exp-company,
+.messages-theme .experience-item.expanded .exp-desc {
+  color: #fff;
 }
 
 .messages-theme .experience-item::before {
   content: '';
   position: absolute;
-  left: -30px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+  left: -48px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
+}
+
+.messages-theme .experience-item::after {
+  content: '';
+  position: absolute;
+  left: -38px;
+  top: 18px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+.messages-theme .exp-header {
+  padding-right: 24px;
 }
 
 .messages-theme .exp-header h3 {
   color: #fff;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .messages-theme .exp-period {
   background: rgba(255, 255, 255, 0.25);
   color: #fff;
+  font-size: 11px;
 }
 
 .messages-theme .exp-company {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .messages-theme .exp-desc {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
 }
 
 .messages-theme .expand-icon {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   color: #fff;
+  top: 12px;
+  right: 12px;
 }
 
 .messages-theme .exp-details {
-  border-top-color: rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.messages-theme .exp-details ul {
+  margin-bottom: 10px;
 }
 
 .messages-theme .exp-details li {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 12px;
+  margin-bottom: 6px;
 }
 
 .messages-theme .exp-details li::before {
-  color: #fff;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .messages-theme .exp-skill-tag {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
+  font-size: 10px;
+  padding: 2px 8px;
 }
 
 /* Finder Theme - Blue/White (default, already styled) */
