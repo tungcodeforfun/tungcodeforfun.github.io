@@ -288,114 +288,118 @@ function App() {
   const DockIcon = ({ type }) => {
     const icons = {
       about: (
-        // Notes app icon - macOS Big Sur style
-        // Reference: schemecolor.com/apple-notes-color-scheme - #FFD52E yellow
+        // Notes app icon - macOS Sequoia style
+        // Reference: Apple Notes app - yellow notepad with folded corner
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="notesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FFE55B" />
-              <stop offset="100%" stopColor="#FFD52E" />
+              <stop offset="0%" stopColor="#FFEB3B" />
+              <stop offset="100%" stopColor="#FFC107" />
             </linearGradient>
-            <filter id="notesShadow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.15"/>
-            </filter>
           </defs>
+          {/* Yellow background */}
           <rect width="120" height="120" rx="26" fill="url(#notesGrad)" />
-          <g filter="url(#notesShadow)">
-            <rect x="26" y="20" width="68" height="80" rx="4" fill="#fff" />
-            <rect x="26" y="20" width="68" height="12" rx="4" fill="#FFF9E6" />
-          </g>
-          {/* Note lines */}
-          <line x1="34" y1="42" x2="86" y2="42" stroke="#E8DCC8" strokeWidth="1.5" />
-          <line x1="34" y1="52" x2="86" y2="52" stroke="#E8DCC8" strokeWidth="1.5" />
-          <line x1="34" y1="62" x2="86" y2="62" stroke="#E8DCC8" strokeWidth="1.5" />
-          <line x1="34" y1="72" x2="86" y2="72" stroke="#E8DCC8" strokeWidth="1.5" />
-          <line x1="34" y1="82" x2="86" y2="82" stroke="#E8DCC8" strokeWidth="1.5" />
-          {/* Text preview */}
-          <rect x="34" y="38" width="40" height="2" rx="1" fill="#C4A44A" />
-          <rect x="34" y="48" width="48" height="2" rx="1" fill="#D4C4A0" />
-          <rect x="34" y="58" width="35" height="2" rx="1" fill="#D4C4A0" />
-          <rect x="34" y="68" width="42" height="2" rx="1" fill="#D4C4A0" />
+          {/* White notepad */}
+          <rect x="24" y="18" width="72" height="88" rx="6" fill="#fff" />
+          {/* Folded corner */}
+          <path d="M96 18 L96 36 L78 18 Z" fill="#FFEB3B" />
+          <path d="M78 18 L96 36 L78 36 Z" fill="#E6D435" />
+          {/* Horizontal lines */}
+          <line x1="32" y1="42" x2="88" y2="42" stroke="#E0E0E0" strokeWidth="2" />
+          <line x1="32" y1="54" x2="88" y2="54" stroke="#E0E0E0" strokeWidth="2" />
+          <line x1="32" y1="66" x2="88" y2="66" stroke="#E0E0E0" strokeWidth="2" />
+          <line x1="32" y1="78" x2="88" y2="78" stroke="#E0E0E0" strokeWidth="2" />
+          <line x1="32" y1="90" x2="88" y2="90" stroke="#E0E0E0" strokeWidth="2" />
+          {/* Text preview lines */}
+          <rect x="32" y="46" width="45" height="4" rx="2" fill="#FFD54F" />
+          <rect x="32" y="58" width="52" height="3" rx="1.5" fill="#BDBDBD" />
+          <rect x="32" y="70" width="38" height="3" rx="1.5" fill="#BDBDBD" />
         </svg>
       ),
       experience: (
-        // Messages app icon - macOS Big Sur style with white bubble
-        // Reference: logos-world.net/messages-logo - green square, white bubble
+        // Messages app icon - macOS Sequoia style
+        // Reference: Apple Messages - bright green with white chat bubble
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="messagesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#65D969" />
-              <stop offset="100%" stopColor="#2DC13E" />
+              <stop offset="0%" stopColor="#5DD568" />
+              <stop offset="100%" stopColor="#34C759" />
             </linearGradient>
-            <filter id="bubbleShadow" x="-10%" y="-10%" width="120%" height="130%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.2"/>
-            </filter>
           </defs>
+          {/* Green background */}
           <rect width="120" height="120" rx="26" fill="url(#messagesGrad)" />
-          <g filter="url(#bubbleShadow)">
-            {/* Speech bubble */}
-            <ellipse cx="60" cy="54" rx="36" ry="28" fill="#fff" />
-            {/* Bubble tail */}
-            <path d="M30 68 Q24 80 18 90 Q32 82 38 74 Q34 72 30 68" fill="#fff" />
-          </g>
+          {/* Chat bubble */}
+          <path d="M60 24 C85 24 96 40 96 56 C96 72 85 86 60 86 C55 86 50 85 46 83 L26 94 L32 76 C26 70 24 63 24 56 C24 40 35 24 60 24 Z" fill="#fff" />
         </svg>
       ),
       projects: (
-        // Finder app icon - macOS Big Sur two-tone blue face
-        // Reference: macworld.com - two-tone blue, cubist-inspired design
+        // Finder app icon - macOS Sequoia style
+        // Reference: Apple Finder - two-tone blue smiling face
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="finderGradLeft" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#42A5F5" />
-              <stop offset="100%" stopColor="#1E88E5" />
+            <linearGradient id="finderLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#3A9BF5" />
+              <stop offset="100%" stopColor="#1A73E8" />
             </linearGradient>
-            <linearGradient id="finderGradRight" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#90CAF9" />
-              <stop offset="100%" stopColor="#64B5F6" />
+            <linearGradient id="finderRight" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#8DC4F9" />
+              <stop offset="100%" stopColor="#5BA4F5" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="#1E88E5" />
-          {/* Face - left half (darker blue) */}
-          <path d="M60 16 L60 104 L20 104 Q10 104 10 94 L10 26 Q10 16 20 16 Z" fill="url(#finderGradLeft)" />
-          {/* Face - right half (lighter blue) */}
-          <path d="M60 16 L60 104 L100 104 Q110 104 110 94 L110 26 Q110 16 100 16 Z" fill="url(#finderGradRight)" />
-          {/* Eyes */}
-          <ellipse cx="42" cy="50" rx="6" ry="10" fill="#fff" />
-          <ellipse cx="78" cy="50" rx="6" ry="10" fill="#fff" />
-          {/* Nose line */}
-          <line x1="60" y1="44" x2="60" y2="68" stroke="#1565C0" strokeWidth="3" strokeLinecap="round" />
+          {/* Rounded square base - split in half */}
+          <clipPath id="finderClip">
+            <rect width="120" height="120" rx="26" />
+          </clipPath>
+          <g clipPath="url(#finderClip)">
+            {/* Left half - darker blue */}
+            <rect x="0" y="0" width="60" height="120" fill="url(#finderLeft)" />
+            {/* Right half - lighter blue */}
+            <rect x="60" y="0" width="60" height="120" fill="url(#finderRight)" />
+          </g>
+          {/* Eyes - white ovals */}
+          <ellipse cx="44" cy="50" rx="8" ry="12" fill="#fff" />
+          <ellipse cx="76" cy="50" rx="8" ry="12" fill="#fff" />
+          {/* Pupils */}
+          <circle cx="44" cy="52" r="3" fill="#1565C0" />
+          <circle cx="76" cy="52" r="3" fill="#1565C0" />
+          {/* Center nose line */}
+          <line x1="60" y1="40" x2="60" y2="72" stroke="#1565C0" strokeWidth="4" strokeLinecap="round" />
           {/* Smile */}
-          <path d="M36 76 Q60 92 84 76" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" />
+          <path d="M38 80 Q60 98 82 80" stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" />
         </svg>
       ),
       contact: (
-        // Contacts app icon - macOS Big Sur address book style
-        // Reference: Apple HIG - book with colored tabs
+        // Contacts app icon - macOS Sequoia style
+        // Reference: Apple Contacts - brown/tan address book with silhouette
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="contactsBookGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id="contactsBg" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#E8DED4" />
+              <stop offset="100%" stopColor="#D4C4B0" />
+            </linearGradient>
+            <linearGradient id="contactsSpine" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#8B7355" />
-              <stop offset="5%" stopColor="#A08060" />
-              <stop offset="100%" stopColor="#C4A87C" />
+              <stop offset="50%" stopColor="#A08060" />
+              <stop offset="100%" stopColor="#8B7355" />
             </linearGradient>
           </defs>
-          <rect width="120" height="120" rx="26" fill="#E8E0D5" />
-          {/* Book spine */}
-          <rect x="16" y="16" width="14" height="88" rx="2" fill="url(#contactsBookGrad)" />
-          {/* Book pages */}
-          <rect x="30" y="18" width="74" height="84" rx="4" fill="#fff" />
-          <rect x="32" y="20" width="70" height="80" rx="3" fill="#FAFAFA" />
-          {/* Page lines */}
-          <line x1="30" y1="30" x2="30" y2="90" stroke="#D0C8C0" strokeWidth="0.5" />
-          <line x1="32" y1="30" x2="32" y2="90" stroke="#E8E0D8" strokeWidth="0.5" />
-          {/* Silhouette */}
-          <circle cx="67" cy="48" r="14" fill="#C8C8C8" />
-          <ellipse cx="67" cy="78" rx="20" ry="12" fill="#C8C8C8" />
-          {/* Colored tabs on the right edge */}
-          <rect x="102" y="24" width="8" height="14" rx="2" fill="#FF3B30" />
-          <rect x="102" y="42" width="8" height="14" rx="2" fill="#FF9500" />
-          <rect x="102" y="60" width="8" height="14" rx="2" fill="#34C759" />
-          <rect x="102" y="78" width="8" height="14" rx="2" fill="#007AFF" />
+          {/* Background */}
+          <rect width="120" height="120" rx="26" fill="url(#contactsBg)" />
+          {/* Book binding on left */}
+          <rect x="14" y="14" width="16" height="92" rx="3" fill="url(#contactsSpine)" />
+          {/* Main page area */}
+          <rect x="30" y="16" width="76" height="88" rx="4" fill="#FAFAF8" />
+          {/* Page edge shadows */}
+          <rect x="30" y="16" width="3" height="88" fill="rgba(0,0,0,0.05)" />
+          {/* Contact silhouette - head */}
+          <circle cx="68" cy="46" r="16" fill="#C8C8C8" />
+          {/* Contact silhouette - body */}
+          <ellipse cx="68" cy="84" rx="26" ry="16" fill="#C8C8C8" />
+          {/* Colored tabs */}
+          <rect x="104" y="22" width="6" height="16" rx="2" fill="#FF3B30" />
+          <rect x="104" y="44" width="6" height="16" rx="2" fill="#FF9500" />
+          <rect x="104" y="66" width="6" height="16" rx="2" fill="#34C759" />
+          <rect x="104" y="88" width="6" height="16" rx="2" fill="#007AFF" />
         </svg>
       )
     }
@@ -613,18 +617,31 @@ function App() {
           </div>
           <div className="messages-chat-body">
             {experience.map((job) => (
-              <div key={job.id} className="experience-item" style={{
-                background: '#007AFF',
-                color: '#fff',
-                borderRadius: '18px',
-                padding: '10px 14px',
-                marginLeft: 'auto',
-                maxWidth: '80%',
-                marginBottom: '8px'
-              }}>
-                <div style={{ fontWeight: 600, marginBottom: '4px' }}>{job.title}</div>
-                <div style={{ fontSize: '13px', opacity: 0.9 }}>{job.company} · {job.period}</div>
-                <div style={{ fontSize: '13px', marginTop: '8px' }}>{job.desc}</div>
+              <div
+                key={job.id}
+                className={`experience-item expandable ${expandedItems[job.id] ? 'expanded' : ''}`}
+                onClick={() => toggleExpand(job.id)}
+              >
+                <span className="expand-icon">{expandedItems[job.id] ? '−' : '+'}</span>
+                <div className="exp-header">
+                  <h3>{job.title}</h3>
+                </div>
+                <div className="exp-company">{job.company} · {job.period}</div>
+                <div className="exp-desc">{job.desc}</div>
+                {expandedItems[job.id] && (
+                  <div className="exp-details">
+                    <ul>
+                      {job.details.map((detail, i) => (
+                        <li key={i}>{detail}</li>
+                      ))}
+                    </ul>
+                    <div className="exp-skills">
+                      {job.skills.map((skill, i) => (
+                        <span key={i} className="exp-skill-tag">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
