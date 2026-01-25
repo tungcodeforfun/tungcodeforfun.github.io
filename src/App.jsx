@@ -1,8 +1,53 @@
 import './App.css'
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 
 function App() {
   const [activeWindow, setActiveWindow] = useState('about')
+  const [windowPositions, setWindowPositions] = useState({
+    about: { x: 50, y: 60 },
+    experience: { x: 150, y: 80 },
+    projects: { x: 250, y: 100 },
+    contact: { x: 350, y: 120 }
+  })
+  const [windowOrder, setWindowOrder] = useState(['about', 'experience', 'projects', 'contact'])
+  const dragRef = useRef(null)
+  const dragOffset = useRef({ x: 0, y: 0 })
+
+  const bringToFront = (id) => {
+    setWindowOrder(prev => [...prev.filter(w => w !== id), id])
+    setActiveWindow(id)
+  }
+
+  const handleMouseDown = (e, windowId) => {
+    if (e.target.closest('.window-content')) return
+    e.preventDefault()
+    dragRef.current = windowId
+    const pos = windowPositions[windowId]
+    dragOffset.current = {
+      x: e.clientX - pos.x,
+      y: e.clientY - pos.y
+    }
+    bringToFront(windowId)
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  const handleMouseMove = useCallback((e) => {
+    if (!dragRef.current) return
+    setWindowPositions(prev => ({
+      ...prev,
+      [dragRef.current]: {
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y
+      }
+    }))
+  }, [])
+
+  const handleMouseUp = useCallback(() => {
+    dragRef.current = null
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }, [handleMouseMove])
 
   const skills = ["Java", "Python", "JavaScript", "AWS", "Spring Boot", "React", "Docker", "SQL", "Git", "Redis", "PostgreSQL", "DataDog"]
 
@@ -27,11 +72,40 @@ function App() {
     { name: "TungBot", tech: "Python", url: "https://github.com/tungcodeforfun/TungBot" }
   ]
 
+  const DockIcon = ({ type }) => {
+    const icons = {
+      about: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+        </svg>
+      ),
+      experience: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        </svg>
+      ),
+      projects: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M3 7c0-1.1.9-2 2-2h4l2 2h8c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V7z"/>
+        </svg>
+      ),
+      contact: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M22 6l-10 7L2 6"/>
+        </svg>
+      )
+    }
+    return icons[type]
+  }
+
   const dockItems = [
-    { id: 'about', icon: '👤', label: 'About' },
-    { id: 'experience', icon: '💼', label: 'Experience' },
-    { id: 'projects', icon: '📁', label: 'Projects' },
-    { id: 'contact', icon: '✉️', label: 'Contact' }
+    { id: 'about', label: 'About' },
+    { id: 'experience', label: 'Experience' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'contact', label: 'Contact' }
   ]
 
   return (
@@ -55,7 +129,15 @@ function App() {
       {/* Windows Container */}
       <div className="windows-container">
         {/* About Window */}
-        <div className={`macos-window ${activeWindow === 'about' ? 'active' : ''}`} onClick={() => setActiveWindow('about')}>
+        <div
+          className={`macos-window ${activeWindow === 'about' ? 'active' : ''}`}
+          style={{
+            left: windowPositions.about.x,
+            top: windowPositions.about.y,
+            zIndex: windowOrder.indexOf('about')
+          }}
+          onMouseDown={(e) => handleMouseDown(e, 'about')}
+        >
           <div className="window-header">
             <div className="traffic-lights">
               <span className="light red"></span>
@@ -94,7 +176,15 @@ function App() {
         </div>
 
         {/* Experience Window */}
-        <div className={`macos-window window-offset-1 ${activeWindow === 'experience' ? 'active' : ''}`} onClick={() => setActiveWindow('experience')}>
+        <div
+          className={`macos-window ${activeWindow === 'experience' ? 'active' : ''}`}
+          style={{
+            left: windowPositions.experience.x,
+            top: windowPositions.experience.y,
+            zIndex: windowOrder.indexOf('experience')
+          }}
+          onMouseDown={(e) => handleMouseDown(e, 'experience')}
+        >
           <div className="window-header">
             <div className="traffic-lights">
               <span className="light red"></span>
@@ -120,7 +210,15 @@ function App() {
         </div>
 
         {/* Projects Window */}
-        <div className={`macos-window window-offset-2 ${activeWindow === 'projects' ? 'active' : ''}`} onClick={() => setActiveWindow('projects')}>
+        <div
+          className={`macos-window ${activeWindow === 'projects' ? 'active' : ''}`}
+          style={{
+            left: windowPositions.projects.x,
+            top: windowPositions.projects.y,
+            zIndex: windowOrder.indexOf('projects')
+          }}
+          onMouseDown={(e) => handleMouseDown(e, 'projects')}
+        >
           <div className="window-header">
             <div className="traffic-lights">
               <span className="light red"></span>
@@ -146,7 +244,15 @@ function App() {
         </div>
 
         {/* Contact Window */}
-        <div className={`macos-window window-offset-3 ${activeWindow === 'contact' ? 'active' : ''}`} onClick={() => setActiveWindow('contact')}>
+        <div
+          className={`macos-window ${activeWindow === 'contact' ? 'active' : ''}`}
+          style={{
+            left: windowPositions.contact.x,
+            top: windowPositions.contact.y,
+            zIndex: windowOrder.indexOf('contact')
+          }}
+          onMouseDown={(e) => handleMouseDown(e, 'contact')}
+        >
           <div className="window-header">
             <div className="traffic-lights">
               <span className="light red"></span>
@@ -183,9 +289,9 @@ function App() {
             <button
               key={item.id}
               className={`dock-item ${activeWindow === item.id ? 'active' : ''}`}
-              onClick={() => setActiveWindow(item.id)}
+              onClick={() => bringToFront(item.id)}
             >
-              <span className="dock-icon">{item.icon}</span>
+              <span className="dock-icon"><DockIcon type={item.id} /></span>
               <span className="dock-label">{item.label}</span>
               {activeWindow === item.id && <span className="dock-indicator"></span>}
             </button>

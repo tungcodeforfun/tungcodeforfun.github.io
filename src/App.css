@@ -81,45 +81,30 @@ body {
 /* Windows Container */
 .windows-container {
   flex: 1;
-  padding: 48px 24px 100px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
-  overflow-y: auto;
+  position: relative;
+  overflow: hidden;
 }
 
 /* macOS Window */
 .macos-window {
+  position: absolute;
   background: var(--window-bg);
   backdrop-filter: blur(40px);
   border: 1px solid var(--window-border);
   border-radius: 12px;
-  width: 100%;
-  max-width: 500px;
+  width: 420px;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-}
-
-.macos-window:hover {
-  transform: translateY(-2px);
+  transition: box-shadow 0.2s;
+  user-select: none;
 }
 
 .macos-window.active {
-  z-index: 10;
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.6),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
-
-.window-offset-1 { transform: translateY(10px); }
-.window-offset-2 { transform: translateY(20px); }
-.window-offset-3 { transform: translateY(30px); }
-.window-offset-1:hover, .window-offset-2:hover, .window-offset-3:hover { transform: translateY(-2px); }
 
 /* Window Header */
 .window-header {
@@ -131,6 +116,11 @@ body {
   align-items: center;
   padding: 0 12px;
   position: relative;
+  cursor: grab;
+}
+
+.window-header:active {
+  cursor: grabbing;
 }
 
 .traffic-lights {
@@ -160,6 +150,10 @@ body {
 /* Window Content */
 .window-content {
   padding: 20px;
+  cursor: default;
+  user-select: text;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 /* About Window */
@@ -411,7 +405,17 @@ body {
 }
 
 .dock-icon {
-  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: var(--text);
 }
 
 .dock-label {
@@ -431,18 +435,9 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .windows-container {
-    padding: 48px 12px 120px;
-    flex-direction: column;
-    align-items: center;
-  }
-
   .macos-window {
-    max-width: 100%;
-  }
-
-  .window-offset-1, .window-offset-2, .window-offset-3 {
-    transform: none;
+    width: calc(100vw - 24px);
+    left: 12px !important;
   }
 
   .menu-bar {
@@ -473,7 +468,8 @@ body {
   }
 
   .dock-icon {
-    font-size: 24px;
+    width: 24px;
+    height: 24px;
   }
 }
 
