@@ -806,9 +806,9 @@ function App() {
 
   const windowTitles = {
     about: 'Notes',
-    experience: 'Experience',
-    projects: 'Projects',
-    contact: 'Contact'
+    experience: 'Messages',
+    projects: 'Finder',
+    contact: 'Contacts'
   }
 
   // Mobile layout
@@ -890,206 +890,13 @@ function App() {
 
       {/* Windows Container */}
       <div className="windows-container">
-        {renderWindow('about', 'Notes', (
-          <div className="notes-layout">
-            {/* Sidebar - Folders */}
-            <div className="notes-sidebar">
-              <div className="notes-sidebar-header">iCloud</div>
-              <div className="notes-folder-list">
-                <div className="notes-folder-item active">
-                  <span className="notes-folder-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
-                    </svg>
-                  </span>
-                  <span>All Notes</span>
-                  <span className="notes-folder-count">3</span>
-                </div>
-                <div className="notes-folder-item">
-                  <span className="notes-folder-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                    </svg>
-                  </span>
-                  <span>Portfolio</span>
-                  <span className="notes-folder-count">3</span>
-                </div>
-                <div className="notes-folder-item">
-                  <span className="notes-folder-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-                    </svg>
-                  </span>
-                  <span>Favorites</span>
-                  <span className="notes-folder-count">1</span>
-                </div>
-              </div>
-            </div>
+        {renderWindow('about', 'Notes', windowContents.about)}
 
-            {/* Notes List - Middle Panel */}
-            <div className="notes-list-panel">
-              <div className="notes-list-header">All Notes</div>
-              <div className="notes-list">
-                {notesData.map((note) => (
-                  <div
-                    key={note.id}
-                    className={`notes-list-item ${activeNote === note.id ? 'active' : ''}`}
-                    onClick={() => setActiveNote(note.id)}
-                  >
-                    <div className="notes-list-item-title">{note.title}</div>
-                    <div className="notes-list-item-date">{note.date}</div>
-                    <div className="notes-list-item-preview">{note.preview}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {renderWindow('experience', 'Messages', windowContents.experience)}
 
-            {/* Note Content - Main Panel */}
-            <div className="notes-content-panel">
-              <div className="notes-content-header">
-                <div className="notes-content-date">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-              </div>
-              <div className="notes-content-body">
-                {activeNote === 'about' && (
-                  <>
-                    <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px', color: '#1d1d1f' }}>Tung Nguyen</h2>
-                    <p style={{ color: '#FFD52E', fontWeight: 600, marginBottom: '4px' }}>Senior Software Engineer</p>
-                    <p style={{ color: '#86868b', marginBottom: '16px' }}>Ernst & Young · New York, NY</p>
-                    <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
-                  </>
-                )}
-                {activeNote === 'education' && (
-                  <>
-                    <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Education</h2>
-                    <p style={{ fontWeight: 600 }}>Virginia Tech</p>
-                    <p>B.S. Computer Science, 2022</p>
-                    <p style={{ color: '#86868b' }}>Dean's List · Beyond Boundaries Scholar</p>
-                  </>
-                )}
-                {activeNote === 'skills' && (
-                  <>
-                    <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Skills</h2>
-                    <div className="skills-tags">
-                      {skills.map((skill, i) => (
-                        <span key={i} className="skill-tag">{skill}</span>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+        {renderWindow('projects', 'Finder', windowContents.projects)}
 
-        {renderWindow('experience', 'Experience', (
-          <div className="experience-list">
-            {experience.map((job) => (
-              <div
-                key={job.id}
-                className={`experience-item expandable ${expandedItems[job.id] ? 'expanded' : ''}`}
-                onClick={() => toggleExpand(job.id)}
-              >
-                <div className="exp-header">
-                  <h3>{job.title}</h3>
-                  <span className="exp-period">{job.period}</span>
-                </div>
-                <p className="exp-company">{job.company}</p>
-                <p className="exp-desc">{job.desc}</p>
-                <span className="expand-icon">{expandedItems[job.id] ? '−' : '+'}</span>
-                {expandedItems[job.id] && (
-                  <div className="exp-details">
-                    <ul>
-                      {job.details.map((detail, i) => (
-                        <li key={i}>{detail}</li>
-                      ))}
-                    </ul>
-                    <div className="exp-skills">
-                      {job.skills.map((skill, i) => (
-                        <span key={i} className="exp-skill-tag">{skill}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
-
-        {renderWindow('projects', 'Projects', (
-          <div className="finder-list">
-            {projects.map((proj) => (
-              <div key={proj.id} className={`finder-item-wrapper ${expandedItems[proj.id] ? 'expanded' : ''}`}>
-                <div className="finder-item" onClick={() => toggleExpand(proj.id)}>
-                  <span className="finder-icon">
-                    <svg viewBox="0 0 32 32" fill="none">
-                      <path d="M6 6h12l2 2h6a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#64b5f6" />
-                      <rect x="4" y="10" width="24" height="16" rx="2" fill="#90caf9" />
-                    </svg>
-                  </span>
-                  <div className="finder-info">
-                    <span className="finder-name">{proj.name}</span>
-                    <span className="finder-tech">{proj.tech}</span>
-                  </div>
-                  <span className="finder-arrow">
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style={{ transform: expandedItems[proj.id] ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
-                    </svg>
-                  </span>
-                </div>
-                {expandedItems[proj.id] && (
-                  <div className="project-details">
-                    <p className="project-desc">{proj.desc}</p>
-                    <ul>
-                      {proj.details.map((detail, i) => (
-                        <li key={i}>{detail}</li>
-                      ))}
-                    </ul>
-                    <a href={proj.url} target="_blank" rel="noopener noreferrer" className="project-link">
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                      </svg>
-                      View on GitHub
-                    </a>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
-
-        {renderWindow('contact', 'Contact', (
-          <div className="contact-window">
-            <h2>Let's Connect</h2>
-            <p>Open to new opportunities and collaborations</p>
-            <div className="contact-links">
-              <a href="mailto:tungnguyen1651@gmail.com" className="contact-btn">
-                <span className="btn-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="4" width="20" height="16" rx="2" />
-                    <path d="M22 6l-10 7L2 6" />
-                  </svg>
-                </span>
-                <span>tungnguyen1651@gmail.com</span>
-              </a>
-              <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
-                <span className="btn-icon">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                </span>
-                <span>github.com/tungcodeforfun</span>
-              </a>
-              <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="contact-btn">
-                <span className="btn-icon">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </span>
-                <span>LinkedIn</span>
-              </a>
-            </div>
-          </div>
-        ))}
+        {renderWindow('contact', 'Contacts', windowContents.contact)}
       </div>
 
       {/* Dock */}
