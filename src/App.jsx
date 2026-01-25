@@ -14,18 +14,23 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  // Window sizes - uniform size for grid layout
-  const windowWidth = 440
-  const windowHeight = 320
-  const gap = 30
+  // Window sizes - 16:10 aspect ratio (standard Mac display ratio)
+  // Based on macOS HIG: typical app windows scale to fit available space
+  // Reference: Mac displays use 16:10 (8:5) aspect ratio
+  const windowWidth = 480
+  const windowHeight = 300  // 480:300 = 8:5 = 16:10 ratio
+  const gap = 24  // Standard macOS window gap
 
   // Calculate centered 2x2 grid positions
   const gridWidth = windowWidth * 2 + gap
   const gridHeight = windowHeight * 2 + gap
+  const menuBarHeight = 28  // macOS menu bar
+  const dockHeight = 70     // macOS dock area
+  const availableHeight = window.innerHeight - menuBarHeight - dockHeight
   const startX = Math.max(40, (window.innerWidth - gridWidth) / 2)
-  const startY = Math.max(50, (window.innerHeight - gridHeight - 100) / 2 + 28) // 28px for menu bar, 100px for dock
+  const startY = Math.max(menuBarHeight + 20, menuBarHeight + (availableHeight - gridHeight) / 2)
 
-  // Window positions - 2x2 grid layout
+  // Window positions - 2x2 grid layout (Mission Control style)
   const defaultPositions = {
     about: { x: startX, y: startY },                              // Top-left
     experience: { x: startX + windowWidth + gap, y: startY },     // Top-right
@@ -33,7 +38,7 @@ function App() {
     contact: { x: startX + windowWidth + gap, y: startY + windowHeight + gap }  // Bottom-right
   }
 
-  // Window sizes - all same size for uniform grid
+  // Window sizes - uniform 16:10 aspect ratio
   const defaultSizes = {
     about: { w: windowWidth, h: windowHeight },
     experience: { w: windowWidth, h: windowHeight },
