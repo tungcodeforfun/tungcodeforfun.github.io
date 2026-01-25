@@ -108,6 +108,10 @@ function App() {
 
   // Drag handlers using direct DOM manipulation for performance
   const handleDragStart = (e, windowId) => {
+    // Always bring window to front when clicking anywhere on it
+    bringToFront(windowId)
+
+    // Only start dragging if clicking on header (not content, traffic lights, or resize handles)
     if (e.target.closest('.window-content') || e.target.closest('.traffic-lights') || e.target.closest('.resize-handle')) return
     e.preventDefault()
 
@@ -120,7 +124,6 @@ function App() {
       origY: pos.y
     }
 
-    bringToFront(windowId)
     document.addEventListener('mousemove', handleDragMove)
     document.addEventListener('mouseup', handleDragEnd)
   }
