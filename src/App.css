@@ -626,12 +626,12 @@ body {
   cursor: pointer;
 }
 
-.experience-item.expandable:hover {
+:not(.messages-theme) > .window-content .experience-item.expandable:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-.experience-item.expanded {
+:not(.messages-theme) > .window-content .experience-item.expanded {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(10, 132, 255, 0.3);
 }
