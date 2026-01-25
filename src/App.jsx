@@ -61,7 +61,7 @@ function App() {
   // Use refs for positions and sizes to avoid re-renders during drag/resize
   const windowPositions = useRef(getInitialPositions())
   const windowSizes = useRef({
-    about: { w: 420, h: 450 },
+    about: { w: 680, h: 450 },
     experience: { w: 420, h: 280 },
     projects: { w: 420, h: 280 },
     contact: { w: 420, h: 300 }
@@ -512,33 +512,102 @@ function App() {
     )
   }
 
+  // Notes data for 3-panel layout
+  const notesData = [
+    { id: 'about', title: 'About Me', date: 'Today', preview: 'Senior Software Engineer at EY...' },
+    { id: 'education', title: 'Education', date: 'Yesterday', preview: 'Virginia Tech - B.S. Computer Science' },
+    { id: 'skills', title: 'Skills', date: 'Dec 2024', preview: 'Java, Python, JavaScript, AWS...' }
+  ]
+  const [activeNote, setActiveNote] = useState('about')
+
   // Mobile content sections
   const windowContents = {
     about: (
-      <div className="about-window">
-        <div className="about-header">
-          <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" className="about-avatar" />
-          <div className="about-info">
-            <h1>Tung Nguyen</h1>
-            <p className="about-title">Senior Software Engineer</p>
-            <p className="about-company">Ernst & Young · New York, NY</p>
+      <div className="notes-layout">
+        {/* Sidebar - Folders */}
+        <div className="notes-sidebar">
+          <div className="notes-sidebar-header">iCloud</div>
+          <div className="notes-folder-list">
+            <div className="notes-folder-item active">
+              <span className="notes-folder-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                </svg>
+              </span>
+              <span>All Notes</span>
+              <span className="notes-folder-count">3</span>
+            </div>
+            <div className="notes-folder-item">
+              <span className="notes-folder-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+              </span>
+              <span>Portfolio</span>
+              <span className="notes-folder-count">3</span>
+            </div>
+            <div className="notes-folder-item">
+              <span className="notes-folder-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+              </span>
+              <span>Favorites</span>
+              <span className="notes-folder-count">1</span>
+            </div>
           </div>
         </div>
-        <div className="about-bio">
-          <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
-        </div>
-        <div className="about-education">
-          <h3>Education</h3>
-          <p><strong>Virginia Tech</strong></p>
-          <p>B.S. Computer Science, 2022</p>
-          <p className="subtle">Dean's List · Beyond Boundaries Scholar</p>
-        </div>
-        <div className="about-skills">
-          <h3>Skills</h3>
-          <div className="skills-tags">
-            {skills.map((skill, i) => (
-              <span key={i} className="skill-tag">{skill}</span>
+
+        {/* Notes List - Middle Panel */}
+        <div className="notes-list-panel">
+          <div className="notes-list-header">All Notes</div>
+          <div className="notes-list">
+            {notesData.map((note) => (
+              <div
+                key={note.id}
+                className={`notes-list-item ${activeNote === note.id ? 'active' : ''}`}
+                onClick={() => setActiveNote(note.id)}
+              >
+                <div className="notes-list-item-title">{note.title}</div>
+                <div className="notes-list-item-date">{note.date}</div>
+                <div className="notes-list-item-preview">{note.preview}</div>
+              </div>
             ))}
+          </div>
+        </div>
+
+        {/* Note Content - Main Panel */}
+        <div className="notes-content-panel">
+          <div className="notes-content-header">
+            <div className="notes-content-date">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          </div>
+          <div className="notes-content-body">
+            {activeNote === 'about' && (
+              <>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px', color: '#1d1d1f' }}>Tung Nguyen</h2>
+                <p style={{ color: '#FFD52E', fontWeight: 600, marginBottom: '4px' }}>Senior Software Engineer</p>
+                <p style={{ color: '#86868b', marginBottom: '16px' }}>Ernst & Young · New York, NY</p>
+                <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
+              </>
+            )}
+            {activeNote === 'education' && (
+              <>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Education</h2>
+                <p style={{ fontWeight: 600 }}>Virginia Tech</p>
+                <p>B.S. Computer Science, 2022</p>
+                <p style={{ color: '#86868b' }}>Dean's List · Beyond Boundaries Scholar</p>
+              </>
+            )}
+            {activeNote === 'skills' && (
+              <>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Skills</h2>
+                <div className="skills-tags">
+                  {skills.map((skill, i) => (
+                    <span key={i} className="skill-tag">{skill}</span>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -653,7 +722,7 @@ function App() {
   }
 
   const windowTitles = {
-    about: 'About Me',
+    about: 'Notes',
     experience: 'Experience',
     projects: 'Projects',
     contact: 'Contact'
@@ -738,31 +807,92 @@ function App() {
 
       {/* Windows Container */}
       <div className="windows-container">
-        {renderWindow('about', 'About Me', (
-          <div className="about-window">
-            <div className="about-header">
-              <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" className="about-avatar" />
-              <div className="about-info">
-                <h1>Tung Nguyen</h1>
-                <p className="about-title">Senior Software Engineer</p>
-                <p className="about-company">Ernst & Young · New York, NY</p>
+        {renderWindow('about', 'Notes', (
+          <div className="notes-layout">
+            {/* Sidebar - Folders */}
+            <div className="notes-sidebar">
+              <div className="notes-sidebar-header">iCloud</div>
+              <div className="notes-folder-list">
+                <div className="notes-folder-item active">
+                  <span className="notes-folder-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                    </svg>
+                  </span>
+                  <span>All Notes</span>
+                  <span className="notes-folder-count">3</span>
+                </div>
+                <div className="notes-folder-item">
+                  <span className="notes-folder-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                  </span>
+                  <span>Portfolio</span>
+                  <span className="notes-folder-count">3</span>
+                </div>
+                <div className="notes-folder-item">
+                  <span className="notes-folder-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                  </span>
+                  <span>Favorites</span>
+                  <span className="notes-folder-count">1</span>
+                </div>
               </div>
             </div>
-            <div className="about-bio">
-              <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
-            </div>
-            <div className="about-education">
-              <h3>Education</h3>
-              <p><strong>Virginia Tech</strong></p>
-              <p>B.S. Computer Science, 2022</p>
-              <p className="subtle">Dean's List · Beyond Boundaries Scholar</p>
-            </div>
-            <div className="about-skills">
-              <h3>Skills</h3>
-              <div className="skills-tags">
-                {skills.map((skill, i) => (
-                  <span key={i} className="skill-tag">{skill}</span>
+
+            {/* Notes List - Middle Panel */}
+            <div className="notes-list-panel">
+              <div className="notes-list-header">All Notes</div>
+              <div className="notes-list">
+                {notesData.map((note) => (
+                  <div
+                    key={note.id}
+                    className={`notes-list-item ${activeNote === note.id ? 'active' : ''}`}
+                    onClick={() => setActiveNote(note.id)}
+                  >
+                    <div className="notes-list-item-title">{note.title}</div>
+                    <div className="notes-list-item-date">{note.date}</div>
+                    <div className="notes-list-item-preview">{note.preview}</div>
+                  </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Note Content - Main Panel */}
+            <div className="notes-content-panel">
+              <div className="notes-content-header">
+                <div className="notes-content-date">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              </div>
+              <div className="notes-content-body">
+                {activeNote === 'about' && (
+                  <>
+                    <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px', color: '#1d1d1f' }}>Tung Nguyen</h2>
+                    <p style={{ color: '#FFD52E', fontWeight: 600, marginBottom: '4px' }}>Senior Software Engineer</p>
+                    <p style={{ color: '#86868b', marginBottom: '16px' }}>Ernst & Young · New York, NY</p>
+                    <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
+                  </>
+                )}
+                {activeNote === 'education' && (
+                  <>
+                    <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Education</h2>
+                    <p style={{ fontWeight: 600 }}>Virginia Tech</p>
+                    <p>B.S. Computer Science, 2022</p>
+                    <p style={{ color: '#86868b' }}>Dean's List · Beyond Boundaries Scholar</p>
+                  </>
+                )}
+                {activeNote === 'skills' && (
+                  <>
+                    <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Skills</h2>
+                    <div className="skills-tags">
+                      {skills.map((skill, i) => (
+                        <span key={i} className="skill-tag">{skill}</span>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
