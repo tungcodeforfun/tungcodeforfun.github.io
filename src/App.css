@@ -139,6 +139,7 @@ body {
 }
 
 /* macOS Window - Reference: github.com/RedEdge967/MacOS-CSS */
+/* macOS Tahoe uses 10px corner radius for windows */
 .macos-window {
   position: absolute;
   background: rgba(30, 30, 31, 0.85);
@@ -155,6 +156,7 @@ body {
   user-select: none;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Clip content to rounded corners */
 }
 
 .macos-window.active {
@@ -207,6 +209,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-bottom-left-radius: 10px; /* Match window corner */
 }
 
 .notes-sidebar-header {
@@ -347,6 +350,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  border-bottom-right-radius: 10px; /* Match window corner */
 }
 
 .notes-content-header {
@@ -571,6 +575,8 @@ body {
   padding: 8px 12px 10px;
   background: #fff;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom-left-radius: 10px; /* Match window corner */
+  border-bottom-right-radius: 10px; /* Match window corner */
 }
 
 .messages-plus-btn,
@@ -902,6 +908,8 @@ body {
   user-select: text;
   flex: 1;
   overflow-y: auto;
+  border-bottom-left-radius: 10px; /* Match window corner */
+  border-bottom-right-radius: 10px; /* Match window corner */
 }
 
 /* Resize Handles */
