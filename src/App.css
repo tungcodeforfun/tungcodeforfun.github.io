@@ -202,7 +202,9 @@ body {
   gap: 12px;
 }
 
-.messages-theme .experience-item {
+.messages-theme .experience-item,
+.messages-theme .experience-item.expandable,
+.messages-theme .experience-item.expanded {
   background: #34c759;
   border: none;
   color: #fff;
@@ -216,28 +218,17 @@ body {
   transition: background 0.15s;
 }
 
-.messages-theme .experience-item:hover {
+.messages-theme .experience-item:hover,
+.messages-theme .experience-item.expandable:hover {
   background: #2fb350;
   color: #fff;
+  border-color: transparent;
 }
 
-.messages-theme .experience-item:hover .exp-header h3,
-.messages-theme .experience-item:hover .exp-period,
-.messages-theme .experience-item:hover .exp-company,
-.messages-theme .experience-item:hover .exp-desc {
-  color: #fff;
-}
-
-.messages-theme .experience-item.expanded {
+.messages-theme .experience-item.expanded,
+.messages-theme .experience-item.expandable.expanded {
   background: #2aa147;
   border-color: transparent;
-  color: #fff;
-}
-
-.messages-theme .experience-item.expanded .exp-header h3,
-.messages-theme .experience-item.expanded .exp-period,
-.messages-theme .experience-item.expanded .exp-company,
-.messages-theme .experience-item.expanded .exp-desc {
   color: #fff;
 }
 
