@@ -177,82 +177,108 @@ body {
 /* Messages Theme - iOS Messages style */
 .macos-window.messages-theme,
 .mobile-window.messages-theme {
-  background: #fff;
-  border-color: rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #4a9fe8 0%, #7ec8f2 40%, #b8dff7 70%, #d4ecfa 100%);
+  border-color: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
 .messages-theme .window-header {
-  background: #f6f6f6;
-  border-bottom: 1px solid #e5e5e5;
+  background: rgba(74, 159, 232, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .messages-theme .window-title {
-  color: #000;
+  color: #fff;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.messages-theme .traffic-lights .light.red,
+.messages-theme .traffic-lights .light.yellow,
+.messages-theme .traffic-lights .light.green {
+  opacity: 0.9;
 }
 
 .messages-theme .window-content {
-  background: #fff;
+  background: transparent;
   padding: 16px;
+  position: relative;
+}
+
+/* Cloud effect */
+.messages-theme .window-content::before {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  left: -10%;
+  width: 50%;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.messages-theme .window-content::after {
+  content: '';
+  position: absolute;
+  bottom: 30%;
+  right: -5%;
+  width: 40%;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  filter: blur(25px);
+  pointer-events: none;
 }
 
 .messages-theme .experience-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 
 .messages-theme .experience-item,
 .messages-theme .experience-item.expandable,
 .messages-theme .experience-item.expanded {
-  background: #34c759;
+  background: #007aff;
   border: none;
   color: #fff;
   border-radius: 18px;
   border-bottom-right-radius: 4px;
-  padding: 12px 16px;
-  margin-left: 60px;
+  padding: 10px 14px;
+  margin-left: auto;
   margin-right: 8px;
+  max-width: 85%;
   position: relative;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .messages-theme .experience-item:hover,
 .messages-theme .experience-item.expandable:hover {
-  background: #2fb350;
+  background: #0066d6;
   color: #fff;
   border-color: transparent;
+  transform: scale(1.01);
 }
 
 .messages-theme .experience-item.expanded,
 .messages-theme .experience-item.expandable.expanded {
-  background: #2aa147;
+  background: #005cc5;
   border-color: transparent;
   color: #fff;
 }
 
-.messages-theme .experience-item::before {
-  content: '';
-  position: absolute;
-  left: -48px;
-  top: 8px;
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
-}
-
+/* Remove the avatar pseudo-elements */
+.messages-theme .experience-item::before,
 .messages-theme .experience-item::after {
-  content: '';
-  position: absolute;
-  left: -38px;
-  top: 18px;
-  width: 16px;
-  height: 16px;
-  background: #fff;
-  border-radius: 50%;
-  opacity: 0.9;
+  display: none;
 }
 
 .messages-theme .exp-header {
@@ -285,14 +311,14 @@ body {
 .messages-theme .expand-icon {
   background: rgba(255, 255, 255, 0.25);
   color: #fff;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
 }
 
 .messages-theme .exp-details {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
 }
 
 .messages-theme .exp-details ul {
