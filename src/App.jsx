@@ -25,9 +25,9 @@ function App() {
 
   // Window sizes - sized to fit multi-panel app layouts comfortably
   // Using 16:10 aspect ratio (standard Mac display ratio)
-  const windowWidth = 960
-  const windowHeight = 600  // 960:600 = 16:10 ratio
-  const gap = 8
+  const windowWidth = 880
+  const windowHeight = 550  // 880:550 = 16:10 ratio
+  const gap = 10
 
   // Calculate centered 2x2 grid positions
   const gridWidth = windowWidth * 2 + gap
