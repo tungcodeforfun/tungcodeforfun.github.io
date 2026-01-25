@@ -14,58 +14,25 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  // Calculate initial positions based on viewport - spread out more
-  const getInitialPositions = () => {
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-    const menuBarHeight = 28
-    const dockHeight = 80
+  // Fixed window positions - simple cascade layout
+  const defaultPositions = {
+    about: { x: 60, y: 60 },
+    experience: { x: 120, y: 100 },
+    projects: { x: 180, y: 140 },
+    contact: { x: 240, y: 180 }
+  }
 
-    if (vw >= 1200) {
-      // Large desktop: spread across screen
-      return {
-        about: { x: 40, y: 50 },
-        experience: { x: vw - 480, y: 50 },
-        projects: { x: 120, y: vh - 380 },
-        contact: { x: vw - 520, y: vh - 400 }
-      }
-    } else if (vw >= 1024) {
-      // Desktop: 2x2 with more spacing
-      const gapX = 60
-      const startX = 40
-      const startY = menuBarHeight + 30
-      return {
-        about: { x: startX, y: startY },
-        experience: { x: vw - 460, y: startY + 40 },
-        projects: { x: startX + 80, y: startY + 320 },
-        contact: { x: vw - 480, y: startY + 360 }
-      }
-    } else if (vw >= 768) {
-      // Tablet: staggered cascade with more spread
-      const startY = menuBarHeight + 30
-      return {
-        about: { x: 30, y: startY },
-        experience: { x: vw - 450, y: startY + 60 },
-        projects: { x: 60, y: startY + 200 },
-        contact: { x: vw - 420, y: startY + 260 }
-      }
-    }
-    return {
-      about: { x: 20, y: 50 },
-      experience: { x: 20, y: 50 },
-      projects: { x: 20, y: 50 },
-      contact: { x: 20, y: 50 }
-    }
+  // Fixed window sizes - sized for their content
+  const defaultSizes = {
+    about: { w: 680, h: 420 },
+    experience: { w: 580, h: 420 },
+    projects: { w: 540, h: 380 },
+    contact: { w: 520, h: 440 }
   }
 
   // Use refs for positions and sizes to avoid re-renders during drag/resize
-  const windowPositions = useRef(getInitialPositions())
-  const windowSizes = useRef({
-    about: { w: 680, h: 450 },
-    experience: { w: 620, h: 420 },
-    projects: { w: 420, h: 320 },
-    contact: { w: 480, h: 400 }
-  })
+  const windowPositions = useRef({ ...defaultPositions })
+  const windowSizes = useRef({ ...defaultSizes })
 
   // Handle resize for mobile detection
   useEffect(() => {
@@ -619,27 +586,18 @@ function App() {
             </button>
           </div>
           <div className="messages-conversation-list">
-            {experience.map((job, index) => (
-              <div
-                key={job.id}
-                className={`messages-conversation-item ${expandedItems[job.id] || index === 0 ? 'active' : ''}`}
-                onClick={() => {
-                  setExpandedItems({})
-                  toggleExpand(job.id)
-                }}
-              >
-                <div className="messages-conv-avatar">
-                  <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="" />
-                </div>
-                <div className="messages-conv-info">
-                  <div className="messages-conv-header">
-                    <span className="messages-conv-name">{job.company}</span>
-                    <span className="messages-conv-time">{job.period.split(' - ')[0]}</span>
-                  </div>
-                  <div className="messages-conv-preview">{job.title}</div>
-                </div>
+            <div className="messages-conversation-item active">
+              <div className="messages-conv-avatar">
+                <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="" />
               </div>
-            ))}
+              <div className="messages-conv-info">
+                <div className="messages-conv-header">
+                  <span className="messages-conv-name">Ernst & Young</span>
+                  <span className="messages-conv-time">Now</span>
+                </div>
+                <div className="messages-conv-preview">Experience & Career</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -690,44 +648,80 @@ function App() {
       </div>
     ),
     projects: (
-      <div className="finder-list">
-        {projects.map((proj) => (
-          <div key={proj.id} className={`finder-item-wrapper ${expandedItems[proj.id] ? 'expanded' : ''}`}>
-            <div className="finder-item" onClick={() => toggleExpand(proj.id)}>
-              <span className="finder-icon">
-                <svg viewBox="0 0 32 32" fill="none">
-                  <path d="M6 6h12l2 2h6a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#64b5f6" />
-                  <rect x="4" y="10" width="24" height="16" rx="2" fill="#90caf9" />
-                </svg>
-              </span>
-              <div className="finder-info">
-                <span className="finder-name">{proj.name}</span>
-                <span className="finder-tech">{proj.tech}</span>
-              </div>
-              <span className="finder-arrow">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style={{ transform: expandedItems[proj.id] ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
-                </svg>
-              </span>
+      <div className="finder-layout">
+        {/* Finder Sidebar */}
+        <div className="finder-sidebar">
+          <div className="finder-sidebar-section">
+            <div className="finder-sidebar-header">Favorites</div>
+            <div className="finder-sidebar-item">
+              <svg viewBox="0 0 24 24" fill="#007AFF">
+                <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+              </svg>
+              <span>Desktop</span>
             </div>
-            {expandedItems[proj.id] && (
-              <div className="project-details">
-                <p className="project-desc">{proj.desc}</p>
-                <ul>
-                  {proj.details.map((detail, i) => (
-                    <li key={i}>{detail}</li>
-                  ))}
-                </ul>
-                <a href={proj.url} target="_blank" rel="noopener noreferrer" className="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  View on GitHub
-                </a>
-              </div>
-            )}
+            <div className="finder-sidebar-item">
+              <svg viewBox="0 0 24 24" fill="#007AFF">
+                <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/>
+              </svg>
+              <span>Documents</span>
+            </div>
+            <div className="finder-sidebar-item active">
+              <svg viewBox="0 0 24 24" fill="#fff">
+                <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/>
+              </svg>
+              <span>Projects</span>
+            </div>
           </div>
-        ))}
+          <div className="finder-sidebar-section">
+            <div className="finder-sidebar-header">Locations</div>
+            <div className="finder-sidebar-item">
+              <svg viewBox="0 0 24 24" fill="#888">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+              </svg>
+              <span>iCloud Drive</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Finder Main Content */}
+        <div className="finder-main">
+          <div className="finder-toolbar">
+            <button className="finder-nav-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+              </svg>
+            </button>
+            <button className="finder-nav-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+              </svg>
+            </button>
+            <span className="finder-path">Projects</span>
+          </div>
+          <div className="finder-files">
+            {projects.map((proj) => (
+              <a
+                key={proj.id}
+                href={proj.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="finder-file-item"
+                style={{ textDecoration: 'none' }}
+              >
+                <span className="finder-file-icon">
+                  <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M6 4h12l2 2h8a2 2 0 012 2v18a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2z" fill="#64b5f6" />
+                    <rect x="4" y="8" width="24" height="18" rx="2" fill="#90caf9" />
+                  </svg>
+                </span>
+                <div className="finder-file-info">
+                  <div className="finder-file-name">{proj.name}</div>
+                  <div className="finder-file-meta">{proj.tech}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     ),
     contact: (
