@@ -11,6 +11,7 @@ function App() {
   })
   const [windowOrder, setWindowOrder] = useState(['about', 'experience', 'projects', 'contact'])
   const [, forceUpdate] = useState(0)
+  const [expandedItems, setExpandedItems] = useState({})
 
   // Use refs for positions and sizes to avoid re-renders during drag/resize
   const windowPositions = useRef({
@@ -182,27 +183,80 @@ function App() {
     forceUpdate(n => n + 1) // Sync state after resize
   }
 
+  const toggleExpand = (id) => {
+    setExpandedItems(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
   const skills = ["Java", "Python", "JavaScript", "AWS", "Spring Boot", "React", "Docker", "SQL", "Git", "Redis", "PostgreSQL", "DataDog"]
 
   const experience = [
     {
+      id: 'exp1',
       title: "Senior Software Engineer",
       company: "Ernst & Young",
       period: "Dec 2024 - Present",
-      desc: "AWS migrations, Redis caching (65% latency reduction), CI/CD pipelines"
+      desc: "AWS migrations, Redis caching (65% latency reduction), CI/CD pipelines",
+      details: [
+        "Led migration of legacy systems to AWS, reducing infrastructure costs by 40%",
+        "Implemented Redis caching layer achieving 65% reduction in API latency",
+        "Designed and deployed CI/CD pipelines using GitHub Actions and AWS CodePipeline",
+        "Mentored junior developers and conducted code reviews for team of 5"
+      ],
+      skills: ["AWS", "Redis", "Docker", "Terraform", "GitHub Actions"]
     },
     {
+      id: 'exp2',
       title: "Software Engineer",
       company: "Ernst & Young",
       period: "Aug 2022 - Dec 2024",
-      desc: "Spring Boot APIs for 3,000+ locations, event-driven architecture"
+      desc: "Spring Boot APIs for 3,000+ locations, event-driven architecture",
+      details: [
+        "Built RESTful APIs serving 3,000+ retail locations with 99.9% uptime",
+        "Designed event-driven architecture using Apache Kafka for real-time data processing",
+        "Optimized PostgreSQL queries reducing response times by 70%",
+        "Implemented DataDog monitoring and alerting for production systems"
+      ],
+      skills: ["Java", "Spring Boot", "Kafka", "PostgreSQL", "DataDog"]
     }
   ]
 
   const projects = [
-    { name: "TCG Price Tracker", tech: "Python", url: "https://github.com/tungcodeforfun/tcg-price-tracker" },
-    { name: "Workout Tracker", tech: "Swift", url: "https://github.com/tungcodeforfun/WorkoutTracker" },
-    { name: "TungBot", tech: "Python", url: "https://github.com/tungcodeforfun/TungBot" }
+    {
+      id: 'proj1',
+      name: "TCG Price Tracker",
+      tech: "Python",
+      url: "https://github.com/tungcodeforfun/tcg-price-tracker",
+      desc: "Real-time trading card game price tracking application",
+      details: [
+        "Scrapes pricing data from multiple TCG marketplaces",
+        "Tracks price history and alerts users of significant changes",
+        "Built with Python, BeautifulSoup, and SQLite"
+      ]
+    },
+    {
+      id: 'proj2',
+      name: "Workout Tracker",
+      tech: "Swift",
+      url: "https://github.com/tungcodeforfun/WorkoutTracker",
+      desc: "iOS app for tracking workouts and fitness progress",
+      details: [
+        "Native iOS app built with SwiftUI",
+        "Tracks exercises, sets, reps, and progress over time",
+        "Integrates with HealthKit for comprehensive fitness data"
+      ]
+    },
+    {
+      id: 'proj3',
+      name: "TungBot",
+      tech: "Python",
+      url: "https://github.com/tungcodeforfun/TungBot",
+      desc: "Discord bot with various utility and fun commands",
+      details: [
+        "Built with discord.py library",
+        "Features include music playback, moderation tools, and games",
+        "Deployed on cloud infrastructure with 24/7 uptime"
+      ]
+    }
   ]
 
   const DockIcon = ({ type }) => {
@@ -392,14 +446,33 @@ function App() {
 
         {renderWindow('experience', 'Experience', (
           <div className="experience-list">
-            {experience.map((job, i) => (
-              <div key={i} className="experience-item">
+            {experience.map((job) => (
+              <div
+                key={job.id}
+                className={`experience-item expandable ${expandedItems[job.id] ? 'expanded' : ''}`}
+                onClick={() => toggleExpand(job.id)}
+              >
                 <div className="exp-header">
                   <h3>{job.title}</h3>
                   <span className="exp-period">{job.period}</span>
                 </div>
                 <p className="exp-company">{job.company}</p>
                 <p className="exp-desc">{job.desc}</p>
+                <span className="expand-icon">{expandedItems[job.id] ? '−' : '+'}</span>
+                {expandedItems[job.id] && (
+                  <div className="exp-details">
+                    <ul>
+                      {job.details.map((detail, i) => (
+                        <li key={i}>{detail}</li>
+                      ))}
+                    </ul>
+                    <div className="exp-skills">
+                      {job.skills.map((skill, i) => (
+                        <span key={i} className="exp-skill-tag">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -407,24 +480,42 @@ function App() {
 
         {renderWindow('projects', 'Projects', (
           <div className="finder-list">
-            {projects.map((proj, i) => (
-              <a key={i} href={proj.url} target="_blank" rel="noopener noreferrer" className="finder-item">
-                <span className="finder-icon">
-                  <svg viewBox="0 0 32 32" fill="none">
-                    <path d="M6 6h12l2 2h6a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#64b5f6" />
-                    <rect x="4" y="10" width="24" height="16" rx="2" fill="#90caf9" />
-                  </svg>
-                </span>
-                <div className="finder-info">
-                  <span className="finder-name">{proj.name}</span>
-                  <span className="finder-tech">{proj.tech}</span>
+            {projects.map((proj) => (
+              <div key={proj.id} className={`finder-item-wrapper ${expandedItems[proj.id] ? 'expanded' : ''}`}>
+                <div className="finder-item" onClick={() => toggleExpand(proj.id)}>
+                  <span className="finder-icon">
+                    <svg viewBox="0 0 32 32" fill="none">
+                      <path d="M6 6h12l2 2h6a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#64b5f6" />
+                      <rect x="4" y="10" width="24" height="16" rx="2" fill="#90caf9" />
+                    </svg>
+                  </span>
+                  <div className="finder-info">
+                    <span className="finder-name">{proj.name}</span>
+                    <span className="finder-tech">{proj.tech}</span>
+                  </div>
+                  <span className="finder-arrow">
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style={{ transform: expandedItems[proj.id] ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                    </svg>
+                  </span>
                 </div>
-                <span className="finder-arrow">
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
-                  </svg>
-                </span>
-              </a>
+                {expandedItems[proj.id] && (
+                  <div className="project-details">
+                    <p className="project-desc">{proj.desc}</p>
+                    <ul>
+                      {proj.details.map((detail, i) => (
+                        <li key={i}>{detail}</li>
+                      ))}
+                    </ul>
+                    <a href={proj.url} target="_blank" rel="noopener noreferrer" className="project-link">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                      </svg>
+                      View on GitHub
+                    </a>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         ))}

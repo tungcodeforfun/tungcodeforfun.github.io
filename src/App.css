@@ -374,7 +374,7 @@ body {
 .experience-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .experience-item {
@@ -382,6 +382,37 @@ body {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.experience-item.expandable {
+  cursor: pointer;
+}
+
+.experience-item.expandable:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.experience-item.expanded {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(10, 132, 255, 0.3);
+}
+
+.expand-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .exp-header {
@@ -389,6 +420,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 4px;
+  padding-right: 30px;
 }
 
 .exp-header h3 {
@@ -402,6 +434,7 @@ body {
   background: rgba(10, 132, 255, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
+  white-space: nowrap;
 }
 
 .exp-company {
@@ -416,11 +449,81 @@ body {
   line-height: 1.5;
 }
 
+.exp-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideDown 0.2s ease-out;
+}
+
+.exp-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.exp-details li {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.exp-details li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.exp-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.exp-skill-tag {
+  background: rgba(10, 132, 255, 0.2);
+  color: var(--accent);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Finder List */
 .finder-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+}
+
+.finder-item-wrapper {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.finder-item-wrapper:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.finder-item-wrapper.expanded {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(10, 132, 255, 0.3);
 }
 
 .finder-item {
@@ -430,11 +533,12 @@ body {
   padding: 10px 12px;
   border-radius: 6px;
   text-decoration: none;
+  cursor: pointer;
   transition: background 0.1s;
 }
 
 .finder-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .finder-icon {
@@ -471,6 +575,60 @@ body {
   color: var(--text-muted);
   display: flex;
   align-items: center;
+}
+
+.project-details {
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+  animation: slideDown 0.2s ease-out;
+}
+
+.project-desc {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.project-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.project-details li {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  padding-left: 14px;
+  position: relative;
+  margin-bottom: 6px;
+}
+
+.project-details li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: rgba(10, 132, 255, 0.15);
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.project-link:hover {
+  background: rgba(10, 132, 255, 0.25);
 }
 
 /* Contact Window */
