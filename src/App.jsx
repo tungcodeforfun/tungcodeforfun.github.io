@@ -14,20 +14,31 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  // Window positions - spread out like a real workspace
+  // Window sizes - uniform size for grid layout
+  const windowWidth = 440
+  const windowHeight = 320
+  const gap = 30
+
+  // Calculate centered 2x2 grid positions
+  const gridWidth = windowWidth * 2 + gap
+  const gridHeight = windowHeight * 2 + gap
+  const startX = Math.max(40, (window.innerWidth - gridWidth) / 2)
+  const startY = Math.max(50, (window.innerHeight - gridHeight - 100) / 2 + 28) // 28px for menu bar, 100px for dock
+
+  // Window positions - 2x2 grid layout
   const defaultPositions = {
-    about: { x: 60, y: 50 },         // Top-left
-    experience: { x: 520, y: 70 },   // Top-right
-    projects: { x: 100, y: 340 },    // Bottom-left
-    contact: { x: 540, y: 320 }      // Bottom-right
+    about: { x: startX, y: startY },                              // Top-left
+    experience: { x: startX + windowWidth + gap, y: startY },     // Top-right
+    projects: { x: startX, y: startY + windowHeight + gap },      // Bottom-left
+    contact: { x: startX + windowWidth + gap, y: startY + windowHeight + gap }  // Bottom-right
   }
 
-  // Window sizes - proper macOS proportions
+  // Window sizes - all same size for uniform grid
   const defaultSizes = {
-    about: { w: 580, h: 380 },
-    experience: { w: 520, h: 400 },
-    projects: { w: 480, h: 320 },
-    contact: { w: 440, h: 380 }
+    about: { w: windowWidth, h: windowHeight },
+    experience: { w: windowWidth, h: windowHeight },
+    projects: { w: windowWidth, h: windowHeight },
+    contact: { w: windowWidth, h: windowHeight }
   }
 
   // Use refs for positions and sizes to avoid re-renders during drag/resize
