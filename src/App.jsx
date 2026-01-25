@@ -403,6 +403,7 @@ function App() {
 
     const pos = windowPositions.current[id]
     const size = windowSizes.current[id]
+    const isMessages = id === 'experience'
 
     return (
       <div
@@ -418,25 +419,64 @@ function App() {
         }}
         onMouseDown={(e) => handleDragStart(e, id)}
       >
-        <div className="window-header">
-          <div className="traffic-lights">
-            <button className="light red" onClick={(e) => closeWindow(e, id)}>
-              <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
+        {isMessages ? (
+          <div className="window-header messages-header">
+            <button className="messages-back-btn" onClick={(e) => closeWindow(e, id)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
             </button>
-            <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
-              <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
-            </button>
-            <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
-              <svg viewBox="0 0 12 12">
-                <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
+            <div className="messages-contact">
+              <div className="messages-avatar">
+                <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" />
+              </div>
+              <span className="messages-name">Tung Nguyen</span>
+            </div>
+            <button className="messages-video-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
               </svg>
             </button>
           </div>
-          <span className="window-title">{title}</span>
-        </div>
+        ) : (
+          <div className="window-header">
+            <div className="traffic-lights">
+              <button className="light red" onClick={(e) => closeWindow(e, id)}>
+                <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
+              </button>
+              <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
+                <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
+              </button>
+              <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
+                <svg viewBox="0 0 12 12">
+                  <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
+                </svg>
+              </button>
+            </div>
+            <span className="window-title">{title}</span>
+          </div>
+        )}
         <div className="window-content">
           {content}
         </div>
+        {isMessages && (
+          <div className="messages-input-bar">
+            <button className="messages-plus-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 4v16m-8-8h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              </svg>
+            </button>
+            <div className="messages-input">
+              <span>iMessage</span>
+            </div>
+            <button className="messages-mic-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            </button>
+          </div>
+        )}
         {/* Resize handles */}
         {!state.maximized && (
           <>
@@ -581,7 +621,7 @@ function App() {
             </span>
             <span>github.com/tungcodeforfun</span>
           </a>
-          <a href="https://linkedin.com/in/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
+          <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="contact-btn">
             <span className="btn-icon">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -808,7 +848,7 @@ function App() {
                 </span>
                 <span>github.com/tungcodeforfun</span>
               </a>
-              <a href="https://linkedin.com/in/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
+              <a href="https://linkedin.com/in/tungngvyen" target="_blank" rel="noopener noreferrer" className="contact-btn">
                 <span className="btn-icon">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
