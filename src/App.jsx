@@ -16,18 +16,18 @@ function App() {
 
   // Window positions - spread out like a real workspace
   const defaultPositions = {
-    about: { x: 40, y: 50 },        // Top-left area
-    experience: { x: 500, y: 60 },   // Top-right area
-    projects: { x: 80, y: 320 },     // Bottom-left area
-    contact: { x: 460, y: 280 }      // Bottom-right area
+    about: { x: 60, y: 50 },         // Top-left
+    experience: { x: 520, y: 70 },   // Top-right
+    projects: { x: 100, y: 340 },    // Bottom-left
+    contact: { x: 540, y: 320 }      // Bottom-right
   }
 
-  // Window sizes - compact to fit side by side
+  // Window sizes - proper macOS proportions
   const defaultSizes = {
-    about: { w: 420, h: 320 },
-    experience: { w: 400, h: 340 },
-    projects: { w: 380, h: 280 },
-    contact: { w: 400, h: 360 }
+    about: { w: 580, h: 380 },
+    experience: { w: 520, h: 400 },
+    projects: { w: 480, h: 320 },
+    contact: { w: 440, h: 380 }
   }
 
   // Use refs for positions and sizes to avoid re-renders during drag/resize
