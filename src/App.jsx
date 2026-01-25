@@ -454,15 +454,16 @@ function App() {
       >
         <div className="window-header">
           <div className="traffic-lights">
-            <button className="light red" onClick={(e) => closeWindow(e, id)}>
-              <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.2" /></svg>
+            <button className="light red" onClick={(e) => closeWindow(e, id)} title="Close">
+              <svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="#4d0000" strokeWidth="1.1" strokeLinecap="round" /></svg>
             </button>
-            <button className="light yellow" onClick={(e) => minimizeWindow(e, id)}>
-              <svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="#995700" strokeWidth="1.5" /></svg>
+            <button className="light yellow" onClick={(e) => minimizeWindow(e, id)} title="Minimize">
+              <svg viewBox="0 0 12 12"><path d="M2.5 6h7" stroke="#995700" strokeWidth="1.1" strokeLinecap="round" /></svg>
             </button>
-            <button className="light green" onClick={(e) => maximizeWindow(e, id)}>
+            <button className="light green" onClick={(e) => maximizeWindow(e, id)} title="Enter Full Screen">
               <svg viewBox="0 0 12 12">
-                <path d="M2 3.5h3v-1.5M10 8.5h-3v1.5M7 2v3h3M5 10v-3h-3" stroke="#006400" strokeWidth="1" fill="none" />
+                {/* macOS fullscreen arrows pointing to corners */}
+                <path d="M2.5 2.5l2.8 2.8M9.5 9.5l-2.8-2.8M9.5 2.5l-2.8 2.8M2.5 9.5l2.8-2.8" stroke="#006400" strokeWidth="1.1" strokeLinecap="round" />
               </svg>
             </button>
           </div>

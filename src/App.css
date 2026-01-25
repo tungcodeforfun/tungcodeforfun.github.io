@@ -1,5 +1,10 @@
-/* macOS Desktop Theme */
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+/* macOS Sequoia Desktop Theme */
+/* References:
+   - Apple HIG: developer.apple.com/design/human-interface-guidelines
+   - Traffic lights: github.com/lwouis/macos-traffic-light-buttons-as-SVG
+   - System colors: gist.github.com/lithammer/e9e68c131297c3158a654c0fdfc4111a
+   - Window shadows: gist.github.com/CrazyMORF/f0d4059cbfd5c13928d3
+*/
 
 * {
   margin: 0;
@@ -7,9 +12,9 @@
   box-sizing: border-box;
 }
 
-/* Apple System Colors - Reference: gist.github.com/lithammer/e9e68c131297c3158a654c0fdfc4111a */
+/* Apple System Colors - iOS/macOS Dark Mode */
 :root {
-  /* Dark mode system colors */
+  /* Dark mode accent colors - Apple HIG */
   --system-blue: #0A84FF;
   --system-green: #30D158;
   --system-red: #FF453A;
@@ -19,32 +24,61 @@
   --system-purple: #BF5AF2;
   --system-indigo: #5E5CE6;
   --system-teal: #64D2FF;
+  --system-cyan: #5AC8F5;
+  --system-mint: #63E6E2;
 
-  /* macOS UI colors - Reference: schemecolor.com/macos-window-ui-colors */
+  /* Traffic Light Button Colors - Accurate macOS values */
+  /* Source: schemecolor.com/close-minimise-and-maximise-buttons-in-mac.php */
   --traffic-red: #FF605C;
+  --traffic-red-hover: #ed6a5f;
+  --traffic-red-border: #e24b41;
+  --traffic-red-symbol: #4d0000;
   --traffic-yellow: #FFBD44;
+  --traffic-yellow-hover: #f6be50;
+  --traffic-yellow-border: #e1a73e;
+  --traffic-yellow-symbol: #995700;
   --traffic-green: #00CA4E;
+  --traffic-green-hover: #61c555;
+  --traffic-green-border: #2dac2f;
+  --traffic-green-symbol: #006400;
+  --traffic-unfocused: #dcdcdc;
+  --traffic-unfocused-border: #d1d0d2;
 
-  /* Grays and backgrounds */
-  --bg-dark: #1e1e1f;
-  --window-bg: rgba(30, 30, 31, 0.85);
-  --window-border: rgba(255, 255, 255, 0.1);
+  /* macOS Gray Scale - Dark Mode */
+  --gray-1: rgb(142, 142, 147);
+  --gray-2: rgb(99, 99, 102);
+  --gray-3: rgb(72, 72, 74);
+  --gray-4: rgb(58, 58, 60);
+  --gray-5: rgb(44, 44, 46);
+  --gray-6: rgb(28, 28, 30);
+
+  /* Background & Surface Colors */
+  --bg-dark: #1c1c1e;
+  --window-bg: rgba(40, 40, 42, 0.78);
+  --window-bg-active: rgba(40, 40, 42, 0.88);
+  --window-border: rgba(255, 255, 255, 0.12);
+  --window-border-active: rgba(255, 255, 255, 0.18);
+  --sidebar-bg: rgba(30, 30, 32, 0.95);
+
+  /* Text Colors */
   --text: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-tertiary: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.4);
 
-  /* Light mode colors */
-  --light-silver: #E1DFE1;
-  --argent: #C0BFC0;
-  --tech-white: #F5F5F5;
+  /* Light mode surface colors */
+  --light-bg: #f5f5f7;
+  --light-surface: #ffffff;
+  --light-border: rgba(0, 0, 0, 0.1);
 
-  /* iMessage colors */
-  --imessage-blue: #0b93f6;
+  /* iMessage colors - accurate Apple values */
+  --imessage-blue: #007AFF;
+  --imessage-blue-dark: #0b93f6;
   --imessage-gray: #e5e5ea;
 
-  /* Apple Notes colors - Reference: schemecolor.com/apple-notes-color-scheme */
+  /* Apple Notes colors */
   --notes-yellow: #FFD52E;
-  --notes-bg: #F9F9F9;
+  --notes-bg: #FAFAFA;
   --notes-border: #E5E5E5;
   --notes-sidebar-bg: #F2F2F7;
   --notes-sidebar-selected: rgba(0, 0, 0, 0.06);
@@ -54,59 +88,75 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  /* SF Pro font stack - accurate macOS system font */
+  /* Reference: developer.apple.com/fonts/ */
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1;
+  text-rendering: optimizeLegibility;
   background: var(--bg-dark);
   color: var(--text);
   min-height: 100vh;
   overflow: hidden;
 }
 
-/* Desktop - macOS Sequoia Style Wallpaper */
-/* Reference: macOS Sequoia default wallpaper - gradient with subtle color shifts */
+/* Desktop - macOS Sequoia "Helios" Wallpaper Recreation */
+/* Reference: macOS Sequoia Helios wallpaper - dynamic gradient with warm/cool fusion */
+/* Colors extracted from 4kwallpapers.com/macos-sequoia-wallpapers/ */
 .macos-desktop {
   min-height: 100vh;
   background:
-    /* Top-left warm glow */
-    radial-gradient(ellipse 100% 80% at 0% 0%, rgba(255, 149, 128, 0.35) 0%, transparent 50%),
-    /* Top-right purple/pink */
-    radial-gradient(ellipse 80% 70% at 100% 0%, rgba(167, 139, 250, 0.4) 0%, transparent 45%),
-    /* Center-left orange glow */
-    radial-gradient(ellipse 60% 50% at 10% 50%, rgba(251, 146, 60, 0.3) 0%, transparent 50%),
-    /* Center blue */
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
-    /* Bottom-right teal/cyan */
-    radial-gradient(ellipse 70% 60% at 90% 80%, rgba(34, 211, 238, 0.3) 0%, transparent 50%),
-    /* Bottom-left warm */
-    radial-gradient(ellipse 60% 50% at 20% 90%, rgba(249, 115, 22, 0.25) 0%, transparent 50%),
-    /* Base deep gradient */
-    linear-gradient(180deg,
-      #0c1929 0%,
-      #0f172a 30%,
-      #1e1b4b 60%,
+    /* Top-left warm coral/peach glow */
+    radial-gradient(ellipse 90% 70% at 5% 10%, rgba(255, 140, 105, 0.45) 0%, transparent 55%),
+    /* Top center-left orange accent */
+    radial-gradient(ellipse 50% 40% at 25% 5%, rgba(255, 165, 89, 0.35) 0%, transparent 50%),
+    /* Top-right purple/violet glow */
+    radial-gradient(ellipse 70% 60% at 95% 5%, rgba(147, 112, 219, 0.45) 0%, transparent 50%),
+    /* Right side magenta accent */
+    radial-gradient(ellipse 40% 50% at 100% 30%, rgba(199, 125, 255, 0.3) 0%, transparent 45%),
+    /* Center-left deep orange */
+    radial-gradient(ellipse 45% 40% at 15% 45%, rgba(255, 120, 50, 0.3) 0%, transparent 50%),
+    /* Center cyan/teal */
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(64, 180, 229, 0.25) 0%, transparent 55%),
+    /* Bottom-left green/teal transition */
+    radial-gradient(ellipse 50% 45% at 10% 85%, rgba(72, 209, 176, 0.25) 0%, transparent 50%),
+    /* Bottom center blue */
+    radial-gradient(ellipse 70% 50% at 50% 95%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+    /* Bottom-right cyan accent */
+    radial-gradient(ellipse 55% 45% at 85% 80%, rgba(34, 211, 238, 0.3) 0%, transparent 50%),
+    /* Base dark gradient - Sequoia deep blue-black */
+    linear-gradient(160deg,
+      #0a0f1a 0%,
+      #0d1525 25%,
+      #111827 50%,
+      #1a1f3c 75%,
       #0f172a 100%
     );
   display: flex;
   flex-direction: column;
 }
 
-/* Menu Bar */
+/* Menu Bar - macOS Sequoia style */
+/* Reference: bjango.com/articles/designingmenubarextras/ */
 .menu-bar {
-  height: 28px;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(50px) saturate(180%);
-  -webkit-backdrop-filter: blur(50px) saturate(180%);
+  height: 25px; /* Accurate macOS menu bar height */
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(80px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(80px) saturate(180%) brightness(1.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 16px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
 .menu-left, .menu-right {
@@ -144,31 +194,38 @@ body {
   overflow: hidden;
 }
 
-/* macOS Window - Reference: github.com/RedEdge967/MacOS-CSS */
-/* macOS Tahoe uses 10px corner radius for windows */
+/* macOS Window - Sequoia/Tahoe style */
+/* Reference: gist.github.com/CrazyMORF/f0d4059cbfd5c13928d3 */
+/* macOS uses 10px corner radius for windows */
 .macos-window {
   position: absolute;
-  background: rgba(30, 30, 31, 0.85);
-  backdrop-filter: blur(30px) saturate(1.5);
-  -webkit-backdrop-filter: blur(30px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--window-bg);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid var(--window-border);
   border-radius: 10px;
   min-width: 300px;
   min-height: 200px;
+  /* Accurate macOS window shadow */
   box-shadow:
-    0 40px 60px rgba(0, 0, 0, 0.2),
-    0 0 15px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s;
+    0 22px 70px 4px rgba(0, 0, 0, 0.35),
+    0 0 0 0.5px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
   user-select: none;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Clip content to rounded corners */
+  overflow: hidden;
 }
 
 .macos-window.active {
+  background: var(--window-bg-active);
+  border-color: var(--window-border-active);
+  /* More prominent shadow for active window */
   box-shadow:
-    0 50px 80px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(0, 0, 0, 0.15);
+    0 22px 70px 4px rgba(0, 0, 0, 0.56),
+    0 0 0 0.5px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
 
 /* Notes Theme - macOS Notes app style with 3-panel layout */
@@ -802,18 +859,19 @@ body {
   max-width: 100%;
 }
 
-/* iMessage bubble styling - Reference: samuelkraft.com */
+/* iMessage bubble styling - Reference: Apple Messages app */
+/* iMessage blue is #007AFF (system blue) or #0b93f6 for sent bubbles */
 .messages-theme .experience-item,
 .messages-theme .experience-item.expandable,
 .messages-theme .experience-item.expanded {
-  background: var(--imessage-blue);
+  background: var(--imessage-blue-dark);
   border: none;
   color: #fff;
-  border-radius: 25px;
-  padding: 10px 20px;
+  border-radius: 18px; /* More accurate iMessage bubble radius */
+  padding: 10px 16px;
   margin-left: auto;
   margin-right: 0;
-  max-width: 255px;
+  max-width: 260px;
   position: relative;
   cursor: pointer;
   transition: background 0.15s;
@@ -828,7 +886,7 @@ body {
   right: -7px;
   width: 20px;
   height: 25px;
-  background: var(--imessage-blue);
+  background: var(--imessage-blue-dark);
   border-bottom-left-radius: 16px 14px;
 }
 
@@ -1359,29 +1417,30 @@ body {
 
 .macos-window.maximized {
   position: fixed !important;
-  top: 28px !important;
+  top: 25px !important; /* Match menu bar height */
   left: 0 !important;
   right: 0;
-  bottom: 80px;
+  bottom: 72px; /* Account for dock */
   width: 100% !important;
-  height: calc(100vh - 108px) !important;
+  height: calc(100vh - 97px) !important;
   border-radius: 0;
   z-index: 50 !important;
 }
 
 .macos-window.maximized .window-content {
-  max-height: calc(100vh - 148px);
+  max-height: calc(100vh - 135px);
 }
 
-/* Window Header */
+/* Window Header - Titlebar */
+/* Reference: Apple HIG - macOS window titlebar is 22px, but toolbar adds height */
 .window-header {
-  height: 40px;
-  background: rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px 12px 0 0;
+  height: 38px; /* Titlebar + unified toolbar height */
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px 10px 0 0;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 13px;
   position: relative;
   cursor: grab;
 }
@@ -1394,6 +1453,8 @@ body {
   cursor: grabbing;
 }
 
+/* Traffic Light Buttons - Accurate macOS styling */
+/* Reference: github.com/lwouis/macos-traffic-light-buttons-as-SVG */
 .traffic-lights {
   display: flex;
   gap: 8px;
@@ -1410,31 +1471,81 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: filter 0.15s;
+  transition: all 0.1s ease;
+  position: relative;
+  /* Subtle inner shadow for depth */
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.15);
 }
 
 .light svg {
   opacity: 0;
   width: 8px;
   height: 8px;
-  transition: opacity 0.15s;
+  transition: opacity 0.1s ease;
 }
 
 .traffic-lights:hover .light svg {
   opacity: 1;
 }
 
-/* Traffic light colors - Reference: schemecolor.com/macos-window-ui-colors */
-.light.red { background: var(--traffic-red); }
-.light.yellow { background: var(--traffic-yellow); }
-.light.green { background: var(--traffic-green); }
-
-.light:hover {
-  filter: brightness(1.1);
+/* Traffic light colors with accurate macOS values */
+.light.red {
+  background: linear-gradient(180deg, #ff6058 0%, #ff5045 100%);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-red-border);
+}
+.light.yellow {
+  background: linear-gradient(180deg, #ffbd2e 0%, #ffb819 100%);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-yellow-border);
+}
+.light.green {
+  background: linear-gradient(180deg, #28c940 0%, #1aab29 100%);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-green-border);
 }
 
-.light:active {
-  filter: brightness(0.9);
+/* Hover states */
+.light.red:hover {
+  background: linear-gradient(180deg, #ff7066 0%, #ff6058 100%);
+}
+.light.yellow:hover {
+  background: linear-gradient(180deg, #ffc944 0%, #ffbd2e 100%);
+}
+.light.green:hover {
+  background: linear-gradient(180deg, #3cd54e 0%, #28c940 100%);
+}
+
+/* Active/pressed states */
+.light.red:active {
+  background: linear-gradient(180deg, #b14d48 0%, #a34440 100%);
+}
+.light.yellow:active {
+  background: linear-gradient(180deg, #b8923b 0%, #a67f36 100%);
+}
+.light.green:active {
+  background: linear-gradient(180deg, #4a9741 0%, #428234 100%);
+}
+
+/* Unfocused window state */
+.macos-window:not(.active) .light {
+  background: var(--traffic-unfocused);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-unfocused-border);
+}
+.macos-window:not(.active) .light svg {
+  opacity: 0 !important;
+}
+.macos-window:not(.active) .traffic-lights:hover .light.red {
+  background: linear-gradient(180deg, #ff6058 0%, #ff5045 100%);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-red-border);
+}
+.macos-window:not(.active) .traffic-lights:hover .light.yellow {
+  background: linear-gradient(180deg, #ffbd2e 0%, #ffb819 100%);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-yellow-border);
+}
+.macos-window:not(.active) .traffic-lights:hover .light.green {
+  background: linear-gradient(180deg, #28c940 0%, #1aab29 100%);
+  box-shadow: inset 0 0 0 0.5px var(--traffic-green-border);
+}
+.macos-window:not(.active) .traffic-lights:hover .light svg {
+  opacity: 1 !important;
 }
 
 .window-title {
@@ -1914,10 +2025,11 @@ body {
   height: 100%;
 }
 
-/* Dock - Reference: github.com/RedEdge967/MacOS-CSS */
+/* Dock - Accurate macOS Sequoia styling */
+/* Reference: Apple HIG, girliemac.com/blog/2010/06/02/simulating-macos-dock-like-menu-with-css3/ */
 .dock {
   position: fixed;
-  bottom: 5px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
@@ -1925,39 +2037,49 @@ body {
 
 .dock-container {
   display: flex;
-  gap: 3px;
-  padding: 3px 5px;
-  background: rgba(50, 50, 50, 0.5);
-  backdrop-filter: blur(30px) saturate(1.5);
-  -webkit-backdrop-filter: blur(30px) saturate(1.5);
-  border-radius: 14px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.35);
+  gap: 4px;
+  padding: 4px 6px;
+  background: rgba(45, 45, 48, 0.5);
+  backdrop-filter: blur(50px) saturate(180%);
+  -webkit-backdrop-filter: blur(50px) saturate(180%);
+  border-radius: 16px;
+  /* Accurate macOS dock border effect */
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.2),
+    0 0 0 0.5px rgba(0, 0, 0, 0.3),
+    0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .dock-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2px;
+  padding: 3px;
   background: none;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 }
 
 .dock-item:hover {
-  transform: translateY(-6px) scale(1.12);
+  transform: translateY(-8px) scale(1.15);
+}
+
+/* Adjacent items scale effect (magnification) */
+.dock-item:hover + .dock-item,
+.dock-item:has(+ .dock-item:hover) {
+  transform: translateY(-4px) scale(1.08);
 }
 
 .dock-icon {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 11px; /* macOS icon corner radius ~22% of size */
   overflow: hidden;
 }
 
@@ -1967,16 +2089,18 @@ body {
 }
 
 .app-icon {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  /* Accurate macOS icon shadow */
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
 }
 
 .dock-indicator {
   position: absolute;
-  bottom: -3px;
+  bottom: -2px;
   width: 4px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 50%;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
 }
 
 /* Mobile Layout */
@@ -2130,9 +2254,11 @@ body {
   }
 }
 
-/* Scrollbar */
+/* Scrollbar - macOS style overlay scrollbars */
+/* Reference: Apple HIG - macOS uses overlay scrollbars by default */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -2140,15 +2266,40 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
-/* Selection */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Light theme scrollbar */
+.notes-theme ::-webkit-scrollbar-thumb,
+.messages-theme ::-webkit-scrollbar-thumb,
+.contacts-theme ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.notes-theme ::-webkit-scrollbar-thumb:hover,
+.messages-theme ::-webkit-scrollbar-thumb:hover,
+.contacts-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Selection - macOS highlight color */
 ::selection {
   background: var(--system-blue);
   color: white;
