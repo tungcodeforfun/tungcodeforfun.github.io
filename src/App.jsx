@@ -14,13 +14,11 @@ function App() {
   const [expandedItems, setExpandedItems] = useState({})
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
-  // Window sizes - sized to fit multi-panel app layouts
-  // Notes: sidebar(180) + list(220) + content = 580px min
-  // Messages: sidebar(260) + chat = 500px min
+  // Window sizes - sized to fit multi-panel app layouts comfortably
   // Using 16:10 aspect ratio (standard Mac display ratio)
-  const windowWidth = 560
-  const windowHeight = 350  // 560:350 = 8:5 = 16:10 ratio
-  const gap = 20  // Tighter gap for larger windows
+  const windowWidth = 680
+  const windowHeight = 425  // 680:425 = 8:5 = 16:10 ratio
+  const gap = 16
 
   // Calculate centered 2x2 grid positions
   const gridWidth = windowWidth * 2 + gap
