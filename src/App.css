@@ -749,15 +749,73 @@ body {
   border-radius: 50%;
 }
 
+/* Mobile Layout */
+.macos-desktop.mobile {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.mobile-content {
+  flex: 1;
+  padding: 36px 12px 80px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-window {
+  flex: 1;
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mobile-window .window-header {
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.mobile-window .window-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.macos-desktop.mobile .dock {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 16px);
+  max-width: 320px;
+}
+
+.macos-desktop.mobile .dock-container {
+  justify-content: space-around;
+  width: 100%;
+}
+
+.macos-desktop.mobile .dock-item {
+  flex: 1;
+  max-width: 70px;
+}
+
+.macos-desktop.mobile .dock-icon {
+  width: 44px;
+  height: 44px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .macos-window {
-    width: calc(100vw - 24px);
-    left: 12px !important;
-  }
-
   .menu-bar {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .menu-left, .menu-right {
@@ -770,18 +828,75 @@ body {
     text-align: center;
   }
 
+  .about-avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .about-info h1 {
+    font-size: 20px;
+  }
+
   .exp-header {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    padding-right: 30px;
   }
 
-  .dock-container {
-    padding: 3px 4px;
+  .exp-period {
+    align-self: flex-start;
   }
 
-  .dock-icon {
+  .skills-tags {
+    justify-content: center;
+  }
+
+  .contact-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .contact-btn span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-bar {
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .mobile-content {
+    padding: 36px 8px 76px;
+  }
+
+  .macos-desktop.mobile .dock-icon {
     width: 40px;
     height: 40px;
+  }
+
+  .window-content {
+    padding: 16px;
+  }
+
+  .about-bio p {
+    font-size: 13px;
+  }
+
+  .experience-item {
+    padding: 12px;
+  }
+
+  .exp-header h3 {
+    font-size: 14px;
+  }
+
+  .project-details {
+    padding: 10px 12px 14px;
+    margin: 0 4px;
   }
 }
 

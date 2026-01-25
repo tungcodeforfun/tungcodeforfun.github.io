@@ -12,20 +12,65 @@ function App() {
   const [windowOrder, setWindowOrder] = useState(['about', 'experience', 'projects', 'contact'])
   const [, forceUpdate] = useState(0)
   const [expandedItems, setExpandedItems] = useState({})
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  // Calculate initial positions based on viewport
+  const getInitialPositions = () => {
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const menuBarHeight = 28
+    const dockHeight = 80
+    const availableHeight = vh - menuBarHeight - dockHeight
+    const windowWidth = Math.min(420, vw - 40)
+
+    if (vw >= 1024) {
+      // Desktop: 2x2 grid layout
+      const gapX = 30
+      const gapY = 20
+      const startX = Math.max(20, (vw - (windowWidth * 2 + gapX)) / 2)
+      const startY = menuBarHeight + 20
+      return {
+        about: { x: startX, y: startY },
+        experience: { x: startX + windowWidth + gapX, y: startY },
+        projects: { x: startX, y: startY + 280 },
+        contact: { x: startX + windowWidth + gapX, y: startY + 280 }
+      }
+    } else if (vw >= 768) {
+      // Tablet: staggered cascade
+      const startX = 40
+      const startY = menuBarHeight + 30
+      return {
+        about: { x: startX, y: startY },
+        experience: { x: startX + 50, y: startY + 50 },
+        projects: { x: startX + 100, y: startY + 100 },
+        contact: { x: startX + 150, y: startY + 150 }
+      }
+    }
+    return {
+      about: { x: 20, y: 50 },
+      experience: { x: 20, y: 50 },
+      projects: { x: 20, y: 50 },
+      contact: { x: 20, y: 50 }
+    }
+  }
 
   // Use refs for positions and sizes to avoid re-renders during drag/resize
-  const windowPositions = useRef({
-    about: { x: 50, y: 60 },
-    experience: { x: 500, y: 60 },
-    projects: { x: 50, y: 340 },
-    contact: { x: 500, y: 340 }
-  })
+  const windowPositions = useRef(getInitialPositions())
   const windowSizes = useRef({
     about: { w: 420, h: 450 },
     experience: { w: 420, h: 280 },
-    projects: { w: 420, h: 220 },
-    contact: { w: 420, h: 280 }
+    projects: { w: 420, h: 280 },
+    contact: { w: 420, h: 300 }
   })
+
+  // Handle resize for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const windowRefs = useRef({})
   const dragState = useRef(null)
@@ -386,6 +431,208 @@ function App() {
             <div className="resize-handle resize-sw" onMouseDown={(e) => handleResizeStart(e, id, 'sw')} />
           </>
         )}
+      </div>
+    )
+  }
+
+  // Mobile content sections
+  const windowContents = {
+    about: (
+      <div className="about-window">
+        <div className="about-header">
+          <img src="https://avatars.githubusercontent.com/u/36649688?v=4" alt="avatar" className="about-avatar" />
+          <div className="about-info">
+            <h1>Tung Nguyen</h1>
+            <p className="about-title">Senior Software Engineer</p>
+            <p className="about-company">Ernst & Young · New York, NY</p>
+          </div>
+        </div>
+        <div className="about-bio">
+          <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
+        </div>
+        <div className="about-education">
+          <h3>Education</h3>
+          <p><strong>Virginia Tech</strong></p>
+          <p>B.S. Computer Science, 2022</p>
+          <p className="subtle">Dean's List · Beyond Boundaries Scholar</p>
+        </div>
+        <div className="about-skills">
+          <h3>Skills</h3>
+          <div className="skills-tags">
+            {skills.map((skill, i) => (
+              <span key={i} className="skill-tag">{skill}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    experience: (
+      <div className="experience-list">
+        {experience.map((job) => (
+          <div
+            key={job.id}
+            className={`experience-item expandable ${expandedItems[job.id] ? 'expanded' : ''}`}
+            onClick={() => toggleExpand(job.id)}
+          >
+            <div className="exp-header">
+              <h3>{job.title}</h3>
+              <span className="exp-period">{job.period}</span>
+            </div>
+            <p className="exp-company">{job.company}</p>
+            <p className="exp-desc">{job.desc}</p>
+            <span className="expand-icon">{expandedItems[job.id] ? '−' : '+'}</span>
+            {expandedItems[job.id] && (
+              <div className="exp-details">
+                <ul>
+                  {job.details.map((detail, i) => (
+                    <li key={i}>{detail}</li>
+                  ))}
+                </ul>
+                <div className="exp-skills">
+                  {job.skills.map((skill, i) => (
+                    <span key={i} className="exp-skill-tag">{skill}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    ),
+    projects: (
+      <div className="finder-list">
+        {projects.map((proj) => (
+          <div key={proj.id} className={`finder-item-wrapper ${expandedItems[proj.id] ? 'expanded' : ''}`}>
+            <div className="finder-item" onClick={() => toggleExpand(proj.id)}>
+              <span className="finder-icon">
+                <svg viewBox="0 0 32 32" fill="none">
+                  <path d="M6 6h12l2 2h6a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#64b5f6" />
+                  <rect x="4" y="10" width="24" height="16" rx="2" fill="#90caf9" />
+                </svg>
+              </span>
+              <div className="finder-info">
+                <span className="finder-name">{proj.name}</span>
+                <span className="finder-tech">{proj.tech}</span>
+              </div>
+              <span className="finder-arrow">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style={{ transform: expandedItems[proj.id] ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" />
+                </svg>
+              </span>
+            </div>
+            {expandedItems[proj.id] && (
+              <div className="project-details">
+                <p className="project-desc">{proj.desc}</p>
+                <ul>
+                  {proj.details.map((detail, i) => (
+                    <li key={i}>{detail}</li>
+                  ))}
+                </ul>
+                <a href={proj.url} target="_blank" rel="noopener noreferrer" className="project-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  View on GitHub
+                </a>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    ),
+    contact: (
+      <div className="contact-window">
+        <h2>Let's Connect</h2>
+        <p>Open to new opportunities and collaborations</p>
+        <div className="contact-links">
+          <a href="mailto:tungnguyen1651@gmail.com" className="contact-btn">
+            <span className="btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M22 6l-10 7L2 6" />
+              </svg>
+            </span>
+            <span>tungnguyen1651@gmail.com</span>
+          </a>
+          <a href="https://github.com/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
+            <span className="btn-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+            </span>
+            <span>github.com/tungcodeforfun</span>
+          </a>
+          <a href="https://linkedin.com/in/tungcodeforfun" target="_blank" rel="noopener noreferrer" className="contact-btn">
+            <span className="btn-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </span>
+            <span>LinkedIn</span>
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  const windowTitles = {
+    about: 'About Me',
+    experience: 'Experience',
+    projects: 'Projects',
+    contact: 'Contact'
+  }
+
+  // Mobile layout
+  if (isMobile) {
+    return (
+      <div className="macos-desktop mobile">
+        {/* Menu Bar */}
+        <div className="menu-bar">
+          <div className="menu-left">
+            <span className="apple-logo">
+              <svg viewBox="0 0 17 20" fill="currentColor">
+                <path d="M15.5 14.7c-.3.7-.5 1-.9 1.6-.6.9-1.4 2-2.4 2-.9 0-1.1-.6-2.3-.6-1.2 0-1.5.6-2.4.6-.9 0-1.7-1-2.3-1.9C3.7 14.3 3 11.5 3 9c0-3.2 2.1-4.9 4.1-4.9 1 0 1.9.7 2.5.7.6 0 1.6-.7 2.8-.7.8 0 2.4.3 3.3 2.3-2.9 1.6-2.4 5.6.8 6.6zM11.7 2.5c.5-.6.8-1.5.7-2.5-.7.1-1.6.5-2.1 1.2-.5.5-.9 1.4-.8 2.4.8.1 1.6-.4 2.2-1.1z"/>
+              </svg>
+            </span>
+            <span className="menu-item active">Tung Nguyen</span>
+          </div>
+          <div className="menu-right">
+            <span className="menu-item">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        </div>
+
+        {/* Mobile Content */}
+        <div className="mobile-content">
+          <div className="mobile-window">
+            <div className="window-header">
+              <div className="traffic-lights">
+                <span className="light red"></span>
+                <span className="light yellow"></span>
+                <span className="light green"></span>
+              </div>
+              <span className="window-title">{windowTitles[activeWindow]}</span>
+            </div>
+            <div className="window-content">
+              {windowContents[activeWindow]}
+            </div>
+          </div>
+        </div>
+
+        {/* Dock */}
+        <div className="dock">
+          <div className="dock-container">
+            {dockItems.map((item) => (
+              <button
+                key={item.id}
+                className={`dock-item ${activeWindow === item.id ? 'active' : ''}`}
+                onClick={() => setActiveWindow(item.id)}
+              >
+                <span className="dock-icon"><DockIcon type={item.id} /></span>
+                {activeWindow === item.id && <span className="dock-indicator"></span>}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
