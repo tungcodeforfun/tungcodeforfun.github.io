@@ -33,7 +33,7 @@ function App() {
   const gridWidth = windowWidth * 2 + gap
   const gridHeight = windowHeight * 2 + gap
   const menuBarHeight = 28  // macOS menu bar
-  const dockHeight = 70     // macOS dock area
+  const dockHeight = 85     // macOS dock area (5px bottom + 70px dock + 10px hover expansion)
   const availableHeight = window.innerHeight - menuBarHeight - dockHeight
   const startX = Math.max(40, (window.innerWidth - gridWidth) / 2)
   const startY = Math.max(menuBarHeight + 20, menuBarHeight + (availableHeight - gridHeight) / 2)
