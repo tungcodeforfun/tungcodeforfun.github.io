@@ -365,120 +365,138 @@ function App() {
   }
 
   const DockIcon = ({ type }) => {
+    // macOS app icons use a "squircle" shape (superellipse) with ~22% corner radius
+    // Reference: liamrosenfeld.com/posts/apple_icon_quest/, applypixels.com/blog/the-hunt-for-the-squircle
+    // Reference: Wikimedia Commons Apple icon files, logos.fandom.com/wiki/Notes_(iOS)
     const icons = {
       about: (
-        // Notes app icon - macOS Sequoia style
-        // Reference: Apple Notes app - yellow notepad with folded corner
+        // Notes app icon - macOS Sequoia/Sonoma style
+        // Reference: commons.wikimedia.org/wiki/File:Apple_Notes_icon.svg
+        // Yellow/orange gradient background with white lined notepad
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="notesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FFEB3B" />
-              <stop offset="100%" stopColor="#FFC107" />
+              <stop offset="0%" stopColor="#FFE27A" />
+              <stop offset="100%" stopColor="#FFBF00" />
             </linearGradient>
           </defs>
-          {/* Yellow background */}
-          <rect width="120" height="120" rx="26" fill="url(#notesGrad)" />
-          {/* White notepad */}
-          <rect x="24" y="18" width="72" height="88" rx="6" fill="#fff" />
-          {/* Folded corner */}
-          <path d="M96 18 L96 36 L78 18 Z" fill="#FFEB3B" />
-          <path d="M78 18 L96 36 L78 36 Z" fill="#E6D435" />
-          {/* Horizontal lines */}
-          <line x1="32" y1="42" x2="88" y2="42" stroke="#E0E0E0" strokeWidth="2" />
-          <line x1="32" y1="54" x2="88" y2="54" stroke="#E0E0E0" strokeWidth="2" />
-          <line x1="32" y1="66" x2="88" y2="66" stroke="#E0E0E0" strokeWidth="2" />
-          <line x1="32" y1="78" x2="88" y2="78" stroke="#E0E0E0" strokeWidth="2" />
-          <line x1="32" y1="90" x2="88" y2="90" stroke="#E0E0E0" strokeWidth="2" />
-          {/* Text preview lines */}
-          <rect x="32" y="46" width="45" height="4" rx="2" fill="#FFD54F" />
-          <rect x="32" y="58" width="52" height="3" rx="1.5" fill="#BDBDBD" />
-          <rect x="32" y="70" width="38" height="3" rx="1.5" fill="#BDBDBD" />
+          {/* Yellow squircle background */}
+          <rect width="120" height="120" rx="26.5" fill="url(#notesGrad)" />
+          {/* White notepad with slight shadow */}
+          <rect x="22" y="22" width="76" height="82" rx="8" fill="#fff" filter="url(#noteShadow)" />
+          <defs>
+            <filter id="noteShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.15"/>
+            </filter>
+          </defs>
+          {/* Notepad lines */}
+          <line x1="30" y1="40" x2="90" y2="40" stroke="#E8E8E8" strokeWidth="1.5" />
+          <line x1="30" y1="52" x2="90" y2="52" stroke="#E8E8E8" strokeWidth="1.5" />
+          <line x1="30" y1="64" x2="90" y2="64" stroke="#E8E8E8" strokeWidth="1.5" />
+          <line x1="30" y1="76" x2="90" y2="76" stroke="#E8E8E8" strokeWidth="1.5" />
+          <line x1="30" y1="88" x2="90" y2="88" stroke="#E8E8E8" strokeWidth="1.5" />
+          {/* Yellow highlight title text */}
+          <rect x="30" y="44" width="40" height="5" rx="2" fill="#FFD426" />
+          {/* Gray text lines */}
+          <rect x="30" y="56" width="52" height="3" rx="1.5" fill="#C7C7C7" />
+          <rect x="30" y="68" width="44" height="3" rx="1.5" fill="#C7C7C7" />
+          <rect x="30" y="80" width="36" height="3" rx="1.5" fill="#C7C7C7" />
         </svg>
       ),
       experience: (
-        // Messages app icon - macOS Sequoia style
-        // Reference: Apple Messages - bright green with white chat bubble
+        // Messages app icon - macOS Sequoia/Sonoma style
+        // Reference: commons.wikimedia.org/wiki/File:IMessage_logo.svg
+        // Reference: logos.fandom.com/wiki/Messages_(iOS) - green since Big Sur
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="messagesGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#5DD568" />
-              <stop offset="100%" stopColor="#34C759" />
+              <stop offset="0%" stopColor="#65D96A" />
+              <stop offset="100%" stopColor="#2DC83A" />
             </linearGradient>
           </defs>
-          {/* Green background */}
-          <rect width="120" height="120" rx="26" fill="url(#messagesGrad)" />
-          {/* Chat bubble */}
-          <path d="M60 24 C85 24 96 40 96 56 C96 72 85 86 60 86 C55 86 50 85 46 83 L26 94 L32 76 C26 70 24 63 24 56 C24 40 35 24 60 24 Z" fill="#fff" />
+          {/* Green squircle background */}
+          <rect width="120" height="120" rx="26.5" fill="url(#messagesGrad)" />
+          {/* White chat bubble - accurate Apple shape */}
+          <ellipse cx="60" cy="52" rx="34" ry="28" fill="#fff" />
+          {/* Bubble tail pointing down-left */}
+          <path d="M32 68 Q28 82 24 88 Q38 80 42 72 Z" fill="#fff" />
         </svg>
       ),
       projects: (
-        // Finder app icon - macOS Sequoia style
-        // Reference: Apple Finder - two-tone blue smiling face
+        // Finder app icon - macOS Sequoia/Sonoma style
+        // Reference: svgrepo.com/svg/337803/mac-finder, creativebloq.com/design/apple-changed-the-finder-icon
+        // Classic design: darker blue on LEFT, lighter blue on RIGHT
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
-            <linearGradient id="finderLeft" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#3A9BF5" />
-              <stop offset="100%" stopColor="#1A73E8" />
+            <linearGradient id="finderBlueLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#42A5F5" />
+              <stop offset="100%" stopColor="#1E88E5" />
             </linearGradient>
-            <linearGradient id="finderRight" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#8DC4F9" />
-              <stop offset="100%" stopColor="#5BA4F5" />
+            <linearGradient id="finderBlueRight" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#90CAF9" />
+              <stop offset="100%" stopColor="#64B5F6" />
             </linearGradient>
+            <clipPath id="finderClip">
+              <rect width="120" height="120" rx="26.5" />
+            </clipPath>
           </defs>
-          {/* Rounded square base - split in half */}
-          <clipPath id="finderClip">
-            <rect width="120" height="120" rx="26" />
-          </clipPath>
           <g clipPath="url(#finderClip)">
-            {/* Left half - darker blue */}
-            <rect x="0" y="0" width="60" height="120" fill="url(#finderLeft)" />
+            {/* Left half - darker blue (classic Finder) */}
+            <rect x="0" y="0" width="60" height="120" fill="url(#finderBlueLeft)" />
             {/* Right half - lighter blue */}
-            <rect x="60" y="0" width="60" height="120" fill="url(#finderRight)" />
+            <rect x="60" y="0" width="60" height="120" fill="url(#finderBlueRight)" />
           </g>
-          {/* Eyes - white ovals */}
-          <ellipse cx="44" cy="50" rx="8" ry="12" fill="#fff" />
-          <ellipse cx="76" cy="50" rx="8" ry="12" fill="#fff" />
-          {/* Pupils */}
-          <circle cx="44" cy="52" r="3" fill="#1565C0" />
-          <circle cx="76" cy="52" r="3" fill="#1565C0" />
-          {/* Center nose line */}
-          <line x1="60" y1="40" x2="60" y2="72" stroke="#1565C0" strokeWidth="4" strokeLinecap="round" />
+          {/* Face features */}
+          {/* Eyes */}
+          <ellipse cx="42" cy="48" rx="7" ry="11" fill="#fff" />
+          <ellipse cx="78" cy="48" rx="7" ry="11" fill="#fff" />
+          {/* Pupils - looking slightly down */}
+          <circle cx="42" cy="51" r="3.5" fill="#1565C0" />
+          <circle cx="78" cy="51" r="3.5" fill="#1565C0" />
+          {/* Nose line */}
+          <line x1="60" y1="38" x2="60" y2="70" stroke="#1565C0" strokeWidth="4" strokeLinecap="round" />
           {/* Smile */}
-          <path d="M38 80 Q60 98 82 80" stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" />
+          <path d="M36 78 Q60 96 84 78" stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" />
         </svg>
       ),
       contact: (
-        // Contacts app icon - macOS Sequoia style
-        // Reference: Apple Contacts - brown/tan address book with silhouette
+        // Contacts app icon - macOS Sequoia/Sonoma style
+        // Reference: iconscout.com/icons/apple-contacts, en.wikipedia.org/wiki/Contacts_(Apple)
+        // Tan/cream address book with brown spine and person silhouette
         <svg viewBox="0 0 120 120" className="app-icon">
           <defs>
             <linearGradient id="contactsBg" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#E8DED4" />
-              <stop offset="100%" stopColor="#D4C4B0" />
+              <stop offset="0%" stopColor="#F5EDE4" />
+              <stop offset="100%" stopColor="#E8D9C8" />
             </linearGradient>
             <linearGradient id="contactsSpine" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#8B7355" />
-              <stop offset="50%" stopColor="#A08060" />
-              <stop offset="100%" stopColor="#8B7355" />
+              <stop offset="50%" stopColor="#A08468" />
+              <stop offset="100%" stopColor="#7A6548" />
             </linearGradient>
+            <clipPath id="contactsClip">
+              <rect width="120" height="120" rx="26.5" />
+            </clipPath>
           </defs>
-          {/* Background */}
-          <rect width="120" height="120" rx="26" fill="url(#contactsBg)" />
-          {/* Book binding on left */}
-          <rect x="14" y="14" width="16" height="92" rx="3" fill="url(#contactsSpine)" />
-          {/* Main page area */}
-          <rect x="30" y="16" width="76" height="88" rx="4" fill="#FAFAF8" />
-          {/* Page edge shadows */}
-          <rect x="30" y="16" width="3" height="88" fill="rgba(0,0,0,0.05)" />
+          {/* Tan squircle background */}
+          <rect width="120" height="120" rx="26.5" fill="url(#contactsBg)" />
+          {/* Brown book spine on left */}
+          <g clipPath="url(#contactsClip)">
+            <rect x="10" y="0" width="22" height="120" fill="url(#contactsSpine)" />
+          </g>
+          {/* White page area */}
+          <rect x="32" y="18" width="72" height="84" rx="4" fill="#FEFEFE" />
+          {/* Page edge shadow */}
+          <rect x="32" y="18" width="2" height="84" fill="rgba(0,0,0,0.06)" />
           {/* Contact silhouette - head */}
-          <circle cx="68" cy="46" r="16" fill="#C8C8C8" />
-          {/* Contact silhouette - body */}
-          <ellipse cx="68" cy="84" rx="26" ry="16" fill="#C8C8C8" />
-          {/* Colored tabs */}
-          <rect x="104" y="22" width="6" height="16" rx="2" fill="#FF3B30" />
-          <rect x="104" y="44" width="6" height="16" rx="2" fill="#FF9500" />
-          <rect x="104" y="66" width="6" height="16" rx="2" fill="#34C759" />
-          <rect x="104" y="88" width="6" height="16" rx="2" fill="#007AFF" />
+          <circle cx="68" cy="46" r="14" fill="#BEBEBE" />
+          {/* Contact silhouette - shoulders/body */}
+          <ellipse cx="68" cy="82" rx="24" ry="14" fill="#BEBEBE" />
+          {/* Colored index tabs */}
+          <rect x="102" y="24" width="8" height="14" rx="2" fill="#FF3B30" />
+          <rect x="102" y="44" width="8" height="14" rx="2" fill="#FF9500" />
+          <rect x="102" y="64" width="8" height="14" rx="2" fill="#34C759" />
+          <rect x="102" y="84" width="8" height="14" rx="2" fill="#007AFF" />
         </svg>
       )
     }

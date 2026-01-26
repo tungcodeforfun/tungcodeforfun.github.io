@@ -2070,11 +2070,12 @@ body {
   height: 100%;
 }
 
-/* Dock - Accurate macOS Sequoia styling */
-/* Reference: Apple HIG, girliemac.com/blog/2010/06/02/simulating-macos-dock-like-menu-with-css3/ */
+/* Dock - Accurate macOS Sequoia/Sonoma styling */
+/* Reference: codepen.io/jaredmpeterson/pen/KQyWpX, codepen.io/mnilzg/pen/oNBvXxB */
+/* Reference: Apple HIG dock specifications */
 .dock {
   position: fixed;
-  bottom: 4px;
+  bottom: 5px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
@@ -2082,50 +2083,58 @@ body {
 
 .dock-container {
   display: flex;
-  gap: 4px;
-  padding: 4px 6px;
-  background: rgba(45, 45, 48, 0.5);
-  backdrop-filter: blur(50px) saturate(180%);
-  -webkit-backdrop-filter: blur(50px) saturate(180%);
-  border-radius: 16px;
-  /* Accurate macOS dock border effect */
+  gap: 6px;
+  padding: 5px 8px;
+  /* macOS Sonoma/Sequoia dock: semi-transparent with heavy blur */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 19px;
+  /* Dock glass effect with inner highlight and outer shadow */
   box-shadow:
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.2),
-    0 0 0 0.5px rgba(0, 0, 0, 0.3),
-    0 10px 40px rgba(0, 0, 0, 0.3);
+    inset 0 0.5px 0 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.15),
+    0 0 0 0.5px rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dock-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3px;
+  padding: 4px;
   background: none;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 }
 
 .dock-item:hover {
-  transform: translateY(-8px) scale(1.15);
+  transform: translateY(-10px) scale(1.2);
 }
 
-/* Adjacent items scale effect (magnification) */
+/* Adjacent items scale effect (magnification) - macOS dock behavior */
 .dock-item:hover + .dock-item,
 .dock-item:has(+ .dock-item:hover) {
-  transform: translateY(-4px) scale(1.08);
+  transform: translateY(-5px) scale(1.1);
+}
+
+/* Second adjacent items */
+.dock-item:hover + .dock-item + .dock-item,
+.dock-item:has(+ .dock-item + .dock-item:hover) {
+  transform: translateY(-2px) scale(1.04);
 }
 
 .dock-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 11px; /* macOS icon corner radius ~22% of size */
-  overflow: hidden;
+  overflow: visible;
 }
 
 .dock-icon svg {
@@ -2134,18 +2143,19 @@ body {
 }
 
 .app-icon {
-  /* Accurate macOS icon shadow */
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+  /* macOS icon shadow - per Apple HIG */
+  /* Reference: gist.github.com/thecodewarrior/56b2aeee751fc23c4945c8c232b37c81 */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .dock-indicator {
   position: absolute;
-  bottom: -2px;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.85);
+  bottom: -3px;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
-  box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
 }
 
 /* Mobile Layout */
