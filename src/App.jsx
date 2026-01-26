@@ -179,8 +179,16 @@ function App() {
   const handleDragMove = (e) => {
     if (!dragState.current) return
     const { id, startX, startY, origX, origY } = dragState.current
-    const newX = origX + (e.clientX - startX)
-    const newY = origY + (e.clientY - startY)
+    const size = windowSizes.current[id]
+
+    // Constrain window position (can't go under menu bar or dock)
+    const minY = menuBarHeight
+    const maxY = window.innerHeight - dockHeight - size.h
+    const minX = -size.w + 100  // Allow partial off-screen left
+    const maxX = window.innerWidth - 100  // Allow partial off-screen right
+
+    const newX = Math.max(minX, Math.min(maxX, origX + (e.clientX - startX)))
+    const newY = Math.max(minY, Math.min(maxY, origY + (e.clientY - startY)))
 
     windowPositions.current[id] = { x: newX, y: newY }
 
@@ -240,10 +248,14 @@ function App() {
       newW = Math.max(300, origW - deltaX)
       newX = origX + (origW - newW)
     }
-    if (direction.includes('s')) newH = Math.max(200, origH + deltaY)
+    if (direction.includes('s')) {
+      const maxH = window.innerHeight - dockHeight - origY
+      newH = Math.max(200, Math.min(maxH, origH + deltaY))
+    }
     if (direction.includes('n')) {
       newH = Math.max(200, origH - deltaY)
-      newY = origY + (origH - newH)
+      newY = Math.max(menuBarHeight, origY + (origH - newH))
+      newH = origY + origH - newY  // Recalculate height based on constrained Y
     }
 
     windowSizes.current[id] = { w: newW, h: newH }
