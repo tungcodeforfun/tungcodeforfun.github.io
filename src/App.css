@@ -76,15 +76,16 @@
   --imessage-blue-dark: #0b93f6;
   --imessage-gray: #e5e5ea;
 
-  /* Apple Notes colors - Reference: schemecolor.com/apple-notes-color-scheme.php */
-  --notes-yellow: #FFD52E;  /* Gangster Gold - primary accent */
-  --notes-bg: #F9F9F9;      /* Hint of Red - main background */
-  --notes-border: #E5E5E5;  /* Gray Hint - borders */
-  --notes-sidebar-bg: #F2F2F7;
-  --notes-sidebar-selected: rgba(0, 0, 0, 0.06);
-  --notes-text-primary: #1d1d1f;
-  --notes-text-secondary: #86868b;
-  --notes-text-muted: #aeaeb2;
+  /* Apple Notes colors - Dark Mode */
+  /* Reference: noahgilmore.com/blog/dark-mode-uicolor-compatibility */
+  --notes-yellow: #FFD60A;  /* System yellow dark mode */
+  --notes-bg: #1c1c1e;      /* Secondary system background dark */
+  --notes-border: rgba(84, 84, 88, 0.65);  /* Separator dark */
+  --notes-sidebar-bg: #2c2c2e;  /* Tertiary system background dark */
+  --notes-sidebar-selected: rgba(255, 255, 255, 0.1);
+  --notes-text-primary: #ffffff;
+  --notes-text-secondary: rgba(235, 235, 245, 0.6);
+  --notes-text-muted: rgba(235, 235, 245, 0.3);
 }
 
 body {
@@ -228,8 +229,8 @@ body {
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
 
-/* Notes Theme - macOS Notes app style with 3-panel layout */
-/* Reference: Apple Notes schemecolor.com/apple-notes-color-scheme */
+/* Notes Theme - macOS Notes app dark mode style with 3-panel layout */
+/* Reference: Apple Notes dark mode */
 .macos-window.notes-theme,
 .mobile-window.notes-theme {
   background: var(--notes-bg);
@@ -238,7 +239,7 @@ body {
 }
 
 .notes-theme .window-header {
-  background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+  background: rgba(44, 44, 46, 0.95);
   border-bottom: 1px solid var(--notes-border);
 }
 
@@ -375,7 +376,7 @@ body {
   width: 220px;
   min-width: 150px;
   max-width: 400px;
-  background: #fff;
+  background: var(--notes-bg);
   border-right: 1px solid var(--notes-border);
   display: flex;
   flex-direction: column;
@@ -406,7 +407,7 @@ body {
 }
 
 .notes-list-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .notes-list-item.active {
@@ -446,7 +447,7 @@ body {
 /* Notes Content - main editor area */
 .notes-content-panel {
   flex: 1;
-  background: #fff;
+  background: var(--notes-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -526,8 +527,8 @@ body {
 }
 
 .notes-theme .skill-tag {
-  background: rgba(255, 213, 46, 0.25);
-  color: #000;
+  background: rgba(255, 214, 10, 0.2);
+  color: var(--notes-yellow);
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 12px;
@@ -559,7 +560,7 @@ body {
 
 .notes-theme .about-education p,
 .notes-theme .about-company {
-  color: #424245;
+  color: var(--notes-text-secondary);
 }
 
 .notes-theme .subtle {
@@ -589,19 +590,19 @@ body {
   }
 }
 
-/* Messages Theme - macOS Tahoe style with two-panel layout */
-/* Reference: Apple Messages app, bricxlabs.com/blogs/message-screen-ui-design */
+/* Messages Theme - macOS Dark Mode style with two-panel layout */
+/* Reference: Apple Messages app dark mode, noahgilmore.com/blog/dark-mode-uicolor-compatibility */
 .macos-window.messages-theme,
 .mobile-window.messages-theme {
-  background: rgba(246, 246, 246, 0.95);
+  background: rgba(28, 28, 30, 0.95);
   backdrop-filter: blur(30px) saturate(1.5);
   -webkit-backdrop-filter: blur(30px) saturate(1.5);
-  border-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .messages-theme .window-header {
-  background: rgba(255, 255, 255, 0.85);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(44, 44, 46, 0.95);
+  border-bottom: 1px solid rgba(84, 84, 88, 0.65);
 }
 
 .messages-theme .window-header.messages-header {
@@ -610,8 +611,8 @@ body {
   justify-content: space-between;
   padding: 8px 12px;
   height: 52px;
-  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(44, 44, 46, 0.95);
+  border-bottom: 1px solid rgba(84, 84, 88, 0.65);
 }
 
 .messages-contact {
@@ -637,7 +638,7 @@ body {
 }
 
 .messages-name {
-  color: #000;
+  color: #fff;
   font-size: 13px;
   font-weight: 600;
 }
@@ -659,7 +660,7 @@ body {
 }
 
 .messages-theme .window-title {
-  color: #000;
+  color: #fff;
   font-weight: 600;
 }
 
@@ -683,8 +684,8 @@ body {
   width: 260px;
   min-width: 180px;
   max-width: 400px;
-  background: rgba(246, 246, 246, 0.98);
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(44, 44, 46, 0.98);
+  border-right: 1px solid rgba(84, 84, 88, 0.65);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -701,16 +702,16 @@ body {
 
 .messages-search {
   flex: 1;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(118, 118, 128, 0.24);
   border: none;
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 13px;
-  color: #1d1d1f;
+  color: #fff;
 }
 
 .messages-search::placeholder {
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(235, 235, 245, 0.6);
 }
 
 .messages-compose-btn {
@@ -740,7 +741,7 @@ body {
 }
 
 .messages-conversation-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .messages-conversation-item.active {
@@ -780,17 +781,17 @@ body {
 .messages-conv-name {
   font-size: 14px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: #fff;
 }
 
 .messages-conv-time {
   font-size: 12px;
-  color: #86868b;
+  color: rgba(235, 235, 245, 0.6);
 }
 
 .messages-conv-preview {
   font-size: 13px;
-  color: #86868b;
+  color: rgba(235, 235, 245, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -799,7 +800,7 @@ body {
 /* Messages chat panel */
 .messages-chat-panel {
   flex: 1;
-  background: #fff;
+  background: #1c1c1e;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -809,11 +810,11 @@ body {
 
 .messages-chat-header {
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(84, 84, 88, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+  background: rgba(44, 44, 46, 0.95);
 }
 
 .messages-chat-contact {
@@ -839,7 +840,7 @@ body {
 .messages-chat-name {
   font-size: 14px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: #fff;
 }
 
 .messages-chat-body {
@@ -857,8 +858,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px 12px;
-  background: #fff;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #1c1c1e;
+  border-top: 1px solid rgba(84, 84, 88, 0.65);
 }
 
 .messages-plus-btn,
@@ -883,12 +884,12 @@ body {
 
 .messages-input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(118, 118, 128, 0.24);
   border-radius: 18px;
   padding: 8px 14px;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgba(235, 235, 245, 0.6);
+  border: 1px solid rgba(84, 84, 88, 0.65);
 }
 
 .messages-theme .experience-list {
@@ -938,7 +939,7 @@ body {
   right: -26px;
   width: 26px;
   height: 25px;
-  background: #fff;
+  background: #1c1c1e;
   border-bottom-left-radius: 10px;
 }
 
@@ -1214,27 +1215,27 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Contacts Theme - macOS Contacts style with two-panel layout */
-/* Reference: Apple HIG - sidebar with contact list, detail card view */
+/* Contacts Theme - macOS Contacts Dark Mode style with two-panel layout */
+/* Reference: Apple HIG dark mode - sidebar with contact list, detail card view */
 .macos-window.contacts-theme,
 .mobile-window.contacts-theme {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(28, 28, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .contacts-theme .window-header {
-  background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(44, 44, 46, 0.95);
+  border-bottom: 1px solid rgba(84, 84, 88, 0.65);
 }
 
 .contacts-theme .window-title {
-  color: #1d1d1f;
+  color: #fff;
   font-weight: 600;
 }
 
 .contacts-theme .window-content {
-  color: #1d1d1f;
-  background: #fff;
+  color: #fff;
+  background: #1c1c1e;
   padding: 0;
   display: flex;
   flex-direction: row;
@@ -1253,8 +1254,8 @@ body {
   width: 220px;
   min-width: 150px;
   max-width: 350px;
-  background: rgba(246, 246, 246, 0.98);
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(44, 44, 46, 0.98);
+  border-right: 1px solid rgba(84, 84, 88, 0.65);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1271,26 +1272,26 @@ body {
 
 .contacts-search {
   flex: 1;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(118, 118, 128, 0.24);
   border: none;
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 13px;
-  color: #1d1d1f;
+  color: #fff;
 }
 
 .contacts-search::placeholder {
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(235, 235, 245, 0.6);
 }
 
 .contacts-group-header {
   padding: 8px 16px 4px;
   font-size: 11px;
   font-weight: 600;
-  color: #86868b;
+  color: rgba(235, 235, 245, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: rgba(246, 246, 246, 0.98);
+  background: rgba(44, 44, 46, 0.98);
   position: sticky;
   top: 0;
 }
@@ -1310,7 +1311,7 @@ body {
 }
 
 .contacts-list-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .contacts-list-item.active {
@@ -1327,7 +1328,7 @@ body {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: #E8E8E8;
+  background: rgba(118, 118, 128, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1348,13 +1349,13 @@ body {
 .contacts-list-name {
   font-size: 14px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: #fff;
 }
 
 /* Contacts detail panel */
 .contacts-detail-panel {
   flex: 1;
-  background: #fff;
+  background: #1c1c1e;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1377,7 +1378,7 @@ body {
   border-radius: 50%;
   overflow: hidden;
   margin-bottom: 16px;
-  background: #E8E8E8;
+  background: rgba(118, 118, 128, 0.24);
 }
 
 .contacts-card-avatar img {
@@ -1389,13 +1390,13 @@ body {
 .contacts-card-name {
   font-size: 22px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: #fff;
   margin-bottom: 4px;
 }
 
 .contacts-card-title {
   font-size: 14px;
-  color: #86868b;
+  color: rgba(235, 235, 245, 0.6);
   margin-bottom: 20px;
 }
 
@@ -1407,22 +1408,22 @@ body {
 
 .contacts-card-label {
   font-size: 12px;
-  color: #86868b;
+  color: rgba(235, 235, 245, 0.6);
   margin-bottom: 4px;
   text-transform: lowercase;
 }
 
 .contacts-card-value {
   font-size: 15px;
-  color: #007AFF;
+  color: #0A84FF;
   text-decoration: none;
   display: block;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(84, 84, 88, 0.65);
 }
 
 .contacts-card-value:hover {
-  color: #0056b3;
+  color: #409CFF;
 }
 
 .contacts-card-actions {
@@ -1437,7 +1438,7 @@ body {
   align-items: center;
   gap: 4px;
   padding: 12px 20px;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(118, 118, 128, 0.24);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -1445,18 +1446,18 @@ body {
 }
 
 .contacts-action-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(118, 118, 128, 0.36);
 }
 
 .contacts-action-btn svg {
   width: 24px;
   height: 24px;
-  color: #007AFF;
+  color: #0A84FF;
 }
 
 .contacts-action-btn span {
   font-size: 11px;
-  color: #007AFF;
+  color: #0A84FF;
 }
 
 .macos-window.maximized {
@@ -2326,11 +2327,11 @@ body {
   background: transparent;
 }
 
-/* Light theme scrollbar */
+/* Dark theme scrollbar - all app themes now use dark mode */
 .notes-theme ::-webkit-scrollbar-thumb,
 .messages-theme ::-webkit-scrollbar-thumb,
 .contacts-theme ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -2338,7 +2339,7 @@ body {
 .notes-theme ::-webkit-scrollbar-thumb:hover,
 .messages-theme ::-webkit-scrollbar-thumb:hover,
 .contacts-theme ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.45);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
