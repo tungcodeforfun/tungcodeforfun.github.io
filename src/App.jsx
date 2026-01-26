@@ -629,23 +629,23 @@ function App() {
           <div className="notes-content-body">
             {activeNote === 'about' && (
               <>
-                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px', color: '#1d1d1f' }}>Tung Nguyen</h2>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px', color: '#fff' }}>Tung Nguyen</h2>
                 <p style={{ color: '#FFD52E', fontWeight: 600, marginBottom: '4px' }}>Senior Software Engineer</p>
-                <p style={{ color: '#86868b', marginBottom: '16px' }}>Ernst & Young · New York, NY</p>
+                <p style={{ color: 'rgba(235, 235, 245, 0.6)', marginBottom: '16px' }}>Ernst & Young · New York, NY</p>
                 <p>3+ years building scalable cloud solutions. Specializing in Java, Python, and AWS infrastructure with a track record of improving system performance by 70%.</p>
               </>
             )}
             {activeNote === 'education' && (
               <>
-                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Education</h2>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#fff' }}>Education</h2>
                 <p style={{ fontWeight: 600 }}>Virginia Tech</p>
                 <p>B.S. Computer Science, 2022</p>
-                <p style={{ color: '#86868b' }}>Dean's List · Beyond Boundaries Scholar</p>
+                <p style={{ color: 'rgba(235, 235, 245, 0.6)' }}>Dean's List · Beyond Boundaries Scholar</p>
               </>
             )}
             {activeNote === 'skills' && (
               <>
-                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#1d1d1f' }}>Skills</h2>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#fff' }}>Skills</h2>
                 <div className="skills-tags">
                   {skills.map((skill, i) => (
                     <span key={i} className="skill-tag">{skill}</span>
@@ -889,7 +889,7 @@ function App() {
 
             <div className="contacts-card-section">
               <div className="contacts-card-label">work</div>
-              <span className="contacts-card-value" style={{ color: '#1d1d1f', cursor: 'default' }}>Ernst & Young · New York, NY</span>
+              <span className="contacts-card-value" style={{ color: '#fff', cursor: 'default' }}>Ernst & Young · New York, NY</span>
             </div>
 
             <div className="contacts-card-section">
