@@ -1,17 +1,28 @@
-# React + Vite
+# tungcodeforfun.github.io
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal site for Tung Nguyen, Senior Software Engineer in New York City.
 
-Currently, two official plugins are available:
+Single-page React 19 + Vite + TypeScript site. The live background is the RibbonField WebGL
+shader from [ThreeUI](https://github.com/MengTo/threeui), vendored under `src/background/`
+and adapted for reduced motion, tab visibility, context loss, and a scroll-driven fade
+(see `THIRD_PARTY_NOTICES.md`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Develop
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Check
 
-## Expanding the ESLint configuration
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Deploy
 
+Pushes to `main` build and publish to GitHub Pages via `.github/workflows/deploy.yml`.
