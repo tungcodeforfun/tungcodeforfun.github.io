@@ -13,3 +13,17 @@ Ask only when two readings would produce materially different sites.
 User cut the hero positioning paragraph as "corny". Don't write marketing-style self
 descriptions for this site; role, city, and links carry the hero. Prefer terse, factual copy
 everywhere (what it is, what it's built with), no narrative flourish.
+
+## 2026-08-22: ambient background under reduced motion, and text over shaders
+
+- Freezing the shader under `prefers-reduced-motion` made the site look broken on the user's own
+  PC (Windows "Animation effects" off sets that media query). For ambient, low-contrast
+  backgrounds: slow it down and drop pointer parallax, don't stop it. Reserve full stops for
+  interaction-driven or large-scale motion.
+- Screenshots on a headless swiftshader run understate how bright a shader is on a real
+  display. Put a scrim between shader and text column from the start, and verify readability
+  at the brightest expected state, not the dimmed one.
+- When measuring animation in Playwright, `canvas.toDataURL()` on a WebGL canvas without
+  `preserveDrawingBuffer` is blank: count rAF callbacks via `addInitScript` instead. Start
+  `vite preview` from the project dir (shell cwd resets between tool calls) and stop it by the
+  pid from `ss -ltnp`, never `pkill -f`, which matches the calling shell and kills it.

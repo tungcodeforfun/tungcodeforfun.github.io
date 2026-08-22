@@ -1,20 +1,30 @@
 import { render } from '@testing-library/react'
-import { REDUCED_MOTION_QUERY, RibbonField } from './RibbonField'
+import { fireEvent } from '@testing-library/react'
+import { REDUCED_MOTION_QUERY, REDUCED_MOTION_SPEED, RibbonField } from './RibbonField'
 
-type FakeGl = { drawArrays: ReturnType<typeof vi.fn> }
+type FakeGl = {
+  drawArrays: ReturnType<typeof vi.fn>
+  uniform1f: ReturnType<typeof vi.fn>
+  uniform2f: ReturnType<typeof vi.fn>
+}
 
 /** A WebGL context that accepts every call and reports every compile/link as successful. */
 function fakeWebGl(): FakeGl {
   const drawArrays = vi.fn()
+  const uniform1f = vi.fn()
+  const uniform2f = vi.fn()
   const target: Record<string, unknown> = {
     drawArrays,
+    uniform1f,
+    uniform2f,
     getShaderParameter: () => true,
     getProgramParameter: () => true,
     createShader: () => ({}),
     createProgram: () => ({}),
     createBuffer: () => ({}),
     getAttribLocation: () => 0,
-    getUniformLocation: () => ({}),
+    // Uniform locations are their names so calls can be told apart.
+    getUniformLocation: (_program: unknown, name: string) => name,
     VERTEX_SHADER: 1,
     FRAGMENT_SHADER: 2,
     COMPILE_STATUS: 3,
@@ -79,16 +89,35 @@ describe('RibbonField', () => {
     expect(raf).toHaveBeenCalledTimes(1)
   })
 
-  it('draws a single still frame under prefers-reduced-motion', () => {
+  it('keeps animating under prefers-reduced-motion, slowed and without pointer drift', () => {
     stubMatchMedia(true)
+    vi.spyOn(performance, 'now').mockReturnValue(1000)
     const gl = fakeWebGl()
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(gl as unknown as WebGLRenderingContext)
-    const { rerender } = render(<RibbonField dim={0} />)
-    expect(raf).not.toHaveBeenCalled()
-    expect(gl.drawArrays).toHaveBeenCalledTimes(1)
+    render(<RibbonField speed={1} />)
+    expect(raf).toHaveBeenCalledTimes(1)
 
-    rerender(<RibbonField dim={0.5} />)
-    expect(gl.drawArrays).toHaveBeenCalledTimes(2)
-    expect(raf).not.toHaveBeenCalled()
+    fireEvent.pointerMove(window, { clientX: 0, clientY: 0 })
+    const tick = raf.mock.calls[0][0] as (now: number) => void
+    tick(2000)
+
+    expect(gl.uniform1f).toHaveBeenCalledWith('time', REDUCED_MOTION_SPEED)
+    expect(gl.uniform2f).toHaveBeenCalledWith('pointer', 0.72, 0.42)
+  })
+
+  it('steers toward the pointer when motion is allowed', () => {
+    stubMatchMedia(false)
+    const gl = fakeWebGl()
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(gl as unknown as WebGLRenderingContext)
+    render(<RibbonField smoothing={1} />)
+
+    fireEvent.pointerMove(window, { clientX: 0, clientY: 0 })
+    const tick = raf.mock.calls[0][0] as (now: number) => void
+    tick(16)
+
+    const pointerCalls = gl.uniform2f.mock.calls.filter((call: unknown[]) => call[0] === 'pointer')
+    const [, x, y] = pointerCalls[pointerCalls.length - 1]
+    expect(x).toBeCloseTo(0)
+    expect(y).toBeCloseTo(1)
   })
 })

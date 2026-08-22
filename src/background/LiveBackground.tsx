@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { BackgroundBoundary } from './BackgroundBoundary'
 import { RibbonField } from './RibbonField'
 
-const MAX_SCROLL_DIM = 0.88
+const MAX_SCROLL_DIM = 0.93
 // The ribbons return partway at the end of the page so the contact section echoes the hero.
 const END_FLOOR = 0.5
 const SMALL_SCREEN = 720
 // Narrow screens put the hero copy on top of the ribbons, so hold them back a little.
-const SMALL_SCREEN_DIM = 0.45
+const SMALL_SCREEN_DIM = 0.6
 
 function clamp01(value: number) {
   return Math.min(Math.max(value, 0), 1)

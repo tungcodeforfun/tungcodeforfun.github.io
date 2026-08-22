@@ -92,6 +92,34 @@ em {
     var(--bg);
 }
 
+/* Text-protect scrim between the shader and the content column */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(5, 5, 7, 0.82) 0%,
+    rgba(5, 5, 7, 0.62) 38%,
+    rgba(5, 5, 7, 0.18) 58%,
+    rgba(5, 5, 7, 0) 70%
+  );
+}
+
+@media (max-width: 720px) {
+  .scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 5, 7, 0) 0%,
+      rgba(5, 5, 7, 0.15) 32%,
+      rgba(5, 5, 7, 0.72) 55%,
+      rgba(5, 5, 7, 0.8) 100%
+    );
+  }
+}
+
 /* Grain over everything, for texture the shader doesn't reach */
 
 body::after {

@@ -4,7 +4,8 @@
 // Adapted for this site:
 // - pointer is read from `window`, so page content layered on top keeps the parallax
 // - `dim` prop fades the ribbons (used as the hero scrolls out of view)
-// - `prefers-reduced-motion` renders a single still frame
+// - `prefers-reduced-motion` slows playback and disables pointer parallax (ambient, low-contrast
+//   motion stays; anything interaction-driven stops)
 // - pauses on tab hide and recovers from WebGL context loss
 // - device pixel ratio capped lower on small screens
 
@@ -23,11 +24,12 @@ export type RibbonFieldProps = {
   className?: string
 }
 
-const DEFAULTS = { speed: 1, pointerAmount: 1, smoothing: 0.035, dim: 0 } as const
+const DEFAULTS = { speed: 1.4, pointerAmount: 1, smoothing: 0.035, dim: 0 } as const
 const REST_X = 0.72
 const REST_Y = 0.42
-const STILL_FRAME_SECONDS = 4
 const SMALL_SCREEN = 720
+/** Playback multiplier applied under prefers-reduced-motion. */
+export const REDUCED_MOTION_SPEED = 0.3
 
 export const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -51,7 +53,6 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const optionsRef = useRef({ ...DEFAULTS, ...props })
   optionsRef.current = { ...DEFAULTS, ...props }
-  const drawOnceRef = useRef<() => void>(() => {})
   // Bumped when the WebGL context is restored so the effect rebuilds the program.
   const [generation, setGeneration] = useState(0)
 
@@ -86,7 +87,7 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
     const uPointer = gl.getUniformLocation(program, 'pointer')
     const uDim = gl.getUniformLocation(program, 'dim')
 
-    const animate = !prefersReducedMotion()
+    const reduced = prefersReducedMotion()
     let mouseX = REST_X
     let mouseY = REST_Y
     let targetX = REST_X
@@ -96,7 +97,7 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
     const startedAt = performance.now()
 
     const onPointerMove = (event: PointerEvent) => {
-      const amount = optionsRef.current.pointerAmount
+      const amount = reduced ? 0 : optionsRef.current.pointerAmount
       targetX = REST_X + (event.clientX / Math.max(window.innerWidth, 1) - REST_X) * amount
       targetY = REST_Y + (1 - event.clientY / Math.max(window.innerHeight, 1) - REST_Y) * amount
     }
@@ -118,13 +119,14 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
       gl.drawArrays(gl.TRIANGLES, 0, 6)
     }
 
-    const shouldRun = () => animate && visible && !document.hidden
+    const shouldRun = () => visible && !document.hidden
+    const speedScale = reduced ? REDUCED_MOTION_SPEED : 1
 
     const tick = (now: number) => {
       const options = optionsRef.current
       mouseX += (targetX - mouseX) * options.smoothing
       mouseY += (targetY - mouseY) * options.smoothing
-      draw((now - startedAt) * 0.001 * options.speed)
+      draw((now - startedAt) * 0.001 * options.speed * speedScale)
       frame = shouldRun() ? requestAnimationFrame(tick) : 0
     }
 
@@ -136,14 +138,7 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
       frame = 0
     }
 
-    // Still frame for reduced motion, also used after resize and dim changes.
-    const drawStill = () => draw(STILL_FRAME_SECONDS)
-    drawOnceRef.current = animate ? () => {} : drawStill
-
-    const onResize = () => {
-      resize()
-      if (!animate) drawStill()
-    }
+    const onResize = () => resize()
     const onVisibility = () => (document.hidden ? stop() : start())
     const onIntersect: IntersectionObserverCallback = ([entry]) => {
       visible = entry?.isIntersecting ?? true
@@ -166,11 +161,10 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
     canvas.addEventListener('webglcontextrestored', onContextRestored)
 
     resize()
-    if (animate) start()
+    start()
 
     return () => {
       stop()
-      drawOnceRef.current = () => {}
       resizeObserver.disconnect()
       intersection.disconnect()
       window.removeEventListener('pointermove', onPointerMove)
@@ -183,13 +177,6 @@ export function RibbonField({ className = '', ...props }: RibbonFieldProps) {
       gl.deleteProgram(program)
     }
   }, [generation])
-
-  // Reduced-motion mode has no loop: draw the still frame on mount, after a
-  // context restore, and whenever the dim level changes.
-  const dim = optionsRef.current.dim
-  useEffect(() => {
-    drawOnceRef.current()
-  }, [dim, generation])
 
   return (
     <div ref={hostRef} className={`ribbon-field${className ? ` ${className}` : ''}`} aria-hidden="true">
