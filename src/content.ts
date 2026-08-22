@@ -5,8 +5,6 @@ export const profile = {
   email: 'tungnguyen1651@gmail.com',
   github: 'https://github.com/tungcodeforfun',
   linkedin: 'https://linkedin.com/in/tungngvyen',
-  positioning:
-    "I build the backend systems behind a national restaurant chain's point-of-sale platform: the services that decide what 3,500 stores' registers sell, price, and display, and the pipelines that deliver that configuration nightly and on demand.",
 } as const
 
 export type Focus = { title: string; body: string }
