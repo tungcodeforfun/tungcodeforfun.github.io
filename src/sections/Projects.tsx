@@ -4,7 +4,7 @@ export function Projects() {
   return (
     <section id="projects" className="section" aria-labelledby="projects-title">
       <header className="section__head">
-        <span className="section__index">03</span>
+        <span className="section__index">04</span>
         <h2 id="projects-title" className="section__title">
           Selected <em>projects</em>
         </h2>

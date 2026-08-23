@@ -2,6 +2,7 @@ import { LiveBackground } from './background/LiveBackground'
 import { navigation, profile } from './content'
 import { Contact } from './sections/Contact'
 import { Experience } from './sections/Experience'
+import { Freelance } from './sections/Freelance'
 import { Hero } from './sections/Hero'
 import { Projects } from './sections/Projects'
 import { Work } from './sections/Work'
@@ -32,6 +33,7 @@ export default function App() {
       <main id="main" className="page">
         <Hero />
         <Work />
+        <Freelance />
         <Experience />
         <Projects />
         <Contact />

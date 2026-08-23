@@ -279,6 +279,79 @@
   max-width: 40ch;
 }
 
+/* Contract work */
+
+.hire__availability {
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.5;
+  max-width: 40ch;
+  margin-bottom: 40px;
+}
+
+.offer-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 40px;
+}
+
+.offer {
+  padding: 24px 0 28px;
+  border-top: 1px solid var(--line);
+}
+
+.offer__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.offer__body {
+  color: var(--fg-muted);
+  font-size: 15px;
+}
+
+.hire__foot {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.hire__process {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 32px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-muted);
+  max-width: 56ch;
+}
+
+.hire__process li {
+  position: relative;
+  padding-left: 16px;
+}
+
+.hire__process li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.75em;
+  width: 6px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.hire__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
 /* Timeline */
 
 .timeline {
@@ -541,7 +614,10 @@
   }
 
   .focus-grid,
-  .project-grid {
+  .project-grid,
+  .offer-list,
+  .hire__foot,
+  .hire__process {
     grid-template-columns: 1fr;
   }
 

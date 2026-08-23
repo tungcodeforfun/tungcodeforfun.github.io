@@ -1,4 +1,4 @@
-import { profile } from '../content'
+import { freelance, profile } from '../content'
 
 export function Hero() {
   return (
@@ -14,8 +14,8 @@ export function Hero() {
         Tung <em>Nguyen</em>
       </h1>
       <div className="hero__actions reveal" style={{ '--delay': '260ms' } as React.CSSProperties}>
-        <a className="button button--primary" href={`mailto:${profile.email}`}>
-          Email me
+        <a className="button button--primary" href={freelance.bookingUrl}>
+          Book a call
         </a>
         <a className="button button--ghost" href={profile.github} target="_blank" rel="noopener noreferrer">
           GitHub <span aria-hidden="true">↗</span>

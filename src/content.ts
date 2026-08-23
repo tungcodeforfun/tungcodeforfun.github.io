@@ -95,6 +95,34 @@ export const projects: Project[] = [
   },
 ]
 
+export const freelance = {
+  availability: 'Open to part-time contract work alongside my full-time role. US Eastern hours.',
+  // Replace with a Cal.com or Calendly URL when you have one; the button falls back to email.
+  bookingUrl: 'mailto:tungnguyen1651@gmail.com?subject=Project%20inquiry',
+  // Set to null to hide the resume link.
+  resumeUrl: '/resume.pdf' as string | null,
+  offers: [
+    {
+      title: 'Backend APIs and services',
+      body: 'Spring Boot, FastAPI, or Go. PostgreSQL and Redis. Tests, Docker, and API docs with every delivery.',
+    },
+    {
+      title: 'AWS and delivery',
+      body: 'Lambda, SQS and SNS pipelines, Terraform, CI/CD with GitHub Actions or CodePipeline.',
+    },
+    {
+      title: 'Scrapers and monitors',
+      body: 'Playwright with API interception, scheduled collection, a small dashboard, and alerts.',
+    },
+  ],
+  process: [
+    'Written scope before any code',
+    'You own the repo from day one',
+    'Tests and a README with every delivery',
+    'Short async update each working day',
+  ],
+}
+
 export const education = {
   school: 'Virginia Tech',
   degree: 'B.S. Computer Science, 2022',
@@ -103,6 +131,7 @@ export const education = {
 
 export const navigation = [
   { label: 'Work', href: '#work' },
+  { label: 'Hire', href: '#hire' },
   { label: 'Experience', href: '#experience' },
   { label: 'Projects', href: '#projects' },
   { label: 'Contact', href: '#contact' },

@@ -1,4 +1,4 @@
-import { experience, focus, navigation, profile, projects } from './content'
+import { experience, focus, freelance, navigation, profile, projects } from './content'
 
 describe('content', () => {
   it('has a complete profile with valid links', () => {
@@ -32,6 +32,12 @@ describe('content', () => {
       expect(project.url).toMatch(/^https:\/\/github\.com\/tungcodeforfun\//)
       expect(project.stack.length).toBeGreaterThan(0)
     }
+  })
+
+  it('describes contract work with a booking target', () => {
+    expect(freelance.offers.length).toBeGreaterThanOrEqual(3)
+    expect(freelance.process.length).toBeGreaterThan(0)
+    expect(freelance.bookingUrl).toMatch(/^(https:\/\/|mailto:)/)
   })
 
   it('navigates only to in-page anchors', () => {

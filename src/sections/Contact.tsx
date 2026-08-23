@@ -4,7 +4,7 @@ export function Contact() {
   return (
     <section id="contact" className="section section--contact" aria-labelledby="contact-title">
       <header className="section__head">
-        <span className="section__index">04</span>
+        <span className="section__index">05</span>
         <h2 id="contact-title" className="section__title">
           Say <em>hello</em>
         </h2>
