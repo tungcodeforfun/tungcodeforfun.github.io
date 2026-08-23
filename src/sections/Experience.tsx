@@ -4,10 +4,10 @@ export function Experience() {
   return (
     <section id="experience" className="section" aria-labelledby="experience-title">
       <header className="section__head">
-        <span className="section__index">03</span>
         <h2 id="experience-title" className="section__title">
-          <em>Experience</em>
+          Experience
         </h2>
+        <span className="section__meta">{experience[experience.length - 1].start.slice(0, 4)} to present</span>
       </header>
       <ol className="timeline">
         {experience.map((role) => (
@@ -34,7 +34,7 @@ export function Experience() {
             </div>
           </li>
         ))}
-        <li className="role role--education">
+        <li className="role">
           <p className="role__period">
             <time dateTime="2022">2022</time>
           </p>

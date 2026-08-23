@@ -4,20 +4,19 @@ export function Work() {
   return (
     <section id="work" className="section" aria-labelledby="work-title">
       <header className="section__head">
-        <span className="section__index">01</span>
         <h2 id="work-title" className="section__title">
-          What I <em>work on</em>
+          What I work on
         </h2>
+        <span className="section__meta">{focus.length} areas</span>
       </header>
-      <ol className="focus-grid">
-        {focus.map((item, index) => (
+      <ul className="focus-grid">
+        {focus.map((item) => (
           <li key={item.title} className="focus">
-            <span className="focus__num">{String(index + 1).padStart(2, '0')}</span>
             <h3 className="focus__title">{item.title}</h3>
             <p className="focus__body">{item.body}</p>
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
   )
 }

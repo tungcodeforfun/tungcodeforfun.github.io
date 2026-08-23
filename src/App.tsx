@@ -1,4 +1,3 @@
-import { LiveBackground } from './background/LiveBackground'
 import { navigation, profile } from './content'
 import { Contact } from './sections/Contact'
 import { Experience } from './sections/Experience'
@@ -13,7 +12,6 @@ export default function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <LiveBackground />
       <header className="topbar">
         <a className="topbar__name" href="#top">
           {profile.name}

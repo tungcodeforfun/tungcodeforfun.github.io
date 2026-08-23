@@ -6,33 +6,26 @@ export function Contact() {
   return (
     <section id="contact" className="section section--contact" aria-labelledby="contact-title">
       <header className="section__head">
-        <span className="section__index">05</span>
         <h2 id="contact-title" className="section__title">
-          Say <em>hello</em>
+          Say hello
         </h2>
+        <span className="section__meta">{profile.location}</span>
       </header>
       <div className="contact__grid">
         <div className="contact__body">
           <a className="contact__email" href={`mailto:${profile.email}`}>
             {profile.email}
           </a>
-          <ul className="contact__links">
-            <li>
-              <a href={profile.github} target="_blank" rel="noopener noreferrer">
-                GitHub <span aria-hidden="true">↗</span>
-              </a>
-            </li>
-            <li>
-              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">
-                LinkedIn <span aria-hidden="true">↗</span>
-              </a>
-            </li>
-            <li>
-              <span>{profile.location}</span>
-            </li>
-          </ul>
+          <div className="contact__links">
+            <a className="button button--ghost" href={profile.github} target="_blank" rel="noopener noreferrer">
+              GitHub <span aria-hidden="true">↗</span>
+            </a>
+            <a className="button button--ghost" href={profile.linkedin} target="_blank" rel="noopener noreferrer">
+              LinkedIn <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
-        <div className="contact__art" aria-hidden="true">
+        <div className="screen contact__art" aria-hidden="true">
           <BackgroundBoundary fallback={<div className="shader shader--static" />}>
             <LiquidForm />
           </BackgroundBoundary>

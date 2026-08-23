@@ -1,24 +1,34 @@
+/* Palette and type follow ThreeUI's dark theme: monotone UI, color only from the canvases. */
 :root {
   color-scheme: dark;
 
-  --bg: #050507;
-  --bg-raised: rgba(255, 255, 255, 0.03);
-  --fg: #ececf1;
-  --fg-muted: rgba(236, 236, 241, 0.74);
-  --fg-faint: rgba(236, 236, 241, 0.56);
-  --line: rgba(236, 236, 241, 0.12);
-  --line-strong: rgba(236, 236, 241, 0.28);
-  --accent: #38d1f5;
-  --accent-deep: #2b82f5;
-  --accent-violet: #a855f7;
+  --page: #050608;
+  --wall: #0a0b0d;
+  --surface: #101113;
+  --content: #131416;
+  --fg: #f7f8f8;
+  --fg-muted: #8a8f98;
+  --fg-faint: #5f646c;
+  --border: rgba(255, 255, 255, 0.06);
+  --ring: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.13);
+  --screen-edge: rgba(255, 255, 255, 0.14);
+  --tint: rgba(255, 255, 255, 0.026);
+  --hover: rgba(255, 255, 255, 0.045);
+  --fill: #edeef0;
+  --onfill: #0a0b0d;
+  --filled-shadow: inset 0 0 0 0.5px #edeef0, 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 20px -8px rgba(237, 238, 240, 0.25);
 
-  --font-display: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-body: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  --r-xs: 4px;
+  --r-sm: 5px;
+  --r-md: 7px;
+  --r-lg: 9px;
+  --r-xl: 14px;
 
-  --measure: 1040px;
-  --gutter: clamp(20px, 5vw, 64px);
-  --section-gap: clamp(96px, 14vw, 176px);
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
+  --measure: 1120px;
+  --gutter: clamp(20px, 4vw, 48px);
+  --section-gap: clamp(72px, 9vw, 120px);
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 }

@@ -27,3 +27,11 @@ everywhere (what it is, what it's built with), no narrative flourish.
   `preserveDrawingBuffer` is blank: count rAF callbacks via `addInitScript` instead. Start
   `vite preview` from the project dir (shell cwd resets between tool calls) and stop it by the
   pid from `ss -ltnp`, never `pkill -f`, which matches the calling shell and kills it.
+
+## 2026-08-22: "follow X design" means adopt X's system, not sprinkle X's assets
+
+Adding a floating silver blob to the hero was rejected as "random". When the user names a
+reference (ThreeUI), look at how that reference actually composes pages (here: all JetBrains
+Mono, monotone near-black, hairline tiles, tag pills, white filled buttons, every shader framed
+in a bordered screen with a caption) and rebuild in that system. Color comes from the canvases,
+not from type. Do not invent focal objects the reference would never place.

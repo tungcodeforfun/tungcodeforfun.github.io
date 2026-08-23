@@ -5,6 +5,7 @@ export const profile = {
   email: 'tungnguyen1651@gmail.com',
   github: 'https://github.com/tungcodeforfun',
   linkedin: 'https://linkedin.com/in/tungngvyen',
+  line: 'Backend systems on AWS. Java, Python, and Go.',
 } as const
 
 export type Focus = { title: string; body: string }

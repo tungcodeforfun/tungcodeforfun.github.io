@@ -4,10 +4,10 @@ export function Freelance() {
   return (
     <section id="hire" className="section" aria-labelledby="hire-title">
       <header className="section__head">
-        <span className="section__index">02</span>
         <h2 id="hire-title" className="section__title">
-          Contract <em>work</em>
+          Contract work
         </h2>
+        <span className="section__meta">US Eastern</span>
       </header>
       <ul className="offer-list">
         {freelance.offers.map((offer) => (
