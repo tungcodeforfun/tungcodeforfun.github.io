@@ -96,7 +96,6 @@ export const projects: Project[] = [
 ]
 
 export const freelance = {
-  availability: 'Open to part-time contract work alongside my full-time role. US Eastern hours.',
   // Replace with a Cal.com or Calendly URL when you have one; the button falls back to email.
   bookingUrl: 'mailto:tungnguyen1651@gmail.com?subject=Project%20inquiry',
   // Set to null to hide the resume link.

@@ -281,13 +281,6 @@
 
 /* Contract work */
 
-.hire__availability {
-  font-size: clamp(18px, 1.8vw, 22px);
-  line-height: 1.5;
-  max-width: 40ch;
-  margin-bottom: 40px;
-}
-
 .offer-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

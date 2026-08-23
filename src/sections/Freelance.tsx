@@ -9,7 +9,6 @@ export function Freelance() {
           Contract <em>work</em>
         </h2>
       </header>
-      <p className="hire__availability">{freelance.availability}</p>
       <ul className="offer-list">
         {freelance.offers.map((offer) => (
           <li key={offer.title} className="offer">
