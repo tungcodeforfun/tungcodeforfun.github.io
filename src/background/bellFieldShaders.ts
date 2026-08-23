@@ -1,5 +1,8 @@
 // Vendored from MengTo/threeui (src/shaders/bell-field/bellFieldShaders.ts).
 // MIT License, Copyright (c) 2026 Meng To. See THIRD_PARTY_NOTICES.md.
+// Adapted: the angular modes crossfade between integer harmonics. Upstream
+// multiplies atan()'s angle by a fractional mode count, which leaves a visible
+// seam along the branch cut on the left half of the canvas.
 
 export const BELL_FIELD_VERTEX_SHADER = `
   attribute vec2 position;
@@ -19,6 +22,14 @@ export const BELL_FIELD_FRAGMENT_SHADER = `
 
   // damped-cosine stand-in for the Bessel envelope of a circular mode
   float bess(float x) { return cos(x - 0.785398) / sqrt(1.0 + abs(x)); }
+
+  // cos(k * a) for a fractional k, built from the two nearest integer
+  // harmonics so the result is continuous where the angle wraps
+  float harmonic(float k, float a, float phase) {
+    float n = floor(k);
+    float f = k - n;
+    return mix(cos(n * a + phase), cos((n + 1.0) * a + phase), f);
+  }
 
   void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
@@ -40,8 +51,8 @@ export const BELL_FIELD_FRAGMENT_SHADER = `
     float k   = 3.1 + 1.0 * sin(t * 0.23 + 0.6);
 
     float amp = 1.0 + (1.0 - u_strike) * 0.55;
-    float f1 = bess(r * k * PI - t * 2.2) * cos(ang * a + t * 0.5);
-    float f2 = bess(r * k * 1.6 * PI + t * 1.4) * cos((ang * 2.0 + 1.0) * a - t * 0.31);
+    float f1 = bess(r * k * PI - t * 2.2) * harmonic(ang, a, t * 0.5);
+    float f2 = bess(r * k * 1.6 * PI + t * 1.4) * harmonic(ang * 2.0 + 1.0, a, -t * 0.31);
     float f = (f1 + f2 * 0.30) * amp;
 
     // nodal lines, where the metal stands still

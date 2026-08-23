@@ -32,3 +32,4 @@
 - [x] Vendored StreamConvergence + BellField as project-card headers, LiquidForm as the contact focal piece
 - [x] LiquidForm miss-pixels use site black + cool halo instead of grey studio backdrop
 - [x] 19 tests, lint, typecheck, build green; 70.8 KB gz JS; 5 canvases live, no fallbacks
+- [x] BellField seam: upstream `cos(ang * atan(...))` with fractional `ang` tears along the atan branch cut; replaced with a crossfade between integer harmonics (`harmonic()` in bellFieldShaders.ts). Verified with 6-frame bursts before/after.
