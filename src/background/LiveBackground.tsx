@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BackgroundBoundary } from './BackgroundBoundary'
 import { RibbonField } from './RibbonField'
 
-const MAX_SCROLL_DIM = 0.93
+const MAX_SCROLL_DIM = 0.88
 // The ribbons return partway at the end of the page so the contact section echoes the hero.
 const END_FLOOR = 0.5
 const SMALL_SCREEN = 720

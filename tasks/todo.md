@@ -25,3 +25,10 @@
   contrast + robots fixes (see final numbers in the PR/commit).
 - Old macOS-desktop site (App.jsx/App.css, 3.4k lines) removed; content ported to content.ts
   and refreshed from the GitHub profile README.
+
+## 2026-08-22 follow-up: more visible ThreeUI
+
+- [x] Shared `shaderLoop.ts` runtime (context, quad, DPR cap, off-screen/tab pause, reduced motion, context loss)
+- [x] Vendored StreamConvergence + BellField as project-card headers, LiquidForm as the contact focal piece
+- [x] LiquidForm miss-pixels use site black + cool halo instead of grey studio backdrop
+- [x] 19 tests, lint, typecheck, build green; 70.8 KB gz JS; 5 canvases live, no fallbacks

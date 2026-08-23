@@ -454,7 +454,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 30px 28px 28px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--bg-raised);
@@ -467,6 +467,25 @@
   border-color: rgba(56, 209, 245, 0.55);
   transform: translateY(-2px);
   box-shadow: 0 0 0 1px rgba(56, 209, 245, 0.12), 0 24px 60px -30px rgba(56, 209, 245, 0.45);
+}
+
+.project__art {
+  display: block;
+  aspect-ratio: 16 / 7;
+  border-bottom: 1px solid var(--line);
+  filter: saturate(1.05);
+  transition: filter 300ms var(--ease-out);
+}
+
+.project:hover .project__art {
+  filter: saturate(1.25) brightness(1.12);
+}
+
+.project__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 26px 28px 28px;
 }
 
 .project__name {
@@ -507,6 +526,20 @@
 
 .section--contact {
   padding-bottom: 120px;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+  gap: 48px;
+  align-items: center;
+}
+
+.contact__art {
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .contact__email {
@@ -610,8 +643,14 @@
   .project-grid,
   .offer-list,
   .hire__foot,
-  .hire__process {
+  .hire__process,
+  .contact__grid {
     grid-template-columns: 1fr;
+  }
+
+  .contact__art {
+    order: -1;
+    aspect-ratio: 4 / 3;
   }
 
   .role {

@@ -1,9 +1,13 @@
 # Third-party notices
 
-## ThreeUI (RibbonField shader)
+## ThreeUI shaders
 
-`src/background/RibbonField.tsx` and `src/background/ribbonFieldShaders.ts` are adapted from
-the RibbonField component in [MengTo/threeui](https://github.com/MengTo/threeui).
+These files are adapted from components in [MengTo/threeui](https://github.com/MengTo/threeui):
+
+- `src/background/RibbonField.tsx`, `ribbonFieldShaders.ts` (RibbonFieldBackground)
+- `src/background/StreamConvergence.tsx`, `streamConvergenceShaders.ts` (StreamConvergenceBackground)
+- `src/background/LiquidForm.tsx`, `liquidFormShaders.ts` (LiquidFormBackground)
+- `src/background/BellField.tsx`, `bellFieldShaders.ts` (BellFieldBackground)
 
 MIT License
 

@@ -43,7 +43,7 @@ export default function App() {
           © {new Date().getFullYear()} {profile.name}
         </span>
         <span>
-          Background: RibbonField shader by{' '}
+          Shaders adapted from{' '}
           <a href="https://github.com/MengTo/threeui" target="_blank" rel="noopener noreferrer">
             ThreeUI
           </a>{' '}

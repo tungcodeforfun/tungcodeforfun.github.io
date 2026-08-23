@@ -1,71 +1,12 @@
-import { render } from '@testing-library/react'
-import { fireEvent } from '@testing-library/react'
-import { REDUCED_MOTION_QUERY, REDUCED_MOTION_SPEED, RibbonField } from './RibbonField'
-
-type FakeGl = {
-  drawArrays: ReturnType<typeof vi.fn>
-  uniform1f: ReturnType<typeof vi.fn>
-  uniform2f: ReturnType<typeof vi.fn>
-}
-
-/** A WebGL context that accepts every call and reports every compile/link as successful. */
-function fakeWebGl(): FakeGl {
-  const drawArrays = vi.fn()
-  const uniform1f = vi.fn()
-  const uniform2f = vi.fn()
-  const target: Record<string, unknown> = {
-    drawArrays,
-    uniform1f,
-    uniform2f,
-    getShaderParameter: () => true,
-    getProgramParameter: () => true,
-    createShader: () => ({}),
-    createProgram: () => ({}),
-    createBuffer: () => ({}),
-    getAttribLocation: () => 0,
-    // Uniform locations are their names so calls can be told apart.
-    getUniformLocation: (_program: unknown, name: string) => name,
-    VERTEX_SHADER: 1,
-    FRAGMENT_SHADER: 2,
-    COMPILE_STATUS: 3,
-    LINK_STATUS: 4,
-    ARRAY_BUFFER: 5,
-    STATIC_DRAW: 6,
-    FLOAT: 7,
-    TRIANGLES: 8,
-  }
-  return new Proxy(target, {
-    get: (object, key) => (key in object ? object[key as string] : () => undefined),
-  }) as unknown as FakeGl
-}
-
-function stubMatchMedia(reduced: boolean) {
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn((query: string) => ({
-      matches: query === REDUCED_MOTION_QUERY && reduced,
-      media: query,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    })),
-  )
-}
-
-class ObserverStub {
-  observe() {}
-  disconnect() {}
-  unobserve() {}
-}
+import { fireEvent, render } from '@testing-library/react'
+import { fakeWebGl, stubAnimationGlobals, stubMatchMedia } from '../test/webgl'
+import { REDUCED_MOTION_SPEED, RibbonField } from './RibbonField'
 
 describe('RibbonField', () => {
-  let raf: ReturnType<typeof vi.fn>
+  let raf: ReturnType<typeof stubAnimationGlobals>
 
   beforeEach(() => {
-    vi.stubGlobal('ResizeObserver', ObserverStub)
-    vi.stubGlobal('IntersectionObserver', ObserverStub)
-    raf = vi.fn(() => 1)
-    vi.stubGlobal('requestAnimationFrame', raf)
-    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    raf = stubAnimationGlobals()
   })
 
   afterEach(() => {
@@ -98,7 +39,7 @@ describe('RibbonField', () => {
     expect(raf).toHaveBeenCalledTimes(1)
 
     fireEvent.pointerMove(window, { clientX: 0, clientY: 0 })
-    const tick = raf.mock.calls[0][0] as (now: number) => void
+    const tick = raf.mock.calls[0][0]
     tick(2000)
 
     expect(gl.uniform1f).toHaveBeenCalledWith('time', REDUCED_MOTION_SPEED)
@@ -112,7 +53,7 @@ describe('RibbonField', () => {
     render(<RibbonField smoothing={1} />)
 
     fireEvent.pointerMove(window, { clientX: 0, clientY: 0 })
-    const tick = raf.mock.calls[0][0] as (now: number) => void
+    const tick = raf.mock.calls[0][0]
     tick(16)
 
     const pointerCalls = gl.uniform2f.mock.calls.filter((call: unknown[]) => call[0] === 'pointer')

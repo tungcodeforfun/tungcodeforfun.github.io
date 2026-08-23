@@ -1,3 +1,5 @@
+import { BackgroundBoundary } from '../background/BackgroundBoundary'
+import { LiquidForm } from '../background/LiquidForm'
 import { profile } from '../content'
 
 export function Contact() {
@@ -9,24 +11,33 @@ export function Contact() {
           Say <em>hello</em>
         </h2>
       </header>
-      <a className="contact__email" href={`mailto:${profile.email}`}>
-        {profile.email}
-      </a>
-      <ul className="contact__links">
-        <li>
-          <a href={profile.github} target="_blank" rel="noopener noreferrer">
-            GitHub <span aria-hidden="true">↗</span>
+      <div className="contact__grid">
+        <div className="contact__body">
+          <a className="contact__email" href={`mailto:${profile.email}`}>
+            {profile.email}
           </a>
-        </li>
-        <li>
-          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">
-            LinkedIn <span aria-hidden="true">↗</span>
-          </a>
-        </li>
-        <li>
-          <span>{profile.location}</span>
-        </li>
-      </ul>
+          <ul className="contact__links">
+            <li>
+              <a href={profile.github} target="_blank" rel="noopener noreferrer">
+                GitHub <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+            <li>
+              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">
+                LinkedIn <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+            <li>
+              <span>{profile.location}</span>
+            </li>
+          </ul>
+        </div>
+        <div className="contact__art" aria-hidden="true">
+          <BackgroundBoundary fallback={<div className="shader shader--static" />}>
+            <LiquidForm />
+          </BackgroundBoundary>
+        </div>
+      </div>
     </section>
   )
 }

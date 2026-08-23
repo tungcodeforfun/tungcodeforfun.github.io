@@ -68,12 +68,16 @@ export const experience: Role[] = [
   },
 ]
 
+export type ProjectArt = 'stream' | 'bell'
+
 export type Project = {
   name: string
   url: string
   summary: string
   detail: string
   stack: string[]
+  /** Which vendored ThreeUI shader heads the card. */
+  art: ProjectArt
 }
 
 export const projects: Project[] = [
@@ -84,6 +88,7 @@ export const projects: Project[] = [
     detail:
       'Multi-marketplace search, portfolio analytics, and price alerts on a FastAPI and React 19 stack, with Celery workers for collection and CI security scanning on every change.',
     stack: ['FastAPI', 'React 19', 'PostgreSQL', 'Redis', 'Celery', 'Docker'],
+    art: 'stream',
   },
   {
     name: 'streeteasy-monitor',
@@ -92,6 +97,7 @@ export const projects: Project[] = [
     detail:
       'Playwright automation with GraphQL response interception for accurate listing data, a Flask and HTMX dashboard for review, SQLite persistence, and rate-limited outreach.',
     stack: ['Python', 'Playwright', 'Flask', 'HTMX', 'SQLite'],
+    art: 'bell',
   },
 ]
 
