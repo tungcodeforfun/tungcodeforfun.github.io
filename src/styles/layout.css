@@ -98,6 +98,30 @@
   position: relative;
 }
 
+.hero > :not(.hero__form) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Floating LiquidForm on the right; sized to the shorter viewport edge so it never crowds the name. */
+.hero__form {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: min(0px, calc(50% - 50vw + 24px));
+  width: min(62vmin, 720px);
+  aspect-ratio: 1;
+  transform: translate(18%, -50%);
+  pointer-events: none;
+  animation: form-in 1400ms var(--ease-out) both;
+  animation-delay: 200ms;
+}
+
+@keyframes form-in {
+  from { opacity: 0; transform: translate(22%, -46%) scale(0.92); }
+  to { opacity: 1; transform: translate(18%, -50%) scale(1); }
+}
+
 .eyebrow {
   display: flex;
   flex-wrap: wrap;
@@ -631,6 +655,19 @@
     justify-content: flex-end;
   }
 
+  .hero__form {
+    top: 96px;
+    right: -12vw;
+    width: 82vw;
+    transform: none;
+    animation-name: form-in-mobile;
+  }
+
+  @keyframes form-in-mobile {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: none; }
+  }
+
   .hero__title {
     max-width: none;
   }
@@ -665,6 +702,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
+  .hero__form,
   .hero__scroll-line,
   .button--primary::before {
     animation: none;

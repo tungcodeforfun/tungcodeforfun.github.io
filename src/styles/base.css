@@ -86,6 +86,10 @@ em {
   display: block;
 }
 
+.shader--transparent {
+  background: transparent;
+}
+
 .shader--static,
 .ribbon-field--static {
   background:

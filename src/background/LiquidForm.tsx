@@ -17,12 +17,14 @@ export type LiquidFormProps = {
   mouseAmount?: number
   metal?: number
   camera?: number
+  /** Render only the form; pixels that miss it are see-through. */
+  transparent?: boolean
   className?: string
 }
 
 const DEFAULTS = { speed: 1, morph: 1, noiseScale: 1, mouseAmount: 0.3, metal: 1, camera: 5.5 } as const
 
-export function LiquidForm({ className = '', ...props }: LiquidFormProps) {
+export function LiquidForm({ className = '', transparent = false, ...props }: LiquidFormProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const optionsRef = useLatest({ ...DEFAULTS, ...props })
@@ -43,6 +45,7 @@ export function LiquidForm({ className = '', ...props }: LiquidFormProps) {
       attribute: 'a_pos',
       // 70-step raymarch per pixel: the most expensive shader on the page.
       dprCap: 1.5,
+      alpha: transparent,
       onResize: (u, width, height) => u.f2('u_res', width, height),
       onFrame: (u, seconds) => {
         const options = optionsRef.current
@@ -55,6 +58,7 @@ export function LiquidForm({ className = '', ...props }: LiquidFormProps) {
         u.f('u_mouse_amount', options.mouseAmount)
         u.f('u_metal', options.metal)
         u.f('u_camera', options.camera)
+        u.f('u_transparent', transparent ? 1 : 0)
       },
     })
     if (!loop) return undefined
@@ -69,10 +73,11 @@ export function LiquidForm({ className = '', ...props }: LiquidFormProps) {
       window.removeEventListener('pointermove', onPointerMove)
       loop.dispose()
     }
-  }, [optionsRef])
+  }, [optionsRef, transparent])
 
+  const classes = ['shader', 'liquid-form', transparent ? 'shader--transparent' : '', className].filter(Boolean).join(' ')
   return (
-    <div ref={hostRef} className={`shader liquid-form${className ? ` ${className}` : ''}`} aria-hidden="true">
+    <div ref={hostRef} className={classes} aria-hidden="true">
       <canvas ref={canvasRef} />
     </div>
   )

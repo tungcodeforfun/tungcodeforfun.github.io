@@ -26,6 +26,8 @@ export type ShaderLoopSpec = {
   attribute?: string
   /** Device pixel ratio cap. Small screens are capped at 1.5 regardless. */
   dprCap?: number
+  /** Request an alpha channel; the fragment shader must then write premultiplied color. */
+  alpha?: boolean
   /** Called after the viewport changes, with the backing-store size. */
   onResize?: (u: Uniforms, width: number, height: number, dpr: number) => void
   /** Called once per frame before the quad is drawn. `seconds` already includes the reduced-motion scale. */
@@ -51,7 +53,7 @@ function compile(gl: WebGLRenderingContext, type: number, source: string) {
 
 /** Returns null when WebGL is unavailable; throws if the GPU rejects the program. */
 export function startShaderLoop(host: HTMLElement, canvas: HTMLCanvasElement, spec: ShaderLoopSpec): ShaderLoop | null {
-  const gl = canvas.getContext('webgl', { alpha: false, antialias: false })
+  const gl = canvas.getContext('webgl', { alpha: spec.alpha ?? false, premultipliedAlpha: true, antialias: false })
   if (!gl) return null
 
   const reduced = prefersReducedMotion()

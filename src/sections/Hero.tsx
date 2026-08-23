@@ -1,8 +1,15 @@
+import { BackgroundBoundary } from '../background/BackgroundBoundary'
+import { LiquidForm } from '../background/LiquidForm'
 import { freelance, profile } from '../content'
 
 export function Hero() {
   return (
     <section className="hero" aria-labelledby="hero-title">
+      <div className="hero__form" aria-hidden="true">
+        <BackgroundBoundary fallback={<></>}>
+          <LiquidForm transparent mouseAmount={0.45} camera={5.2} />
+        </BackgroundBoundary>
+      </div>
       <p className="eyebrow reveal" style={{ '--delay': '0ms' } as React.CSSProperties}>
         <span>{profile.role}</span>
         <span className="eyebrow__sep" aria-hidden="true">

@@ -18,6 +18,7 @@ uniform float u_noise_scale;
 uniform float u_mouse_amount;
 uniform float u_metal;
 uniform float u_camera;
+uniform float u_transparent;
 
 #define MAX_STEPS 70
 #define MAX_DIST 20.0
@@ -133,10 +134,16 @@ void main() {
     col *= mix(0.7, 1.0, smoothstep(-0.1, 0.1, disp));
     col = col / (col + 0.5);
     col = pow(col, vec3(1.0/2.2));
+    gl_FragColor = vec4(col, 1.0);
   } else {
     float halo = exp(-length(uv) * 2.2);
-    col = vec3(0.02, 0.02, 0.027) + vec3(0.05, 0.09, 0.13) * halo;
+    if (u_transparent > 0.5) {
+      // premultiplied: a faint cool halo that reaches zero well inside the canvas edge
+      float a = halo * 0.3 * (1.0 - smoothstep(0.22, 0.46, length(uv)));
+      gl_FragColor = vec4(vec3(0.25, 0.45, 0.65) * a, a);
+    } else {
+      gl_FragColor = vec4(vec3(0.02, 0.02, 0.027) + vec3(0.05, 0.09, 0.13) * halo, 1.0);
+    }
   }
-  gl_FragColor = vec4(col, 1.0);
 }
 `

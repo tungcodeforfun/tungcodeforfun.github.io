@@ -14,7 +14,6 @@ export default function App() {
         Skip to content
       </a>
       <LiveBackground />
-      <div className="scrim" aria-hidden="true" />
       <header className="topbar">
         <a className="topbar__name" href="#top">
           {profile.name}

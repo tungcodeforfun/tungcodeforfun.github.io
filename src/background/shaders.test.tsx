@@ -40,3 +40,19 @@ describe.each(components)('%s', (_name, Shader) => {
     expect(gl.drawArrays).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('LiquidForm transparent', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  it('requests an alpha context and marks the host transparent', () => {
+    stubAnimationGlobals()
+    stubMatchMedia(false)
+    const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
+    const { container } = render(<LiquidForm transparent />)
+    expect(container.firstChild).toHaveClass('shader--transparent')
+    expect(getContext).toHaveBeenCalledWith('webgl', expect.objectContaining({ alpha: true }))
+  })
+})
