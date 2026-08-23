@@ -42,10 +42,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-      <div className="hero__foot" aria-hidden="true">
-        <span>Move the pointer. The field follows.</span>
-        <span>WebGL · 2 KB shader · vendored from ThreeUI</span>
-      </div>
     </section>
   )
 }
