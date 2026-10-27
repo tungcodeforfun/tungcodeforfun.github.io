@@ -1,9 +1,9 @@
 import { navigation, profile } from './content'
 import { Contact } from './sections/Contact'
+import { Contract } from './sections/Contract'
 import { Experience } from './sections/Experience'
-import { Freelance } from './sections/Freelance'
 import { Hero } from './sections/Hero'
-import { Projects } from './sections/Projects'
+import { Pullfolio } from './sections/Pullfolio'
 import { Work } from './sections/Work'
 
 export default function App() {
@@ -16,36 +16,34 @@ export default function App() {
         <a className="topbar__name" href="#top">
           {profile.name}
         </a>
-        <nav className="topbar__nav" aria-label="Sections">
-          {navigation.map((item) => (
-            <a key={item.href} href={item.href}>
-              {item.label}
-            </a>
-          ))}
-          <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="topbar__external">
-            LinkedIn <span aria-hidden="true">↗</span>
-          </a>
+        <nav aria-label="Sections">
+          <ul>
+            {navigation.map((item) => (
+              <li key={item.href}>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
         </nav>
+        <div className="controls">
+          <button type="button" className="control" data-toggle="motion" hidden>
+            Pause motion
+          </button>
+          <button type="button" className="control" data-toggle="theme" hidden>
+            Dark
+          </button>
+        </div>
       </header>
-      <main id="main" className="page">
+      <main id="main" tabIndex={-1}>
         <Hero />
         <Work />
-        <Freelance />
+        <Pullfolio />
         <Experience />
-        <Projects />
+        <Contract />
         <Contact />
       </main>
       <footer className="footer">
-        <span>
-          © {new Date().getFullYear()} {profile.name}
-        </span>
-        <span>
-          Shaders adapted from{' '}
-          <a href="https://github.com/MengTo/threeui" target="_blank" rel="noopener noreferrer">
-            ThreeUI
-          </a>{' '}
-          (MIT)
-        </span>
+        © {new Date().getFullYear()} {profile.name}.
       </footer>
     </>
   )

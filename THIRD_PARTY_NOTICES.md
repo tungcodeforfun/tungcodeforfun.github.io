@@ -1,32 +1,25 @@
 # Third-party notices
 
-## ThreeUI shaders
+## Source Serif 4
 
-These files are adapted from components in [MengTo/threeui](https://github.com/MengTo/threeui):
+`public/fonts/source-serif.woff2` is a Latin subset of Source Serif 4 version 4.004 (variable, weight 400–600, optical size 8–60), taken from the `@fontsource-variable/source-serif-4` package.
 
-- `src/background/RibbonField.tsx`, `ribbonFieldShaders.ts` (RibbonFieldBackground)
-- `src/background/StreamConvergence.tsx`, `streamConvergenceShaders.ts` (StreamConvergenceBackground)
-- `src/background/LiquidForm.tsx`, `liquidFormShaders.ts` (LiquidFormBackground)
-- `src/background/BellField.tsx`, `bellFieldShaders.ts` (BellFieldBackground)
+© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’. Licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
 
-MIT License
+## Mona Sans
 
-Copyright (c) 2026 Meng To
+`public/fonts/mona-sans.woff2` is a Latin subset of Mona Sans version 5.3.0 (variable, weight 400–650, width 100–115) from https://github.com/github/mona-sans.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Copyright 2023 The Mona Sans Project Authors (https://github.com/github/mona-sans). Licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## three.js
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The hero scene bundles three.js 0.186.1 (https://github.com/mrdoob/three.js).
+
+Copyright © 2010-2026 three.js authors. Licensed under the MIT License: https://github.com/mrdoob/three.js/blob/dev/LICENSE
+
+## IBM Plex Sans
+
+`design/comps3/fonts/ibm-plex-sans-latin-*.woff2` are the Latin subsets of IBM Plex Sans from the `@fontsource/ibm-plex-sans` 5.3.0 package, used only by the design comps.
+
+Copyright 2019 IBM Corp. All rights reserved. Licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
