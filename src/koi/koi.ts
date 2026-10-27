@@ -100,9 +100,10 @@ export function swim(koi: Koi, dt: number, heading: number, speed: number, glidi
 
 function hold(c: Float64Array, i: number, L: number, water: Water) {
   const s = i / N
-  held.x = clamp(c[i * 2], 0, water.width)
-  held.y = clamp(c[i * 2 + 1], 0, water.height)
-  if (water.fence) clear(water.fence, held, L * (0.03 + (s < TAIL ? halfWidth(s) : fanWidth((s - TAIL) / (1 - TAIL)))))
+  const m = L * (0.03 + (s < TAIL ? halfWidth(s) : fanWidth((s - TAIL) / (1 - TAIL))))
+  held.x = clamp(c[i * 2], m, water.width - m)
+  held.y = clamp(c[i * 2 + 1], m, water.height - m)
+  if (water.fence) clear(water.fence, held, m)
   const moved = held.x !== c[i * 2] || held.y !== c[i * 2 + 1]
   c[i * 2] = held.x
   c[i * 2 + 1] = held.y
