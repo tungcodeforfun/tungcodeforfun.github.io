@@ -13,6 +13,9 @@ export default function App() {
         Skip to content
       </a>
       <header className="topbar">
+        <a className="topbar__name" href="#top">
+          {profile.name}
+        </a>
         <nav aria-label="Sections">
           <ul>
             {navigation.map((item) => (
@@ -31,7 +34,7 @@ export default function App() {
           </button>
         </div>
       </header>
-      <main id="main" className="page" tabIndex={-1}>
+      <main id="main" tabIndex={-1}>
         <Hero />
         <Work />
         <Pullfolio />

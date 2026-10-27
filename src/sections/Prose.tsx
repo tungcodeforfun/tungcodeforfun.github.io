@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 const KEYED = /\{(\w+)\|([^}]+)\}/g
 
-export function Prose({ text }: { text: string }) {
+export function Prose({ text, className, cue }: { text: string; className?: string; cue?: string }) {
   const parts: ReactNode[] = []
   let last = 0
   for (const match of text.matchAll(KEYED)) {
@@ -15,5 +15,9 @@ export function Prose({ text }: { text: string }) {
     last = match.index + match[0].length
   }
   parts.push(text.slice(last))
-  return <p>{parts}</p>
+  return (
+    <p className={className} data-cue={cue}>
+      {parts}
+    </p>
+  )
 }

@@ -3,18 +3,23 @@ import { contract } from '../content'
 export function Contract() {
   return (
     <section className="section" id="contract" aria-labelledby="contract-title">
-      <h2 id="contract-title">Contract work</h2>
-      <p>{contract.intro}</p>
+      <div className="section__head">
+        <h2 id="contract-title">Contract work</h2>
+        <p className="lede">{contract.intro}</p>
+      </div>
       <ul className="offers">
         {contract.offers.map((offer) => (
           <li key={offer.title}>
-            <b>{offer.title}</b> {offer.body}
+            <h3>{offer.title}</h3>
+            <p>{offer.body}</p>
           </li>
         ))}
       </ul>
-      <p>{contract.process}</p>
+      <p className="process">{contract.process}</p>
       <p>
-        <a href={contract.bookingUrl}>{contract.bookingLabel}</a>
+        <a className="btn btn--strong" href={contract.bookingUrl}>
+          {contract.bookingLabel}
+        </a>
       </p>
     </section>
   )

@@ -1,4 +1,13 @@
 @font-face {
+  font-family: 'Mona Sans';
+  src: url('/fonts/mona-sans.woff2') format('woff2');
+  font-weight: 400 650;
+  font-stretch: 100% 115%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Source Serif 4';
   src: url('/fonts/source-serif.woff2') format('woff2');
   font-weight: 400 600;

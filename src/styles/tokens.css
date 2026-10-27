@@ -1,28 +1,35 @@
 :root {
   color-scheme: light dark;
-  --bg: light-dark(#fcfcfa, #151514);
-  --fg: light-dark(#383733, #d6d5cf);
-  --strong: light-dark(#161614, #f4f3ee);
-  --muted: light-dark(#696862, #a3a29b);
-  --deco: light-dark(#c3c2ba, #5b5a55);
-  --line: light-dark(#cdccc4, #4a4945);
-  --dot: light-dark(#cfcec7, #4a4945);
-  --region: light-dark(#f0efea, #21211f);
-  --focus: light-dark(#2453b8, #8db0ff);
-  --k-blue: light-dark(#2453b8, #8db0ff);
-  --k-orange: light-dark(#a24a0d, #f0a25c);
-  --k-green: light-dark(#23703a, #72cd8b);
-  --k-red: light-dark(#b22e2e, #ff8b82);
-  --k-purple: light-dark(#7037ae, #c9a3ff);
-  --k-amber: light-dark(#8a6100, #e6c04a);
-  --k-teal: light-dark(#0b6a76, #5cc9d5);
-  --k-slate: light-dark(#4e5a6a, #a9b6c8);
-  --k-ink: light-dark(#2a2a27, #e4e3dd);
-  --font: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --measure: 680px;
-  --gutter: 24px;
-  --section: 136px;
-  --slow: 1;
+  --bg: light-dark(#eceef1, #0a0c10);
+  --stage: light-dark(#f6f7f9, #10131a);
+  --stage-hi: light-dark(#ffffff, #171b24);
+  --chip: light-dark(#e1e4e9, #1c212b);
+  --chip-hi: light-dark(#d3d8df, #262c38);
+  --fg: light-dark(#2a2d33, #c6c9cf);
+  --strong: light-dark(#0d0f13, #f2f1ed);
+  --muted: light-dark(#5a606a, #8b919b);
+  --deco: light-dark(#a9afb8, #434956);
+  --line: light-dark(rgb(16 22 34 / 0.1), rgb(255 255 255 / 0.08));
+  --dot: light-dark(#bfc5ce, #2f3542);
+  --focus: light-dark(#2457c5, #8fb4ff);
+  --shadow: light-dark(rgb(30 40 60 / 0.18), rgb(0 0 0 / 0.55));
+  --k-blue: light-dark(#2457c5, #86adff);
+  --k-orange: light-dark(#b04a0a, #ff9d57);
+  --k-green: light-dark(#1d7742, #6fd69c);
+  --k-red: light-dark(#c02c2c, #ff6f69);
+  --k-purple: light-dark(#6b3dc0, #bb9cff);
+  --k-amber: light-dark(#8a6100, #f2c14e);
+  --k-teal: light-dark(#0a6d79, #4fd3dc);
+  --k-slate: light-dark(#4a5768, #a3b3c8);
+  --k-ink: light-dark(#23262c, #e8e6e0);
+  --display: 'Mona Sans', ui-sans-serif, system-ui, sans-serif;
+  --text: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.095 24.4%, 1.1 26.8%, 1.084 30.6%, 1.012 41.4%, 0.993 47.6%, 0.998 64.5%, 1);
+  --wide: 1376px;
+  --measure: 34em;
+  --gutter: clamp(20px, 4.4vw, 64px);
+  --section: clamp(120px, 18vh, 200px);
 }
 
 :root[data-theme='light'] {
@@ -31,17 +38,4 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --slow: 3;
-  }
-}
-
-@media (max-width: 600px) {
-  :root {
-    --gutter: 20px;
-    --section: 104px;
-  }
 }
