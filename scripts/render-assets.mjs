@@ -75,7 +75,7 @@ async function renderStills(browser, url) {
   }
 }
 
-const browser = await chromium.launch({ executablePath })
+const browser = await chromium.launch({ executablePath, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
 if (values.stills) {
   await renderStills(browser, values.stills)
 } else {

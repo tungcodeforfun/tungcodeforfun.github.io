@@ -1,4 +1,4 @@
-import { mkdir, rename } from 'node:fs/promises'
+import { mkdir, rename, writeFile } from 'node:fs/promises'
 import { parseArgs } from 'node:util'
 import { chromium } from 'playwright-core'
 
@@ -38,6 +38,35 @@ async function settle(page, ms) {
   await page.waitForTimeout(ms)
 }
 
+async function fullPage(page, path) {
+  const { height, total } = await page.evaluate(() => ({ height: innerHeight, total: document.documentElement.scrollHeight }))
+  const tiles = []
+  for (let y = 0; y < total; y += height) {
+    const top = Math.min(y, total - height)
+    await page.evaluate((t) => window.scrollTo(0, t), top)
+    await settle(page, 700)
+    tiles.push({ y, offset: y - top, data: (await page.screenshot()).toString('base64') })
+    if (y === 0) await page.addStyleTag({ content: '.topbar{visibility:hidden!important}' })
+  }
+  const composer = await page.context().newPage()
+  const png = await composer.evaluate(
+    async ({ tiles, total, height }) => {
+      const images = await Promise.all(
+        tiles.map(async (t) => ({ ...t, bitmap: await createImageBitmap(await (await fetch(`data:image/png;base64,${t.data}`)).blob()) })),
+      )
+      const scale = images[0].bitmap.height / height
+      const canvas = new OffscreenCanvas(images[0].bitmap.width, Math.round(total * scale))
+      const g = canvas.getContext('2d')
+      for (const t of images) g.drawImage(t.bitmap, 0, t.offset * scale, t.bitmap.width, (height - t.offset) * scale, 0, t.y * scale, t.bitmap.width, (height - t.offset) * scale)
+      const blob = await canvas.convertToBlob({ type: 'image/png' })
+      return [...new Uint8Array(await blob.arrayBuffer())]
+    },
+    { tiles, total, height },
+  )
+  await composer.close()
+  await writeFile(path, Buffer.from(png))
+}
+
 async function shots() {
   for (const width of [1440, 390]) {
     for (const scheme of ['dark', 'light']) {
@@ -46,18 +75,8 @@ async function shots() {
         const name = `${values.out}/site-${width}-${scheme}-${rm === 'reduce' ? 'rm' : 'motion'}`
         await settle(page, 6000)
         await page.screenshot({ path: `${name}-first.png` })
-        for (const id of await page.$$eval('main section[id]', (s) => s.map((x) => x.id))) {
-          await page.locator(`#${id}`).scrollIntoViewIfNeeded()
-          await settle(page, 400)
-        }
-        await page.evaluate(async () => {
-          for (let y = 0; y <= document.body.scrollHeight; y += 600) {
-            window.scrollTo(0, y)
-            await new Promise((r) => setTimeout(r, 60))
-          }
-        })
         await page.addStyleTag({ content: '*{animation-timeline:auto!important;animation:none!important}' })
-        await page.screenshot({ path: `${name}-full.png`, fullPage: true })
+        await fullPage(page, `${name}-full.png`)
         console.log(`shot ${name}-{first,full}.png`)
         await context.close()
       }
@@ -222,9 +241,22 @@ async function video() {
 }
 
 async function frames() {
-  const { context, page } = await open(1440, 'dark', 'no-preference')
+  const context = await browser.newContext({ viewport: viewports[1440], colorScheme: 'dark' })
+  await context.addInitScript(() => {
+    window.__cost = []
+    const raf = window.requestAnimationFrame.bind(window)
+    window.requestAnimationFrame = (fn) =>
+      raf((t) => {
+        const start = performance.now()
+        fn(t)
+        window.__cost.push(performance.now() - start)
+      })
+  })
+  const page = await context.newPage()
+  await page.goto(values.url, { waitUntil: 'networkidle' })
   await page.waitForSelector('.hero[data-live]', { state: 'attached', timeout: 30000 })
   await settle(page, 2000)
+  await page.evaluate(() => (window.__cost.length = 0))
   const stats = await page.evaluate(
     () =>
       new Promise((resolve) => {
@@ -244,6 +276,12 @@ async function frames() {
       }),
   )
   console.log(`frames hero 1440 dark: ${JSON.stringify(stats)}`)
+  const cost = await page.evaluate(() => {
+    const s = window.__cost.filter((v) => v > 0.05).sort((a, b) => a - b)
+    const at = (q) => s[Math.min(s.length - 1, Math.floor(q * s.length))]
+    return { callbacks: s.length, p50: at(0.5), p95: at(0.95) }
+  })
+  console.log(`hero main-thread work per frame (rAF callbacks, ms): ${JSON.stringify(cost)}`)
   const offscreen = await page.evaluate(async () => {
     window.scrollTo(0, document.querySelector('#experience').offsetTop)
     await new Promise((r) => setTimeout(r, 600))
@@ -292,3 +330,4 @@ if (only.has('frames')) await frames()
 if (only.has('fallback')) await fallback()
 await browser.close()
 console.log(problems.length ? `PROBLEMS\n${problems.join('\n')}` : 'console clean')
+process.exit(problems.length ? 1 : 0)

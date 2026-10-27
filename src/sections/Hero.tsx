@@ -9,14 +9,11 @@ export function Hero() {
         <div className="hero__still still" role="img" aria-label={hero.still} style={stills('hero')} />
         <div className="hero__scrim" />
         <div className="hero__copy">
-          <div className="hero__id">
-            <h1 id="hero-name">{profile.name}</h1>
-            <p className="hero__role">
-              {profile.role}, {profile.location}
-            </p>
-          </div>
-          <p className="hero__headline">{profile.headline}</p>
-          <p className="hero__also">{profile.also}</p>
+          <h1 id="hero-name">{profile.name}</h1>
+          <p className="hero__role">
+            {profile.role}, {profile.location}
+          </p>
+          <p className="hero__summary">{profile.summary}</p>
           <ul className="hero__links">
             {links.map((link) => (
               <li key={link.href}>

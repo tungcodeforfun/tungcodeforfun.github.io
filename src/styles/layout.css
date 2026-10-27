@@ -107,46 +107,33 @@
   position: absolute;
   left: var(--gutter);
   bottom: clamp(48px, 10vh, 112px);
-  width: min(940px, 64vw);
+  width: min(620px, 52vw);
   opacity: calc(1 - var(--p, 0) * 1.6);
   translate: 0 calc(var(--p, 0) * -48px);
 }
 
-.hero__id {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 14px;
-  font-family: var(--display);
-}
-
 .hero h1 {
-  font-size: 22px;
-  font-weight: 620;
-  letter-spacing: -0.01em;
+  font-family: var(--display);
+  font-size: clamp(46px, 5.6vw, 84px);
+  font-weight: 560;
+  line-height: 0.95;
+  letter-spacing: -0.022em;
+  color: var(--strong);
 }
 
 .hero__role {
-  font-size: 17px;
-  font-weight: 480;
-  color: var(--fg);
-}
-
-.hero__headline {
-  margin-top: 22px;
+  margin-top: 14px;
   font-family: var(--display);
-  font-size: clamp(36px, 4.3vw, 66px);
-  font-weight: 540;
-  font-stretch: 112%;
-  line-height: 1.02;
-  letter-spacing: -0.034em;
+  font-size: clamp(19px, 1.5vw, 22px);
+  font-weight: 500;
   color: var(--strong);
-  text-wrap: balance;
 }
 
-.hero__also {
+.hero__summary {
   margin-top: 18px;
-  font-size: clamp(19px, 1.5vw, 22px);
+  max-width: 36ch;
+  font-size: clamp(19px, 1.4vw, 21px);
+  line-height: 1.5;
   color: var(--fg);
 }
 
@@ -198,6 +185,15 @@
   line-height: 1.5;
   color: var(--fg);
   opacity: calc(1 - var(--p, 0) * 2);
+  isolation: isolate;
+}
+
+.hero__scene::before {
+  content: '';
+  position: absolute;
+  inset: -56px -72px;
+  z-index: -1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--bg) 88%, transparent) 55%, transparent);
 }
 
 .section {
@@ -454,20 +450,13 @@
   background: color-mix(in srgb, var(--strong) 86%, var(--bg));
 }
 
-.contact h2 {
-  font-size: 22px;
-  font-stretch: 100%;
-  letter-spacing: -0.01em;
-}
-
 .contact__line {
   margin-top: 20px;
   font-family: var(--display);
-  font-size: clamp(34px, 4.6vw, 68px);
+  font-size: clamp(24px, 2.6vw, 36px);
   font-weight: 520;
-  font-stretch: 110%;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  letter-spacing: -0.012em;
   color: var(--strong);
 }
 
@@ -552,7 +541,12 @@
   .topbar nav {
     grid-row: 2;
     grid-column: 1 / -1;
-    margin-left: -10px;
+    margin-inline: -9px;
+  }
+
+  .topbar ul {
+    justify-content: space-between;
+    gap: 0;
   }
 
   .topbar nav a,
@@ -574,20 +568,16 @@
     bottom: 32px;
   }
 
-  .hero__headline {
-    font-size: clamp(31px, 8.6vw, 40px);
-    letter-spacing: -0.03em;
-  }
-
   .hero h1 {
-    font-size: 19px;
+    font-size: clamp(42px, 12vw, 52px);
   }
 
   .hero__role {
-    font-size: 15px;
+    margin-top: 10px;
+    font-size: 17px;
   }
 
-  .hero__also {
+  .hero__summary {
     margin-top: 12px;
     font-size: 17px;
   }

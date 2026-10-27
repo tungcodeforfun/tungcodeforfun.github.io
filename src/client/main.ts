@@ -37,9 +37,10 @@ if (hero) {
 function webglAvailable() {
   if (recall('webgl') === 'fail') return false
   const probe = document.createElement('canvas')
-  const ok = !!probe.getContext('webgl2')
-  if (!ok) remember('webgl', 'fail')
-  return ok
+  const gl = probe.getContext('webgl2')
+  gl?.getExtension('WEBGL_lose_context')?.loseContext()
+  if (!gl) remember('webgl', 'fail')
+  return !!gl
 }
 
 function startHero(el: HTMLElement) {

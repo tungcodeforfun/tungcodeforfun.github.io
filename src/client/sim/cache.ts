@@ -1,5 +1,6 @@
+import type { Palette } from '../palette'
 import { spring, stepSpring } from '../spring'
-import { alpha, ball, FONT, glow, label, mix, pill, tabular, type Palette } from './draw'
+import { alpha, ball, FONT, glow, label, mix, pill, tabular } from './draw'
 import { mountSim, type Sim, type SimApi } from './stage'
 
 type Kind = 'hit' | 'miss' | 'wait' | 'db'
@@ -460,11 +461,11 @@ function create(api: SimApi): Sim {
     if (changedCache) {
       api.say(
         cacheOn
-          ? 'Cache on: requests ask the cache first; a miss takes the lock and fills the key.'
+          ? 'Cache on: requests ask the cache first; a miss takes the lock, reads the database and fills the key.'
           : 'Cache off: every request reads the database.',
       )
     } else {
-      api.say(rewritten ? 'Rewritten queries: database reads are faster and steadier.' : 'Original queries: database reads are slower, with a long tail.')
+      api.say(rewritten ? 'Rewritten queries: simulated database reads are faster.' : 'Original queries: simulated database reads are slower.')
     }
   }
 

@@ -2,8 +2,8 @@ export const profile = {
   name: 'Tung Nguyen',
   role: 'Senior Software Engineer',
   location: 'New York',
-  headline: 'Four years building backend Java/Spring Boot services, event-driven systems and AWS infrastructure.',
-  also: 'I also write Python, Go and TypeScript.',
+  summary:
+    'Four years building backend Java/Spring Boot services, event-driven systems and AWS infrastructure; I also write Python, Go and TypeScript.',
   email: 'tungnguyen1651@gmail.com',
   github: 'https://github.com/tungcodeforfun',
   linkedin: 'https://www.linkedin.com/in/tungngvyen',
@@ -74,8 +74,8 @@ export const caseStudies: CaseStudy[] = [
       id: 'queue',
       title: 'Simulation: configuration batches on a queue',
       description:
-        'Configuration messages wait in a queue and three workers apply them to a field of locations. A poisoned message fails, returns to the queue after a visibility timeout, fails again, and after its third attempt moves to the dead-letter queue, which raises an alarm and pages the on-call engineer. Other messages keep flowing. In synchronous HTTP mode the caller holds one call open per location and the slow ones time out.',
-      hint: 'Inject a poisoned message, or switch to synchronous HTTP to see the old failure.',
+        'In this simulation, configuration messages wait in a queue and three workers apply them to a field of locations. A poisoned message fails, returns to the queue after a visibility timeout, fails again, and after its third attempt moves to the dead-letter queue, which raises an alarm and pages the on-call engineer. Other messages keep flowing. In synchronous HTTP mode the simulated caller waits on each location call, and slow calls time out.',
+      hint: 'Inject a poisoned message, or switch to synchronous HTTP and send a batch.',
       caption: `${simCaption} Each dot stands in for a group of locations.`,
       readout: 'Messages flow from the queue to the locations.',
       controls: [
@@ -118,7 +118,7 @@ export const caseStudies: CaseStudy[] = [
       id: 'cache',
       title: 'Simulation: POS requests with and without the cache',
       description:
-        'Requests from POS clients reach the API, which asks a cache in another VPC. Hits return at once; a miss takes a lock, reads the database, fills the cache and returns, while other requests for the same key wait for the fill. A live trace plots each request’s latency and a running P95. Turning the cache off sends every request to the database and the P95 climbs; turning it back on brings it down. The query toggle switches between the original and rewritten database queries.',
+        'In this simulation, requests from POS clients reach the API, which asks a cache in another VPC. Hits return at once; a miss takes a lock, reads the database, fills the cache and returns. A live trace plots each request’s latency and a running P95. Turning the cache off sends every request to the database and the P95 climbs; turning it back on brings it down. The query toggle switches between simulated original and rewritten database queries.',
       hint: 'Turn the cache off and watch the P95 line climb, then turn it back on.',
       caption: `${simCaption} Latencies are illustrative.`,
       readout: 'Cache on, rewritten queries.',

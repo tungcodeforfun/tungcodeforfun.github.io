@@ -1,4 +1,5 @@
-import { alpha, ball, glow, label, mix, pill, tabular, type Palette } from './draw'
+import type { Palette } from '../palette'
+import { alpha, ball, glow, label, mix, pill, tabular } from './draw'
 import { mountSim, type Sim, type SimApi } from './stage'
 
 type MsgState = 'queued' | 'toWorker' | 'working' | 'invisible' | 'toDlq' | 'dead'
@@ -69,6 +70,7 @@ function create(api: SimApi): Sim {
   let calls: Call[] = []
   let sync = false
   let syncClock = 0
+  let userRun = false
   let nextId = 1
   let nextBand = 0
   let ambientClock = 0.4
@@ -79,10 +81,7 @@ function create(api: SimApi): Sim {
 
   const bands = () => Math.max(1, Math.floor(dots.length / BAND))
   const queued = () => msgs.filter((m) => m.state === 'queued')
-  const slotX = (i: number) => {
-    const spacing = Math.min(22, (L.lane.x1 - L.lane.x0 - 24) / Math.max(10, queued().length))
-    return L.lane.x1 - 18 - i * spacing
-  }
+  const slotX = (i: number, count: number) => L.lane.x1 - 18 - i * Math.min(22, (L.lane.x1 - L.lane.x0 - 24) / Math.max(10, count))
 
   function rebuild(w: number, h: number) {
     size = { w, h }
@@ -178,55 +177,61 @@ function create(api: SimApi): Sim {
     return Math.hypot(x - m.x, y - m.y) < 1.5
   }
 
+  function assignWorkers(q: Msg[]) {
+    const front = slotX(0, q.length)
+    for (let k = 0; k < workers.length; k++) {
+      const worker = workers[k]
+      if (worker.busy) continue
+      const head = q.find((m) => m.state === 'queued' && Math.abs(m.x - front) < 30)
+      if (!head) continue
+      head.state = 'toWorker'
+      head.worker = k
+      worker.busy = head
+      q.splice(q.indexOf(head), 1)
+    }
+  }
+
+  function stepInvisible(m: Msg, dt: number) {
+    m.t -= dt
+    approach(m, (L.lane.x0 + L.lane.x1) / 2, L.lane.y + (L.portrait ? 30 : -34), dt, 3)
+    if (m.t > 0) return
+    m.state = 'queued'
+    msgs.splice(msgs.indexOf(m), 1)
+    msgs.push(m)
+  }
+
+  function stepToDlq(m: Msg, dt: number, parked: number) {
+    m.t += dt
+    if (!approach(m, L.dlq.x + 26 + parked * 20, L.dlq.y, dt, 4.5)) return
+    m.state = 'dead'
+    stats.dead++
+    alarm = 1
+    pager = 2.4
+    api.say(`After ${MAX_ATTEMPTS} attempts the poisoned message moved to the dead-letter queue. The alarm paged on-call; other messages kept flowing.`)
+  }
+
+  function stepMessage(m: Msg, dt: number, parked: number) {
+    if (m.state === 'toWorker') {
+      const [x, y] = L.workers[m.worker]
+      if (approach(m, x, y, dt, 10)) {
+        m.state = 'working'
+        workers[m.worker].t = 0
+      }
+    } else if (m.state === 'working') {
+      workers[m.worker].t += dt
+      if (workers[m.worker].t >= WORK_TIME) finishWork(m.worker)
+    } else if (m.state === 'invisible') stepInvisible(m, dt)
+    else if (m.state === 'toDlq') stepToDlq(m, dt, parked)
+  }
+
   function stepQueue(dt: number) {
     const q = queued()
-    q.forEach((m, i) => approach(m, slotX(i), L.lane.y, dt, 7))
-    for (let k = 0; k < workers.length; k++) {
-      const wk = workers[k]
-      wk.fail = Math.max(0, wk.fail - dt * 1.6)
-      if (!wk.busy) {
-        const head = q.find((m) => m.state === 'queued' && Math.abs(m.x - slotX(0)) < 30)
-        if (head) {
-          head.state = 'toWorker'
-          head.worker = k
-          wk.busy = head
-          q.splice(q.indexOf(head), 1)
-        }
-      }
-    }
-    for (const m of msgs) {
-      if (m.state === 'toWorker') {
-        const [x, y] = L.workers[m.worker]
-        if (approach(m, x, y, dt, 10)) {
-          m.state = 'working'
-          workers[m.worker].t = 0
-        }
-      } else if (m.state === 'working') {
-        const wk = workers[m.worker]
-        wk.t += dt
-        if (wk.t >= WORK_TIME) finishWork(m.worker)
-      } else if (m.state === 'invisible') {
-        m.t -= dt
-        approach(m, (L.lane.x0 + L.lane.x1) / 2, L.lane.y + (L.portrait ? 30 : -34), dt, 3)
-        if (m.t <= 0) {
-          m.state = 'queued'
-          msgs.splice(msgs.indexOf(m), 1)
-          msgs.push(m)
-        }
-      } else if (m.state === 'toDlq') {
-        m.t += dt
-        const parked = msgs.filter((n) => n.state === 'dead').length
-        if (approach(m, L.dlq.x + 26 + parked * 20, L.dlq.y, dt, 4.5)) {
-          m.state = 'dead'
-          stats.dead++
-          alarm = 1
-          pager = 2.4
-          api.say(
-            `After ${MAX_ATTEMPTS} attempts the poisoned message moved to the dead-letter queue. The alarm paged on-call; other messages kept flowing.`,
-          )
-        }
-      }
-    }
+    q.forEach((m, i) => approach(m, slotX(i, q.length), L.lane.y, dt, 7))
+    for (const worker of workers) worker.fail = Math.max(0, worker.fail - dt * 1.6)
+    assignWorkers(q)
+    let parked = 0
+    for (const m of msgs) if (m.state === 'dead') parked++
+    for (const m of msgs) stepMessage(m, dt, parked)
   }
 
   function stepSync(dt: number) {
@@ -250,13 +255,14 @@ function create(api: SimApi): Sim {
     if (!open && calls.some((c) => c.state !== 'open') && syncClock < GATEWAY_TIMEOUT + 2) {
       const failed = calls.filter((c) => c.state === 'timeout').length
       stats.calls += calls.length
-      if (syncClock < GATEWAY_TIMEOUT + 1) {
+      if (userRun && syncClock < GATEWAY_TIMEOUT + 1) {
         api.say(
           failed
-            ? `Synchronous run finished: ${failed} of ${calls.length} location calls timed out and were left unapplied.`
+            ? `Synchronous run finished: ${failed} of ${calls.length} simulated calls timed out.`
             : `Synchronous run finished: all ${calls.length} calls returned before the timeout.`,
         )
       }
+      userRun = false
       syncClock = GATEWAY_TIMEOUT + 2
     }
   }
@@ -316,7 +322,8 @@ function create(api: SimApi): Sim {
     action(name, value) {
       if (name === 'batch') {
         sendBatch()
-        api.say(sync ? 'Synchronous run started: the caller waits on every location call.' : `Batch sent: ${BATCH} messages queued.`)
+        userRun = sync
+        api.say(sync ? 'Synchronous run started: the simulated caller waits on each location call.' : `Batch sent: ${BATCH} messages queued.`)
       } else if (name === 'poison') {
         if (sync) {
           api.say('Switch to SQS batches to see a poisoned message retried and dead-lettered.')
@@ -330,7 +337,7 @@ function create(api: SimApi): Sim {
         ambientClock = 0.3
         api.say(
           sync
-            ? 'Synchronous HTTP: one call per location, all inside one gateway timeout.'
+            ? 'Synchronous HTTP: the simulated caller waits on each location call, and slow calls time out.'
             : 'SQS batches: messages wait in the queue and workers apply them.',
         )
       }

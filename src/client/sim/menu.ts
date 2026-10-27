@@ -1,4 +1,5 @@
-import { alpha, ball, glow, label, mix, pill, tabular, type Palette } from './draw'
+import type { Palette } from '../palette'
+import { alpha, ball, glow, label, mix, pill, tabular } from './draw'
 import { mountSim, setControl, type Sim, type SimApi } from './stage'
 
 type Item = {

@@ -15,7 +15,8 @@ import {
   WebGLRenderer,
 } from 'three'
 import { env, onEnvChange, remember, whenVisible } from '../env'
-import { readPalette } from '../sim/draw'
+import { readPalette } from '../palette'
+import { seeded } from '../random'
 import { spring, stepSpring } from '../spring'
 import {
   backdropFragment,
@@ -66,15 +67,6 @@ type Shot = { radius: number; polar: number; azimuth: number; target: Vector3 }
 
 const WIDE: Shot = { radius: 24, polar: 1.04, azimuth: 0.42, target: new Vector3(0, 0.4, 0) }
 const CLOSE: Shot = { radius: 10.5, polar: 1.1, azimuth: 0.92, target: new Vector3(0.7, 1.1, 0.6) }
-
-function seeded(seed: number) {
-  return () => {
-    seed = (seed + 0x6d2b79f5) | 0
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
 
 function circle(radius: number, segments = 64) {
   const pts: number[] = []
@@ -148,10 +140,11 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     throw error
   }
   canvas.addEventListener('webglcontextlost', () => {
-    remember('webgl', 'fail')
     delete hero.dataset.live
     canvas.remove()
     running = false
+    if (raf) cancelAnimationFrame(raf)
+    raf = 0
   })
 
   const random = seeded(1027)
@@ -420,9 +413,9 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
         fail(f, bezier(scratch, f.from, f.ctrl, f.to, f.failAt))
         continue
       }
-      const pos = bezier(new Vector3(), f.from, f.ctrl, f.to, Math.min(f.t, 1))
+      const max = narrow ? 8 : TRAIL
+      const pos = bezier(f.trail.length >= max ? f.trail.pop()! : new Vector3(), f.from, f.ctrl, f.to, Math.min(f.t, 1))
       f.trail.unshift(pos)
-      if (f.trail.length > (narrow ? 8 : TRAIL)) f.trail.pop()
       if (f.t >= 1) {
         land(f)
         flights.splice(i, 1)
@@ -539,6 +532,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
         if (curtain >= 1) shotIndex = wanted
       } else curtain = Math.max(0, curtain - dt * 4)
       progress.value = shotIndex
+      progress.target = shotIndex
       progress.velocity = 0
     } else {
       curtain = 0
@@ -568,7 +562,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     const w = Math.max(1, box.width)
     const h = Math.max(1, box.height)
     narrow = w < 720
-    const dpr = Math.min(devicePixelRatio || 1, narrow ? 1.5 : 1.75)
+    const dpr = Math.min(devicePixelRatio || 1, narrow ? 1.25 : 1.5)
     pixelRatio.value = dpr * (h / 900)
     renderer.setPixelRatio(dpr)
     renderer.setSize(w, h, false)
@@ -597,7 +591,8 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
   let running = false
   new ResizeObserver(() => {
     resize()
-    if (!running) render()
+    if (running) wake()
+    else render()
   }).observe(stage)
 
   if (env.still) {
@@ -614,6 +609,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
   let dirty = true
 
   const frame = (now: number) => {
+    if (!running) return
     const dt = Math.max(0, Math.min((now - last) / 1000, 1 / 30))
     last = now
     if (!env.paused) step(dt * (env.reduced ? 0.35 : 1), true)
