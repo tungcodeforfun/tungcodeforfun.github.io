@@ -1,7 +1,8 @@
 import { links, profile } from './content.ts'
-import { createPond, metrics, type Rect } from './koi/pond.ts'
+import { createPond, metrics } from './koi/pond.ts'
+import type { Rect } from './koi/math.ts'
 
-const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const escape = (s: string) => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 
 function personJsonLd() {
   return JSON.stringify({
@@ -11,7 +12,7 @@ function personJsonLd() {
     jobTitle: profile.role,
     url: profile.site,
     sameAs: [profile.github, profile.linkedin],
-  }).replace(/</g, '\\u003c')
+  }).replaceAll('<', '\\u003c')
 }
 
 function head() {
@@ -40,7 +41,7 @@ function head() {
 }
 
 function still(name: string, width: number, height: number, keepOut: Rect) {
-  const { cellW, cellH } = metrics(width, height)
+  const { fontSize, cellW, cellH } = metrics(width, height)
   const pond = createPond()
   pond.setLayout({ width, height, cellW, cellH, keepOut })
   for (let i = 0; i < 60 * 14; i++) pond.step(1 / 60)
@@ -61,9 +62,11 @@ function still(name: string, width: number, height: number, keepOut: Rect) {
       line += ink ? escape(String.fromCharCode(grid.glyph[i])) : ' '
     }
     if (open) line += '</span>'
-    lines.push(line.replace(/ +$/, ''))
+    lines.push(line.replace(/ +(?=(<\/span>)?$)/, ''))
   }
-  return `<pre class="still still--${name}" aria-hidden="true">${lines.join('\n')}</pre>`
+  const vw = (px: number) => `${((px / width) * 100).toFixed(4)}vw`
+  const size = `font-size:${vw(fontSize)};line-height:${vw(cellH)}`
+  return `<pre class="still still--${name}" style="${size}" aria-hidden="true">${lines.join('\n')}</pre>`
 }
 
 function body() {
@@ -71,8 +74,8 @@ function body() {
   return [
     '<main>',
     `<div class="pond" role="img" aria-label="Two koi, drawn in text symbols, swimming around each other">`,
-    still('wide', 1440, 900, { x: 32, y: 660, w: 470, h: 208 }),
-    still('narrow', 390, 844, { x: 12, y: 664, w: 366, h: 168 }),
+    still('wide', 1440, 900, { x: -15, y: 663, w: 622, h: 252 }),
+    still('narrow', 390, 844, { x: -9, y: 663, w: 408, h: 190 }),
     '<canvas aria-hidden="true"></canvas>',
     '</div>',
     '<div class="card">',

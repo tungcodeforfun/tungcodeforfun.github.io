@@ -86,8 +86,6 @@ main {
 .still {
   margin: 0;
   font-family: 'Koi Mono', ui-monospace, monospace;
-  font-size: 1.0417vw;
-  line-height: 1.1806vw;
   white-space: pre;
 }
 
@@ -157,8 +155,6 @@ a:focus-visible {
 
   .still--narrow {
     display: block;
-    font-size: 2.3077vw;
-    line-height: 2.5641vw;
   }
 
   .js .still--narrow {

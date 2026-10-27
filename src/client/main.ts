@@ -14,7 +14,7 @@ let width = 0
 let height = 0
 let frame = 0
 let last = 0
-let pointer = { x: -1e4, y: -1e4 }
+const pointer = { x: -1e4, y: -1e4 }
 
 function readInks() {
   const style = getComputedStyle(root)
@@ -25,7 +25,7 @@ function layout() {
   if (!canvas || !ctx || !card) return
   width = innerWidth
   height = innerHeight
-  const dpr = Math.min(devicePixelRatio || 1, 2)
+  const dpr = Math.min(devicePixelRatio || 1, 3)
   canvas.width = Math.round(width * dpr)
   canvas.height = Math.round(height * dpr)
   const { fontSize, cellW, cellH } = metrics(width, height)
@@ -108,7 +108,8 @@ async function boot() {
   addEventListener('pointermove', (e) => {
     if (reduced.matches || e.pointerType !== 'mouse') return
     if (Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) < 28) return
-    pointer = { x: e.clientX, y: e.clientY }
+    pointer.x = e.clientX
+    pointer.y = e.clientY
     pond.stir(e.clientX, e.clientY)
   })
 }

@@ -1,8 +1,8 @@
-import { put, type Grid } from './grid.ts'
+import { put, type Grid, type InkId } from './grid.ts'
 import { TAU, clamp, ease, inside, smooth, wrap, type Rect } from './math.ts'
 
-export type Patch = { s: number; u: number; rs: number; ru: number }
-export type Look = { body: number; patch: number; fin: number; eye: number; patches: readonly Patch[] }
+export type Patch = { along: number; across: number; alongRadius: number; acrossRadius: number }
+export type Look = { body: InkId; patch: InkId; fin: InkId; eye: InkId; patches: readonly Patch[] }
 
 export type Koi = {
   look: Look
@@ -35,6 +35,9 @@ const sl = new Float64Array(N)
 const hit = { s: 0, d: 0, tx: 1, ty: 0, ex: 0, ey: 0 }
 const at = { x: 0, y: 0 }
 const root = { x: 0, y: 0 }
+const norm = { x: 0, y: 0, g: 1 }
+const span = { c0: 0, c1: 0, r0: 0, r1: 0 }
+const SIDES = [-1, 1]
 let target: Grid
 let clip: Rect | null = null
 
@@ -47,11 +50,11 @@ export function createKoi(look: Look, length: number, x: number, y: number, head
   return { look, length, x, y, heading, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain }
 }
 
-export function resizeKoi(koi: Koi, length: number, sx: number, sy: number) {
+export function resizeKoi(koi: Koi, length: number, scaleX: number, scaleY: number) {
   const c = koi.chain
   for (let i = 0; i <= N; i++) {
-    c[i * 2] *= sx
-    c[i * 2 + 1] *= sy
+    c[i * 2] *= scaleX
+    c[i * 2 + 1] *= scaleY
   }
   koi.x = c[0]
   koi.y = c[1]
@@ -175,21 +178,19 @@ function scale(tx: number, ty: number) {
 
 function inPatch(look: Look, s: number, u: number) {
   for (const p of look.patches) {
-    const a = (s - p.s) / p.rs
-    const b = (u - p.u) / p.ru
-    const wobble = 0.22 * Math.sin(s * 41 + u * 3.1 + p.s * 17) + 0.12 * Math.sin(u * 9 - s * 23)
+    const a = (s - p.along) / p.alongRadius
+    const b = (u - p.across) / p.acrossRadius
+    const wobble = 0.22 * Math.sin(s * 41 + u * 3.1 + p.along * 17) + 0.12 * Math.sin(u * 9 - s * 23)
     if (a * a + b * b < 1 + wobble) return true
   }
   return false
 }
 
 function cells(x0: number, y0: number, x1: number, y1: number) {
-  return [
-    Math.max(0, Math.floor(x0 / target.cellW)),
-    Math.min(target.cols - 1, Math.ceil(x1 / target.cellW)),
-    Math.max(0, Math.floor(y0 / target.cellH)),
-    Math.min(target.rows - 1, Math.ceil(y1 / target.cellH)),
-  ]
+  span.c0 = Math.max(0, Math.floor(x0 / target.cellW))
+  span.c1 = Math.min(target.cols - 1, Math.ceil(x1 / target.cellW))
+  span.r0 = Math.max(0, Math.floor(y0 / target.cellH))
+  span.r1 = Math.min(target.rows - 1, Math.ceil(y1 / target.cellH))
 }
 
 function band(nx: number, ny: number) {
@@ -209,7 +210,8 @@ function fin(koi: Koi, s: number, side: number, angle: number, size: number, spr
   const ay = sy[i] * Math.cos(angle) + sx[i] * side * Math.sin(angle)
   const len = koi.length * size
   const { cellW, cellH } = target
-  const [c0, c1, r0, r1] = cells(rx - len, ry - len, rx + len, ry + len)
+  cells(rx - len, ry - len, rx + len, ry + len)
+  const { c0, c1, r0, r1 } = span
   for (let r = r0; r <= r1; r++) {
     for (let c = c0; c <= c1; c++) {
       const px = (c + 0.5) * cellW
@@ -245,22 +247,32 @@ function tail(koi: Koi, c: number, r: number, px: number, py: number) {
   else put(target, c, r, ray, koi.look.fin, membrane(hit.d / tw, 6, (2 * tw) / 6, (target.cellW + target.cellH) / 2))
 }
 
+function surface(s: number, side: number) {
+  if (s <= 0) {
+    norm.g = 1
+    norm.x = hit.ex
+    norm.y = hit.ey
+  } else {
+    const k = clamp((halfWidth(s + 0.004) - halfWidth(s - 0.004)) / 0.008, -6, 6)
+    norm.x = -hit.ty * side - k * hit.tx
+    norm.y = hit.tx * side - k * hit.ty
+    norm.g = Math.hypot(norm.x, norm.y)
+  }
+  const m = Math.hypot(norm.x, norm.y) || 1
+  norm.x /= m
+  norm.y /= m
+}
+
 function skin(koi: Koi, c: number, r: number, narrow: number) {
   const s = hit.s
   const w = koi.length * halfWidth(s) * narrow
-  const side = hit.d >= 0 ? 1 : -1
-  const k = s > 0 ? clamp((halfWidth(s + 0.004) - halfWidth(s - 0.004)) / 0.008, -6, 6) : 0
-  let nx = s > 0 ? -hit.ty * side - k * hit.tx : hit.ex
-  let ny = s > 0 ? hit.tx * side - k * hit.ty : hit.ey
-  const g = Math.hypot(nx, ny) || 1
-  nx /= g
-  ny /= g
-  const sd = (Math.abs(hit.d) - w) / (s > 0 ? g : 1)
-  const edgeBand = band(nx, ny)
+  surface(s, hit.d >= 0 ? 1 : -1)
+  const sd = (Math.abs(hit.d) - w) / norm.g
+  const edgeBand = band(norm.x, norm.y)
   if (sd > edgeBand) return
   const u = w > 0 ? hit.d / w : 0
   const ink = inPatch(koi.look, s, u) ? koi.look.patch : koi.look.body
-  if (sd > -edgeBand) put(target, c, r, edge(nx, ny, sd, target.cellH), ink)
+  if (sd > -edgeBand) put(target, c, r, edge(norm.x, norm.y, sd, target.cellH), ink)
   else put(target, c, r, s < HEAD * 0.75 ? ':' : scale(hit.tx, hit.ty), ink, Math.round(255 * (0.55 + 0.45 * (1 - u * u))))
 }
 
@@ -275,7 +287,7 @@ function bounds(pad: number) {
     minY = Math.min(minY, qy[i])
     maxY = Math.max(maxY, qy[i])
   }
-  return cells(minX - pad, minY - pad, maxX + pad, maxY + pad)
+  cells(minX - pad, minY - pad, maxX + pad, maxY + pad)
 }
 
 export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
@@ -283,7 +295,7 @@ export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
   clip = keepOut
   spine(koi)
   const L = koi.length
-  for (const side of [-1, 1]) {
+  for (const side of SIDES) {
     const flare = Math.max(0, -side * koi.bank)
     fin(koi, 0.25, side, 0.9 + 0.2 * Math.sin(koi.scull + side * 0.8) + 0.4 * flare, 0.18, 0.6)
     fin(koi, 0.53, side, 0.7 + 0.12 * Math.sin(koi.scull * 0.8 + side), 0.085, 0.45)
@@ -292,7 +304,8 @@ export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
   point(TAIL, 0)
   root.x = at.x
   root.y = at.y
-  const [c0, c1, r0, r1] = bounds(L * (WIDTH * WAIST + FAN))
+  bounds(L * (WIDTH * WAIST + FAN))
+  const { c0, c1, r0, r1 } = span
   for (let r = r0; r <= r1; r++) {
     for (let c = c0; c <= c1; c++) {
       const px = (c + 0.5) * grid.cellW
@@ -303,7 +316,7 @@ export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
       else skin(koi, c, r, narrow)
     }
   }
-  for (const side of [-1, 1]) {
+  for (const side of SIDES) {
     point(0.08, side * L * halfWidth(0.08) * 0.62)
     if (!inside(clip, at.x, at.y)) put(grid, Math.floor(at.x / grid.cellW), Math.floor(at.y / grid.cellH), 'o', koi.look.eye)
   }

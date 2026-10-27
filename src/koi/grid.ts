@@ -10,6 +10,8 @@ export const Ink = {
   Eye: 9,
 } as const
 
+export type InkId = (typeof Ink)[keyof typeof Ink]
+
 export type Grid = {
   cols: number
   rows: number

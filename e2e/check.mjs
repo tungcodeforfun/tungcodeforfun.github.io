@@ -39,9 +39,13 @@ async function inkUnderCard(page) {
     const canvas = document.querySelector('.pond canvas')
     const box = document.querySelector('.card').getBoundingClientRect()
     const scale = canvas.width / canvas.clientWidth
-    const data = canvas
-      .getContext('2d')
-      .getImageData(box.left * scale, box.top * scale, box.width * scale, box.height * scale).data
+    const [x, y, w, h] = [box.left, box.top, box.width, box.height].map((v) => Math.round(v * scale))
+    const copy = document.createElement('canvas')
+    copy.width = w
+    copy.height = h
+    const ctx = copy.getContext('2d', { willReadFrequently: true })
+    ctx.drawImage(canvas, x, y, w, h, 0, 0, w, h)
+    const data = ctx.getImageData(0, 0, w, h).data
     let inked = 0
     for (let i = 3; i < data.length; i += 4) if (data[i]) inked++
     return inked
