@@ -1,8 +1,9 @@
 import { put, type Grid, type InkId } from './grid.ts'
-import { TAU, clamp, ease, inside, smooth, wrap, type Rect } from './math.ts'
+import { TAU, clamp, clear, ease, inside, smooth, wrap, type Rect } from './math.ts'
 
 export type Patch = { along: number; across: number; alongRadius: number; acrossRadius: number }
 export type Look = { body: InkId; patch: InkId; fin: InkId; eye: InkId; patches: readonly Patch[] }
+export type Water = { width: number; height: number; fence: Rect | null }
 
 export type Koi = {
   look: Look
@@ -17,6 +18,7 @@ export type Koi = {
   effort: number
   scull: number
   chain: Float64Array
+  pressed: boolean
 }
 
 const N = 30
@@ -34,6 +36,7 @@ const sy = new Float64Array(N)
 const sl = new Float64Array(N)
 const hit = { s: 0, d: 0, tx: 1, ty: 0, ex: 0, ey: 0 }
 const at = { x: 0, y: 0 }
+const held = { x: 0, y: 0 }
 const root = { x: 0, y: 0 }
 const norm = { x: 0, y: 0, g: 1 }
 const span = { c0: 0, c1: 0, r0: 0, r1: 0 }
@@ -47,7 +50,7 @@ export function createKoi(look: Look, length: number, x: number, y: number, head
     chain[i * 2] = x - Math.cos(heading) * (length / N) * i
     chain[i * 2 + 1] = y - Math.sin(heading) * (length / N) * i
   }
-  return { look, length, x, y, heading, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain }
+  return { look, length, x, y, heading, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain, pressed: false }
 }
 
 export function resizeKoi(koi: Koi, length: number, scaleX: number, scaleY: number) {
@@ -62,10 +65,12 @@ export function resizeKoi(koi: Koi, length: number, scaleX: number, scaleY: numb
   koi.length = length
 }
 
-export function swim(koi: Koi, dt: number, heading: number, speed: number, gliding: boolean, urgency: number) {
+export function swim(koi: Koi, dt: number, heading: number, speed: number, gliding: boolean, urgency: number, water: Water) {
   const L = koi.length
   const agility = (Math.max(koi.speed, L * 0.08) / (L * BEND)) * (1 + 1.5 * urgency)
-  const want = clamp(wrap(heading - koi.heading) * 1.2, -agility, agility)
+  const delta = wrap(heading - koi.heading)
+  const behind = koi.pressed && Math.abs(delta) > 2.6 && koi.turn * delta < 0
+  const want = clamp((behind ? delta - Math.sign(delta) * TAU : delta) * 1.2, -agility, agility)
   koi.turn += (want - koi.turn) * ease(1.8, dt)
   koi.heading = wrap(koi.heading + koi.turn * dt)
   koi.speed += (speed - koi.speed) * ease(gliding ? 0.25 : 0.8, dt)
@@ -80,13 +85,28 @@ export function swim(koi: Koi, dt: number, heading: number, speed: number, glidi
   const link = L / N
   c[0] = koi.x
   c[1] = koi.y
+  koi.pressed = hold(c, 0, L, water)
   for (let i = 1; i <= N; i++) {
     const dx = c[i * 2] - c[i * 2 - 2]
     const dy = c[i * 2 + 1] - c[i * 2 - 1]
     const m = Math.hypot(dx, dy) || 1
     c[i * 2] = c[i * 2 - 2] + (dx / m) * link
     c[i * 2 + 1] = c[i * 2 - 1] + (dy / m) * link
+    hold(c, i, L, water)
   }
+  koi.x = c[0]
+  koi.y = c[1]
+}
+
+function hold(c: Float64Array, i: number, L: number, water: Water) {
+  const s = i / N
+  held.x = clamp(c[i * 2], 0, water.width)
+  held.y = clamp(c[i * 2 + 1], 0, water.height)
+  if (water.fence) clear(water.fence, held, L * (0.03 + (s < TAIL ? halfWidth(s) : fanWidth((s - TAIL) / (1 - TAIL)))))
+  const moved = held.x !== c[i * 2] || held.y !== c[i * 2 + 1]
+  c[i * 2] = held.x
+  c[i * 2 + 1] = held.y
+  return moved
 }
 
 function halfWidth(s: number) {
@@ -171,9 +191,9 @@ function edge(nx: number, ny: number, sd: number, cellH: number) {
   return nx > 0 === ny > 0 ? '/' : '\\'
 }
 
-function scale(tx: number, ty: number) {
+function scale(tx: number, ty: number, flip: boolean) {
   if (Math.abs(tx) * 1.3 >= Math.abs(ty)) return tx < 0 ? '(' : ')'
-  return ty < 0 ? '⌒' : '‿'
+  return ty < 0 !== flip ? '⌒' : '‿'
 }
 
 function inPatch(look: Look, s: number, u: number) {
@@ -243,7 +263,7 @@ function tail(koi: Koi, c: number, r: number, px: number, py: number) {
   const edgeBand = sides ? band(-hit.ty * side, hit.tx * side) : band(hit.tx, hit.ty)
   if (sd > edgeBand) return
   const ray = line(px - root.x, py - root.y)
-  if (sd > -edgeBand) put(target, c, r, sides ? ray : '~', koi.look.fin, 190)
+  if (sd > -edgeBand) put(target, c, r, sides ? ray : edge(hit.tx, hit.ty, sd, target.cellH), koi.look.fin, 190)
   else put(target, c, r, ray, koi.look.fin, membrane(hit.d / tw, 6, (2 * tw) / 6, (target.cellW + target.cellH) / 2))
 }
 
@@ -273,7 +293,7 @@ function skin(koi: Koi, c: number, r: number, narrow: number) {
   const u = w > 0 ? hit.d / w : 0
   const ink = inPatch(koi.look, s, u) ? koi.look.patch : koi.look.body
   if (sd > -edgeBand) put(target, c, r, edge(norm.x, norm.y, sd, target.cellH), ink)
-  else put(target, c, r, s < HEAD * 0.75 ? ':' : scale(hit.tx, hit.ty), ink, Math.round(255 * (0.55 + 0.45 * (1 - u * u))))
+  else put(target, c, r, s < HEAD * 0.75 ? ':' : scale(hit.tx, hit.ty, ((c + r) & 1) === 1), ink, Math.round(255 * (0.55 + 0.45 * (1 - u * u))))
 }
 
 function bounds(pad: number) {

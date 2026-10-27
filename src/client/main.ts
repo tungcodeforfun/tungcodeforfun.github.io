@@ -7,7 +7,7 @@ const card = document.querySelector<HTMLElement>('.card')
 const ctx = canvas?.getContext('2d')
 const reduced = matchMedia('(prefers-reduced-motion: reduce)')
 const dark = matchMedia('(prefers-color-scheme: dark)')
-const pond = createPond()
+const pond = createPond(Math.floor(Math.random() * 2 ** 31))
 const glyphs = new Map<number, string>()
 let inks: string[] = []
 let width = 0
@@ -28,12 +28,13 @@ function layout() {
   const dpr = Math.min(devicePixelRatio || 1, 3)
   canvas.width = Math.round(width * dpr)
   canvas.height = Math.round(height * dpr)
-  const { fontSize, cellW, cellH } = metrics(width, height)
   const box = card.getBoundingClientRect()
+  const { length, fontSize, cellW, cellH } = metrics(width, height, box.top)
   const pad = cellH
   pond.setLayout({
     width,
     height,
+    length,
     cellW,
     cellH,
     keepOut: { x: box.left - pad, y: box.top - pad, w: box.width + pad * 2, h: box.height + pad * 2 },

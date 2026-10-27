@@ -41,9 +41,9 @@ function head() {
 }
 
 function still(name: string, width: number, height: number, keepOut: Rect) {
-  const { fontSize, cellW, cellH } = metrics(width, height)
+  const { length, fontSize, cellW, cellH } = metrics(width, height, keepOut.y)
   const pond = createPond()
-  pond.setLayout({ width, height, cellW, cellH, keepOut })
+  pond.setLayout({ width, height, length, cellW, cellH, keepOut })
   for (let i = 0; i < 60 * 14; i++) pond.step(1 / 60)
   const grid = pond.paint()
   const lines: string[] = []

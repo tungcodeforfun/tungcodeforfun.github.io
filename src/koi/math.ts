@@ -1,4 +1,5 @@
 export type Rect = { x: number; y: number; w: number; h: number }
+export type Point = { x: number; y: number }
 
 export const TAU = Math.PI * 2
 
@@ -21,6 +22,17 @@ export function ease(rate: number, dt: number) {
 
 export function inside(rect: Rect | null, x: number, y: number) {
   return !!rect && x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h
+}
+
+export function clear(box: Rect, p: Point, margin: number) {
+  const dx = p.x - clamp(p.x, box.x, box.x + box.w)
+  const dy = p.y - clamp(p.y, box.y, box.y + box.h)
+  const d = Math.hypot(dx, dy)
+  if (d >= margin) return
+  if (d) {
+    p.x += (dx / d) * (margin - d)
+    p.y += (dy / d) * (margin - d)
+  } else p.y = box.y - margin
 }
 
 export function random(seed: number) {

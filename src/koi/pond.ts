@@ -1,10 +1,11 @@
 import { clearGrid, createGrid, Ink, put, type Grid } from './grid.ts'
-import { createKoi, line, paintKoi, resizeKoi, swim, type Koi, type Look } from './koi.ts'
-import { TAU, clamp, inside, random, smooth, wrap, type Rect } from './math.ts'
+import { createKoi, line, paintKoi, resizeKoi, swim, type Koi, type Look, type Water } from './koi.ts'
+import { TAU, clamp, clear, inside, random, smooth, wrap, type Point, type Rect } from './math.ts'
 
 export type Layout = {
   width: number
   height: number
+  length: number
   cellW: number
   cellH: number
   keepOut: Rect | null
@@ -51,23 +52,21 @@ const SIZES = [1, 0.94]
 const LANES = [1.04, 0.84]
 const WALL_PROBES = [0, 0.5]
 const TEXT_PROBES = [0, 0.4, 0.8]
+const ROOM_PROBES = [0, 0.35]
 const RINGS = [
   [0, 1],
   [0.45, 0.55],
 ]
 
-export function fishLength(width: number, height: number) {
-  return Math.round(Math.min(width * 0.68, height * 0.5, 470))
+export function metrics(width: number, height: number, top: number) {
+  const length = Math.round(Math.min(width * 0.68, height * 0.5, Math.sqrt(width * top) * 0.48, 470))
+  const fontSize = clamp(Math.round(length / 32), 8, 15)
+  return { length, fontSize, cellW: (fontSize * 1233) / 2048, cellH: Math.round(fontSize * 1.1) }
 }
 
-export function metrics(width: number, height: number) {
-  const fontSize = clamp(Math.round(fishLength(width, height) / 32), 8, 15)
-  return { fontSize, cellW: (fontSize * 1233) / 2048, cellH: Math.round(fontSize * 1.1) }
-}
-
-export function createPond(): Pond {
-  const rand = random(11)
-  let layout: Layout = { width: 1, height: 1, cellW: 1, cellH: 1, keepOut: null }
+export function createPond(seed = 11): Pond {
+  const rand = random(seed)
+  let layout: Layout = { width: 1, height: 1, length: 1, cellW: 1, cellH: 1, keepOut: null }
   let grid: Grid = createGrid(1, 1, 1, 1)
   let koi: Koi[] = []
   let time = rand() * 1000
@@ -81,16 +80,26 @@ export function createPond(): Pond {
   const home = { x: 0, y: 0, rx: 0, ry: 0 }
   const centre = { x: 0, y: 0, rx: 0, ry: 0 }
   const probe = { x: 0, y: 0 }
+  const gap = { x: 0, y: 0, d: 0 }
+  const goals = [
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+  ]
+  const water: Water = { width: 1, height: 1, fence: null }
 
-  function settle() {
+  function settle(L: number) {
     const { width, height, keepOut } = layout
     const top = keepOut ? keepOut.y : height
-    const right = keepOut ? (width - keepOut.x - keepOut.w) * height : 0
+    const side = keepOut ? width - keepOut.x - keepOut.w : 0
+    const right = smooth((side - L) / L) * side * height
     const share = right / (width * top + right || 1)
-    home.x = width / 2 + share * (width - right / height) * 0.5
+    home.x = width / 2 + share * (width - side) * 0.5
     home.y = (top / 2) * (1 - share) + (height / 2) * share
     home.rx = width * 0.18
     home.ry = (top * (1 - share) + height * share) * 0.27
+    water.width = width
+    water.height = height
+    water.fence = keepOut && side < L ? { ...keepOut, w: width - keepOut.x + L } : keepOut
   }
 
   function setLayout(next: Layout) {
@@ -99,8 +108,8 @@ export function createPond(): Pond {
     const steady = Math.abs(sx - 1) < 0.2 && Math.abs(sy - 1) < 0.2
     layout = next
     grid = createGrid(Math.ceil(next.width / next.cellW), Math.ceil(next.height / next.cellH), next.cellW, next.cellH)
-    settle()
-    const L = fishLength(next.width, next.height)
+    const L = next.length
+    settle(L)
     if (koi.length) koi.forEach((k, i) => resizeKoi(k, L * SIZES[i], steady ? 1 : sx, steady ? 1 : sy))
     else koi = [createKoi(KOHAKU, L, home.x + home.rx, home.y, Math.PI / 2), createKoi(SUMI, L * SIZES[1], home.x - home.rx, home.y, -Math.PI / 2)]
     const count = Math.round((next.width * next.height) / 9000)
@@ -132,7 +141,7 @@ export function createPond(): Pond {
   }
 
   function textGap(x: number, y: number) {
-    const box = layout.keepOut
+    const box = water.fence
     return box ? Math.hypot(x - clamp(x, box.x, box.x + box.w), y - clamp(y, box.y, box.y + box.h)) : Infinity
   }
 
@@ -154,27 +163,54 @@ export function createPond(): Pond {
     urge.y = dx * Math.sin(wander) + dy * Math.cos(wander)
   }
 
-  function giveRoom(k: Koi, other: Koi) {
-    const room = k.length * 0.65
-    const links = other.chain.length / 2 - 1
-    for (let j = 0; j < 3; j++) {
-      const at = Math.round((j * links) / 3)
-      const dx = k.x - other.chain[at * 2]
-      const dy = k.y - other.chain[at * 2 + 1]
-      const d = Math.hypot(dx, dy) || 1
-      if (d < room) push(dx / d, dy / d, ((room - d) / room) * 3)
+  function nearest(other: Koi, x: number, y: number) {
+    const c = other.chain
+    gap.d = Infinity
+    for (let j = 0; j < c.length; j += 4) {
+      const dx = x - c[j]
+      const dy = y - c[j + 1]
+      const d = Math.hypot(dx, dy)
+      if (d < gap.d) {
+        gap.x = dx
+        gap.y = dy
+        gap.d = d
+      }
     }
+    if (!gap.d) gap.d = 1e-6
   }
 
-  function curiosity(k: Koi) {
+  function giveRoom(k: Koi, other: Koi) {
+    const room = k.length * 0.6
+    let closeness = 0
+    for (const reach of ROOM_PROBES) {
+      look(k, reach)
+      nearest(other, probe.x, probe.y)
+      closeness = Math.max(closeness, (room - gap.d) / room)
+    }
+    if (closeness <= 0) return
+    nearest(other, k.x, k.y)
+    push(gap.x / gap.d, gap.y / gap.d, closeness * 6)
+    urge.urgency = Math.max(urge.urgency, closeness)
+  }
+
+  function shoulder(k: Koi, other: Koi) {
+    const min = k.length * 0.32
+    nearest(other, k.x, k.y)
+    if (gap.d >= min) return
+    k.x += (gap.x / gap.d) * (min - gap.d)
+    k.y += (gap.y / gap.d) * (min - gap.d)
+    k.pressed = true
+  }
+
+  function curiosity(k: Koi, i: number) {
     if (!interest) return
-    const dx = interest.x - k.x
-    const dy = interest.y - k.y
+    const dx = goals[i].x - k.x
+    const dy = goals[i].y - k.y
     const d = Math.hypot(dx, dy) || 1
     const shy = smooth(textGap(k.x, k.y) / (k.length * 0.6))
     const pull = smooth(interest.age / 0.6) * (1 - smooth((interest.age - 4) / 3)) * shy
     push(dx / d, dy / d, pull * (d > k.length * 0.45 ? 4 : 0.5))
-    urge.urgency = pull * 0.7
+    urge.urgency = Math.max(urge.urgency, pull * 0.7)
   }
 
   function stayIn(k: Koi) {
@@ -184,13 +220,13 @@ export function createPond(): Pond {
       look(k, reach)
       const wx = clamp((margin - probe.x) / margin, 0, 2) - clamp((probe.x - width + margin) / margin, 0, 2)
       const wy = clamp((margin - probe.y) / margin, 0, 2) - clamp((probe.y - height + margin) / margin, 0, 2)
-      push(wx, wy, 2.5)
+      push(wx, wy, 4)
       urge.urgency = Math.max(urge.urgency, Math.abs(wx) * 0.5, Math.abs(wy) * 0.5)
     }
   }
 
   function skirtText(k: Koi) {
-    const box = layout.keepOut
+    const box = water.fence
     if (!box) return
     const room = k.length * 0.75
     for (const reach of TEXT_PROBES) {
@@ -216,7 +252,7 @@ export function createPond(): Pond {
     }
     const gliding = glide[i] > 0 && !(interest && interest.age < 4)
     const eager = interest ? 1 + 0.35 * (1 - smooth((interest.age - 3) / 3)) : 1
-    swim(k, dt, Math.atan2(urge.y, urge.x), gliding ? cruise * 0.5 : cruise * eager, gliding, urge.urgency)
+    swim(k, dt, Math.atan2(urge.y, urge.x), gliding ? cruise * 0.5 : cruise * eager, gliding, urge.urgency, water)
   }
 
   function step(dt: number) {
@@ -227,9 +263,10 @@ export function createPond(): Pond {
       urge.urgency = 0
       circle(k, i)
       giveRoom(k, other)
-      curiosity(k)
+      curiosity(k, i)
       stayIn(k)
       skirtText(k)
+      shoulder(k, other)
       pace(k, i, other, dt)
     }
     if (interest && (interest.age += dt) > 7) interest = null
@@ -242,9 +279,31 @@ export function createPond(): Pond {
     for (let i = motes.length - 1; i >= 0; i--) if ((motes[i].age += dt) > motes[i].life) motes.splice(i, 1)
   }
 
+  function aim(goal: Point, x: number, y: number, L: number) {
+    goal.x = clamp(x, L * 0.5, layout.width - L * 0.5)
+    goal.y = clamp(y, L * 0.5, layout.height - L * 0.5)
+    if (water.fence) clear(water.fence, goal, L * 0.9)
+  }
+
   function tap(x: number, y: number) {
     ripples.push({ x, y, age: 0 })
-    interest = { x, y, age: 0 }
+    const [a, b] = koi
+    const L = a.length
+    const spot = { x, y, age: 0 }
+    aim(spot, x, y, L)
+    const ux = spot.x - (a.x + b.x) / 2
+    const uy = spot.y - (a.y + b.y) / 2
+    const far = Math.hypot(ux, uy) > L * 0.5
+    let dx = far ? -uy : a.x - b.x
+    let dy = far ? ux : a.y - b.y
+    if (far && dx * (a.x - b.x) + dy * (a.y - b.y) < 0) {
+      dx = -dx
+      dy = -dy
+    }
+    const gap = (L * 0.45) / (Math.hypot(dx, dy) || 1)
+    aim(goals[0], spot.x + dx * gap, spot.y + dy * gap, L)
+    aim(goals[1], spot.x - dx * gap, spot.y - dy * gap, L)
+    interest = spot
   }
 
   function stir(x: number, y: number) {
