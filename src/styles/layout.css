@@ -207,10 +207,10 @@
 }
 
 .section h2 {
-  font-size: clamp(44px, 5.6vw, 84px);
-  font-stretch: 112%;
-  line-height: 0.98;
-  letter-spacing: -0.038em;
+  font-size: clamp(38px, 4.4vw, 64px);
+  font-stretch: 108%;
+  line-height: 1;
+  letter-spacing: -0.028em;
 }
 
 .lede {
