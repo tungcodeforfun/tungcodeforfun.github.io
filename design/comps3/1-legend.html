@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comp 3-1: prose as the legend</title>
+<style>
+@font-face { font-family: Plex; src: url(fonts/ibm-plex-sans-latin-400-normal.woff2) format('woff2'); font-weight: 400 }
+@font-face { font-family: Plex; src: url(fonts/ibm-plex-sans-latin-600-normal.woff2) format('woff2'); font-weight: 600 }
+@font-face { font-family: Plex; src: url(fonts/ibm-plex-sans-latin-400-italic.woff2) format('woff2'); font-weight: 400; font-style: italic }
+:root { --bg: #f8f8f6; --fg: #3b3b39; --strong: #1d1d1b; --muted: #6d6d68; --deco: #b9b9b2; --change: #2a62c9; --queue: #b4570e; --worker: #2c7a39; --dead: #bf3434; --stone: #c9c9c2 }
+* { box-sizing: border-box; margin: 0 }
+html { background: var(--bg); color: var(--fg) }
+body { font: 19px/1.6 Plex, system-ui, sans-serif; -webkit-font-smoothing: antialiased }
+main { max-width: 680px; margin: 0 auto; padding: 128px 24px 160px }
+h1 { font-size: 28px; line-height: 1.25; font-weight: 600; color: var(--strong) }
+.role { color: var(--muted); margin-top: 2px }
+.lede { margin-top: 28px }
+.links { margin-top: 12px }
+a { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-color: var(--deco) }
+a:hover { text-decoration-color: currentColor }
+section { margin-top: 136px }
+h2 { font-size: 24px; line-height: 1.3; font-weight: 600; color: var(--strong); margin-bottom: 20px }
+h3 { font-size: 21px; line-height: 1.35; font-weight: 600; color: var(--strong); margin: 72px 0 14px }
+p + p { margin-top: 18px }
+p { text-wrap: pretty }
+b { font-weight: 600 }
+.k-change { color: var(--change) } .k-queue { color: var(--queue) } .k-worker { color: var(--worker) } .k-dead { color: var(--dead) } .k-loc { color: var(--muted) }
+figure { margin: 36px -24px 0; padding: 0 }
+figure svg { display: block; width: 100%; height: auto }
+.figbar { display: flex; align-items: center; gap: 14px; padding: 6px 24px 0 }
+.pause { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #e8e8e3; display: grid; place-items: center; cursor: pointer; flex: none }
+.pause span { width: 12px; height: 14px; border-left: 4px solid var(--strong); border-right: 4px solid var(--strong) }
+figcaption { font-size: 16px; color: var(--muted); line-height: 1.5 }
+.shot { margin: 32px -24px 0; display: block }
+.shot img { width: 100%; display: block; border-radius: 10px }
+.rows { list-style: none; padding: 0 }
+.rows li + li { margin-top: 18px }
+.rows .when { color: var(--muted) }
+.role-title { color: var(--strong); font-weight: 600 }
+ul.plain { padding-left: 1.1em; margin-top: 10px }
+ul.plain li + li { margin-top: 8px }
+.muted { color: var(--muted) }
+.dim { fill: var(--stone) }
+.fx { animation-play-state: running }
+.paused * { animation-play-state: paused !important }
+@keyframes a { 0% { offset-distance: 0%; opacity: 1 } 22% { offset-distance: 100%; opacity: 1 } 23%, 100% { offset-distance: 100%; opacity: 0 } }
+@keyframes b { 0%, 30% { offset-distance: 0%; opacity: 0 } 30.5% { opacity: 1 } 62% { offset-distance: 100%; opacity: 1 } 63%, 100% { offset-distance: 100%; opacity: 0 } }
+@keyframes c { 0%, 66% { offset-distance: 0%; opacity: 0; fill: var(--change) } 66.5% { opacity: 1; fill: var(--change) } 86% { offset-distance: 100%; fill: var(--change) } 88%, 97% { offset-distance: 100%; opacity: 1; fill: var(--dead) } 99%, 100% { offset-distance: 100%; opacity: 0; fill: var(--dead) } }
+@keyframes lit { 0%, 21% { fill: var(--stone) } 24%, 30% { fill: var(--change) } 40%, 100% { fill: var(--stone) } }
+@keyframes lit2 { 0%, 61% { fill: transparent } 64%, 70% { fill: var(--change) } 80%, 100% { fill: transparent } }
+@keyframes ring { 0%, 87% { r: 7; opacity: 0 } 88% { r: 7; opacity: 0.9 } 97% { r: 22; opacity: 0 } 100% { opacity: 0 } }
+@keyframes spin { to { transform: rotate(360deg) } }
+.tok { offset-rotate: 0deg; animation: 9s linear infinite }
+.ta { offset-path: path('M76 150 H436'); animation-name: a }
+.tb { offset-path: path('M76 150 H360 C360 66 210 66 210 150 H436'); animation-name: b }
+.tc { offset-path: path('M76 150 H360 C360 66 210 66 210 150 V252'); animation-name: c }
+.field circle { animation: lit 9s linear infinite }
+.field.two circle { animation-name: lit2 }
+.arc { transform-origin: 360px 150px; animation: spin 2.4s linear infinite }
+.bell { animation: ring 9s ease-out infinite; fill: none; stroke: var(--dead); stroke-width: 2 }
+@media (max-width: 600px) { body { font-size: 18px } main { padding-top: 72px } section { margin-top: 104px } h3 { margin-top: 56px } figure { margin-left: -16px; margin-right: -16px } .figbar { padding: 6px 16px 0 } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Tung Nguyen</h1>
+    <p class="role">Senior Software Engineer, New York</p>
+    <p class="lede">I’ve spent four years building Java/Spring Boot services and AWS event-driven systems, with Python, Go and TypeScript alongside.</p>
+    <p class="links"><a href="#">tungnguyen1651@gmail.com</a>, <a href="#">GitHub</a>, <a href="#">LinkedIn</a>, <a href="#">résumé (PDF)</a></p>
+  </header>
+
+  <section>
+    <h2>Work</h2>
+    <p>At EY (Technology Consulting) I work for a national quick-service restaurant chain on its POS and menu configuration platform, which spans 3,500+ locations. I own the menu configuration and POS control services from API design through production, and as release owner of the core Java/Spring Boot service I have shipped 18+ releases and same-day hotfixes.</p>
+
+    <h3>Chain-wide configuration, moved onto a queue</h3>
+    <p>A <b class="k-change">configuration change</b> used to go out to every location over synchronous HTTP, and those calls timed out.</p>
+    <p>I moved the work onto an SQS <b class="k-queue">queue</b>. A <b class="k-worker">worker</b> processes it in batches and applies each change idempotently, so a failed message can safely go round again. A message that keeps failing is parked in a <b class="k-dead">dead-letter queue</b>, which raises an alert. The timeouts across 3,500+ <b class="k-loc">locations</b> stopped.</p>
+    <figure id="f1">
+      <svg viewBox="0 0 680 300" role="img" aria-labelledby="f1t f1d">
+        <title id="f1t">Configuration changes through a queue</title>
+        <desc id="f1d">A configuration change enters the queue, the worker applies it and it reaches the locations. One change fails, loops back to the queue and succeeds on retry. Another keeps failing and drops into the dead-letter queue, which raises an alert.</desc>
+        <path d="M360 120 C360 66 210 66 210 128" fill="none" stroke="#c4c4bd" stroke-width="2" />
+        <path d="M204 120 l6 9 l6 -9" fill="none" stroke="#c4c4bd" stroke-width="2" />
+        <path d="M210 172 V232" stroke="#c4c4bd" stroke-width="2" />
+        <path d="M76 150 H120 M300 150 H330 M390 150 H430" stroke="#c4c4bd" stroke-width="2" />
+        <rect x="24" y="124" width="52" height="52" rx="12" fill="var(--change)" />
+        <path d="M38 140 h24 M38 150 h24 M38 160 h16" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".85" />
+        <rect x="120" y="128" width="180" height="44" rx="22" fill="#f6dfc6" stroke="var(--queue)" stroke-width="2" />
+        <circle cx="360" cy="150" r="30" fill="var(--worker)" />
+        <path class="arc" d="M360 132 a18 18 0 0 1 18 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+        <rect x="160" y="232" width="100" height="40" rx="20" fill="#f4d3d1" stroke="var(--dead)" stroke-width="2" />
+        <circle cx="290" cy="252" r="7" fill="var(--dead)" />
+        <circle class="bell" cx="290" cy="252" r="7" />
+        <g class="field" id="field"></g>
+        <circle class="tok ta" r="8" fill="var(--change)" />
+        <circle class="tok tb" r="8" fill="var(--change)" />
+        <circle class="tok tc" r="8" fill="var(--change)" />
+      </svg>
+      <div class="figbar"><button class="pause" aria-label="Pause this animation" aria-pressed="false"><span></span></button><figcaption>The grey dots on the right stand in for the locations.</figcaption></div>
+    </figure>
+
+    <h3>Narrowing venue menus</h3>
+    <p>Venue menus listed 1,300+ items. I led the event-driven integration with an upstream menu-eligibility platform: its data comes in over SNS and SQS, and venue-aware APIs serve the result. A cross-account backfill of 1,000+ locations ran idempotently, behind per-store flags. Venue menus went from 1,300+ items to about 130.</p>
+
+    <h3>Caching the POS hot path</h3>
+    <p>I designed Redis caching layers for the customer-facing POS endpoints, including a cross-VPC integration with serverless ElastiCache that uses distributed locking, and rewrote the hot-path database queries. P95 API latency on those endpoints fell 65%.</p>
+  </section>
+
+  <section>
+    <h2>Pullfolio</h2>
+    <p><a href="#">Pullfolio</a> (08/2025 – present) is a trading-card collection app that I designed, built and launched on my own. It had 5,000+ visitors in 3 weeks. It has email, Google and Discord sign-in, shareable binder links, price alerts, and Stripe subscriptions with idempotent, signature-verified webhooks.</p>
+    <a class="shot" href="#"><img src="../../public/work/pullfolio-home.webp" alt="Pullfolio home page" width="1280" height="800" /></a>
+  </section>
+
+  <section>
+    <h2>Experience</h2>
+    <p>Ernst &amp; Young (EY), Technology Consulting, New York, <span class="muted">08/2022 – present</span></p>
+    <ul class="rows" style="margin-top:18px">
+      <li><span class="role-title">Senior Software Engineer</span> <span class="when">12/2024 – present</span>
+        <ul class="plain"><li>Led production incident response across 6 AWS accounts; my runbooks cut repeat diagnoses from days to minutes.</li><li>Cut deployment time 30% across 12+ microservices by re-engineering CI/CD.</li></ul></li>
+      <li><span class="role-title">Software Engineer</span> <span class="when">08/2022 – 12/2024</span>
+        <ul class="plain"><li>Designed gRPC/Protobuf integrations for downstream partner systems, with payloads 40% smaller than JSON.</li><li>Mentored 3 junior engineers on microservices patterns.</li></ul></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Contract work</h2>
+    <p>I also take on contract work: backend APIs and services, AWS pipelines and delivery, and scrapers and monitors. Every project starts with a written scope before any code. <a href="#">Email me about a project</a>.</p>
+  </section>
+</main>
+<script>
+const g = document.getElementById('field')
+for (let c = 0; c < 12; c++) for (let r = 0; r < 10; r++) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+  e.setAttribute('cx', 452 + c * 18); e.setAttribute('cy', 66 + r * 18); e.setAttribute('r', 5)
+  e.style.animationDelay = (c * 0.05) + 's'
+  g.appendChild(e)
+}
+const g2 = g.cloneNode(true); g2.classList.add('two'); g.after(g2)
+document.querySelectorAll('.pause').forEach((b) => b.addEventListener('click', () => { const f = b.closest('figure'); f.classList.toggle('paused'); b.setAttribute('aria-pressed', f.classList.contains('paused')) }))
+</script>
+</body>
+</html>
