@@ -1,47 +1,40 @@
-import { BackgroundBoundary } from '../background/BackgroundBoundary'
-import { RibbonField } from '../background/RibbonField'
-import { freelance, profile } from '../content'
+import { links, profile } from '../content'
+import { HeroField } from './HeroField'
 
 export function Hero() {
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="screen hero__screen">
-        <BackgroundBoundary fallback={<div className="shader shader--static" aria-hidden="true" />}>
-          <RibbonField />
-        </BackgroundBoundary>
-        <div className="hero__shade" aria-hidden="true" />
-        <div className="hero__chrome" aria-hidden="true">
-          <span>
-            <span className="hero__chrome-dots">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span className="hero__chrome-label">tungcodeforfun.github.io</span>
-          </span>
-          <span>ribbon-field</span>
-        </div>
-        <div className="hero__copy">
-          <div className="tags reveal" style={{ '--delay': '0ms' } as React.CSSProperties}>
-            <span className="tag tag--on">{profile.role}</span>
-            <span className="tag">{profile.location}</span>
+    <section className="hero" aria-labelledby="hero-name">
+      <div className="hero__id">
+        <h1 id="hero-name" className="hero__name">
+          {profile.name}
+        </h1>
+        <p className="hero__role">
+          {profile.role}
+          <span className="hero__city">{profile.location}</span>
+        </p>
+        <dl className="facts">
+          <div>
+            <dt className="label">Experience</dt>
+            <dd>{profile.experience}</dd>
           </div>
-          <h1 id="hero-title" className="hero__title reveal" style={{ '--delay': '90ms' } as React.CSSProperties}>
-            {profile.name}
-          </h1>
-          <p className="hero__line reveal" style={{ '--delay': '180ms' } as React.CSSProperties}>
-            {profile.line}
-          </p>
-          <div className="hero__actions reveal" style={{ '--delay': '270ms' } as React.CSSProperties}>
-            <a className="button button--primary" href={freelance.bookingUrl}>
-              Book a call
-            </a>
-            <a className="button button--ghost" href={profile.github} target="_blank" rel="noopener noreferrer">
-              GitHub <span aria-hidden="true">↗</span>
-            </a>
+          <div>
+            <dt className="label">Stack</dt>
+            <dd>{profile.stack.join(', ')}</dd>
           </div>
-        </div>
+          <div>
+            <dt className="label">Now</dt>
+            <dd>{profile.now}</dd>
+          </div>
+        </dl>
+        <ul className="hero__links">
+          {links.map((link) => (
+            <li key={link.label}>
+              <a href={link.href}>{link.short}</a>
+            </li>
+          ))}
+        </ul>
       </div>
+      <HeroField />
     </section>
   )
 }

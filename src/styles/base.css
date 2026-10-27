@@ -7,24 +7,34 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 72px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
-  background: var(--page);
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 1.6;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  font-variant-numeric: lining-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100svh;
+  overflow-x: clip;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+h1,
+h2,
+h3,
+h4 {
+  font-weight: inherit;
+  font-size: inherit;
 }
 
 ul,
@@ -32,89 +42,71 @@ ol {
   list-style: none;
 }
 
-:focus-visible {
-  outline: 2px solid var(--fg);
-  outline-offset: 3px;
-  border-radius: var(--r-xs);
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-::selection {
-  background: var(--fill);
-  color: var(--onfill);
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+main:focus {
+  outline: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .skip-link {
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 100;
+  position: absolute;
+  left: var(--gutter);
+  top: 8px;
+  z-index: 20;
   padding: 8px 12px;
-  background: var(--fill);
-  color: var(--onfill);
-  font-size: 12px;
-  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 13px;
+  text-decoration: none;
   transform: translateY(-200%);
-  transition: transform 160ms var(--ease-out);
 }
 
-.skip-link:focus-visible {
-  transform: translateY(0);
+.skip-link:focus {
+  transform: none;
 }
 
-/* Shader hosts (vendored ThreeUI canvases) */
-
-.shader {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--page);
-}
-
-.shader > canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.shader--transparent {
-  background: transparent;
-}
-
-.shader--static,
-.ribbon-field--static {
-  background:
-    radial-gradient(60% 45% at 78% 42%, rgba(56, 209, 245, 0.22) 0%, transparent 70%),
-    radial-gradient(45% 35% at 70% 76%, rgba(99, 102, 241, 0.18) 0%, transparent 70%),
-    var(--page);
-}
-
-.bell-field__embers {
-  pointer-events: none;
-}
-
-/* Framed "screen" tile, after ThreeUI's catalog previews */
-
-.screen {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--r-lg);
-  background: var(--wall);
-  box-shadow: inset 0 0 0 1px var(--screen-edge);
-}
-
-.screen > .shader {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+::selection {
+  background: var(--accent);
+  color: var(--paper);
 }

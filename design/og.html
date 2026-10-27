@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>OG image</title>
+<style>
+@font-face { font-family: 'Newsreader'; src: url('../public/fonts/newsreader.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Sans'; src: url('../public/fonts/plex-sans-400.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; src: url('../public/fonts/plex-mono-500.woff2') format('woff2'); font-weight: 500; }
+* { margin: 0; box-sizing: border-box }
+body { width: 1200px; height: 630px; background: #f4f1ea; color: #1b1a17; font-family: 'IBM Plex Sans', sans-serif; padding: 64px 72px; display: grid; grid-template-columns: 1fr 360px; gap: 56px; align-items: end }
+.label { font: 500 16px 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #5b584f }
+h1 { font: 400 112px/0.92 'Newsreader', serif; letter-spacing: -0.025em; margin-top: 28px }
+.role { font: 400 36px/1.2 'Newsreader', serif; margin-top: 22px }
+.stack { font-size: 22px; margin-top: 30px; padding-top: 18px; border-top: 1.5px solid #d8d2c4; color: #1b1a17 }
+.url { margin-top: 26px }
+svg { display: block; width: 360px; height: auto }
+figcaption { margin-top: 12px; font-size: 13px }
+</style>
+</head>
+<body>
+<div>
+  <p class="label">tungcodeforfun.github.io</p>
+  <h1>Tung Nguyen</h1>
+  <p class="role">Senior Software Engineer, New York</p>
+  <p class="stack">Java / Spring Boot · AWS event-driven systems · Python · Go · TypeScript</p>
+</div>
+<figure>
+  <svg viewBox="0 0 420 300">
+    <defs>
+      <pattern id="p" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.1" fill="#cdc6b6"/></pattern>
+      <pattern id="a" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.4" fill="#1b1a17"/></pattern>
+      <pattern id="h" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.4" fill="#b23a0c"/></pattern>
+    </defs>
+    <rect width="420" height="300" fill="url(#p)"/>
+    <rect y="60" width="420" height="132" fill="url(#a)"/>
+    <rect y="192" width="420" height="6" fill="url(#h)"/>
+    <circle cx="315" cy="117" r="1.8" fill="#b23a0c"/>
+    <circle cx="57" cy="165" r="1.8" fill="#b23a0c"/>
+  </svg>
+  <figcaption class="label">Fig. 0 · one dot per location, 3,500+</figcaption>
+</figure>
+</body>
+</html>

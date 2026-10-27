@@ -1,34 +1,34 @@
-/* Palette and type follow ThreeUI's dark theme: monotone UI, color only from the canvases. */
 :root {
+  color-scheme: light dark;
+
+  --paper: light-dark(#f4f1ea, #121110);
+  --surface: light-dark(#fbf9f4, #1a1916);
+  --ink: light-dark(#1b1a17, #ece7dc);
+  --muted: light-dark(#5b584f, #a39e92);
+  --rule: light-dark(#d8d2c4, #2f2c27);
+  --accent: light-dark(#b23a0c, #ff8152);
+  --dot: light-dark(#cdc6b6, #38352f);
+
+  --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --measure: 1200px;
+  --gutter: clamp(20px, 4vw, 40px);
+  --section: clamp(72px, 9vw, 128px);
+  --slow: 1;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
   color-scheme: dark;
+}
 
-  --page: #050608;
-  --wall: #0a0b0d;
-  --surface: #101113;
-  --content: #131416;
-  --fg: #f7f8f8;
-  --fg-muted: #8a8f98;
-  --fg-faint: #5f646c;
-  --border: rgba(255, 255, 255, 0.06);
-  --ring: rgba(255, 255, 255, 0.1);
-  --line: rgba(255, 255, 255, 0.13);
-  --screen-edge: rgba(255, 255, 255, 0.14);
-  --tint: rgba(255, 255, 255, 0.026);
-  --hover: rgba(255, 255, 255, 0.045);
-  --fill: #edeef0;
-  --onfill: #0a0b0d;
-  --filled-shadow: inset 0 0 0 0.5px #edeef0, 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 20px -8px rgba(237, 238, 240, 0.25);
-
-  --r-xs: 4px;
-  --r-sm: 5px;
-  --r-md: 7px;
-  --r-lg: 9px;
-  --r-xl: 14px;
-
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-
-  --measure: 1120px;
-  --gutter: clamp(20px, 4vw, 48px);
-  --section-gap: clamp(72px, 9vw, 120px);
-  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --slow: 3;
+  }
 }
