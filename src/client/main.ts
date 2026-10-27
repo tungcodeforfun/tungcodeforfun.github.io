@@ -2,7 +2,7 @@ import '../styles/fonts.css'
 import '../styles/tokens.css'
 import '../styles/base.css'
 import '../styles/layout.css'
-import '../styles/diagram.css'
+import '../styles/figures.css'
 
 const root = document.documentElement
 
@@ -60,8 +60,21 @@ function pauseOffscreen() {
   syncVisibility()
 }
 
+function setupFigurePauses() {
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-pause]')) {
+    const figure = button.closest('figure')
+    if (!figure) continue
+    button.addEventListener('click', () => {
+      const paused = figure.classList.toggle('is-paused')
+      button.setAttribute('aria-pressed', String(paused))
+    })
+    button.hidden = false
+  }
+}
+
 const themeButton = document.querySelector<HTMLButtonElement>('[data-toggle="theme"]')
 const motionButton = document.querySelector<HTMLButtonElement>('[data-toggle="motion"]')
 if (themeButton) setupTheme(themeButton)
 if (motionButton) setupMotion(motionButton)
 pauseOffscreen()
+setupFigurePauses()

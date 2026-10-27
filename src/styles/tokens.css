@@ -1,34 +1,85 @@
 :root {
-  color-scheme: light dark;
-
-  --paper: light-dark(#f4f1ea, #121110);
-  --surface: light-dark(#fbf9f4, #1a1916);
-  --ink: light-dark(#1b1a17, #ece7dc);
-  --muted: light-dark(#5b584f, #a39e92);
-  --rule: light-dark(#d8d2c4, #2f2c27);
-  --accent: light-dark(#b23a0c, #ff8152);
-  --dot: light-dark(#cdc6b6, #38352f);
-
-  --serif: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-
-  --measure: 1200px;
-  --gutter: clamp(20px, 4vw, 40px);
-  --section: clamp(72px, 9vw, 128px);
-  --slow: 1;
-}
-
-:root[data-theme='light'] {
   color-scheme: light;
+  --bg: #fcfcfa;
+  --fg: #383733;
+  --strong: #161614;
+  --muted: #696862;
+  --deco: #c3c2ba;
+  --line: #cdccc4;
+  --dot: #cfcec7;
+  --region: #f0efea;
+  --focus: #2453b8;
+  --k-blue: #2453b8;
+  --k-orange: #a24a0d;
+  --k-green: #23703a;
+  --k-red: #b22e2e;
+  --k-purple: #7037ae;
+  --k-amber: #8a6100;
+  --k-teal: #0b6a76;
+  --k-slate: #4e5a6a;
+  --k-ink: #2a2a27;
+  --font: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --measure: 680px;
+  --gutter: 24px;
+  --section: 136px;
+  --slow: 1;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
+  --bg: #151514;
+  --fg: #d6d5cf;
+  --strong: #f4f3ee;
+  --muted: #a3a29b;
+  --deco: #5b5a55;
+  --line: #4a4945;
+  --dot: #4a4945;
+  --region: #21211f;
+  --focus: #8db0ff;
+  --k-blue: #8db0ff;
+  --k-orange: #f0a25c;
+  --k-green: #72cd8b;
+  --k-red: #ff8b82;
+  --k-purple: #c9a3ff;
+  --k-amber: #e6c04a;
+  --k-teal: #5cc9d5;
+  --k-slate: #a9b6c8;
+  --k-ink: #e4e3dd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #151514;
+    --fg: #d6d5cf;
+    --strong: #f4f3ee;
+    --muted: #a3a29b;
+    --deco: #5b5a55;
+    --line: #4a4945;
+    --dot: #4a4945;
+    --region: #21211f;
+    --focus: #8db0ff;
+    --k-blue: #8db0ff;
+    --k-orange: #f0a25c;
+    --k-green: #72cd8b;
+    --k-red: #ff8b82;
+    --k-purple: #c9a3ff;
+    --k-amber: #e6c04a;
+    --k-teal: #5cc9d5;
+    --k-slate: #a9b6c8;
+    --k-ink: #e4e3dd;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --slow: 3;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --gutter: 20px;
+    --section: 104px;
   }
 }

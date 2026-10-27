@@ -3,62 +3,32 @@ import { education, experience, skills } from '../content'
 export function Experience() {
   return (
     <section className="section" id="experience" aria-labelledby="experience-title">
-      <header className="section__head">
-        <p className="label">03</p>
-        <h2 id="experience-title">Experience</h2>
-        <p className="section__sub">
-          {experience.company}, {experience.unit}
-          <span className="section__meta">
-            {experience.location} · {experience.period}
-          </span>
+      <h2 id="experience-title">Experience</h2>
+      <p>
+        {experience.heading} <span className="muted">{experience.period}</span>
+        <br />
+        {experience.client}
+      </p>
+      {experience.roles.map((role) => (
+        <div key={role.title} className="role">
+          <h3>
+            {role.title} <span className="muted">{role.period}</span>
+          </h3>
+          <ul className="bullets">
+            {role.bullets.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <h3>Skills</h3>
+      {skills.map((s) => (
+        <p key={s.label} className="skill">
+          <b>{s.label}:</b> {s.items}
         </p>
-      </header>
-      <p className="timeline__client label">{experience.client}</p>
-      <ol className="timeline">
-        {experience.roles.map((role) => (
-          <li key={role.title} className="timeline__role">
-            <p className="timeline__period label">{role.period}</p>
-            <div>
-              <h3 className="timeline__title">{role.title}</h3>
-              <ul className="timeline__bullets">
-                {role.bullets.map((b) => (
-                  <li key={b.text}>
-                    {b.text}
-                    {b.figure && (
-                      <>
-                        {' '}
-                        <a className="figref" href={b.figure.href}>
-                          {b.figure.label}
-                        </a>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </li>
-        ))}
-        <li className="timeline__role">
-          <p className="timeline__period label">{education.date}</p>
-          <div>
-            <h3 className="timeline__title">
-              {education.school}, {education.degree}
-            </h3>
-            <ul className="timeline__bullets">
-              <li>{education.honors.join(', ')}</li>
-              <li>Certification: {education.certification}</li>
-            </ul>
-          </div>
-        </li>
-      </ol>
-      <dl className="skills">
-        {skills.map((s) => (
-          <div key={s.label}>
-            <dt className="label">{s.label}</dt>
-            <dd>{s.items}</dd>
-          </div>
-        ))}
-      </dl>
+      ))}
+      <h3>Education</h3>
+      <p>{education.text}</p>
     </section>
   )
 }

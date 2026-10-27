@@ -8,11 +8,10 @@ describe('content', () => {
     expect(profile.linkedin).toMatch(/^https:\/\/www\.linkedin\.com\/in\//)
   })
 
-  it('points every project at a GitHub repo with a stack', () => {
+  it('points every project at a public GitHub repo', () => {
     expect(projects.length).toBeGreaterThan(0)
     for (const project of projects) {
       expect(project.url).toMatch(/^https:\/\/github\.com\/tungcodeforfun\//)
-      expect(project.stack.length).toBeGreaterThan(0)
     }
   })
 })

@@ -1,12 +1,18 @@
 # tungcodeforfun.github.io
 
-Personal site for Tung Nguyen, Senior Software Engineer in New York City.
+Personal site for Tung Nguyen, Senior Software Engineer in New York.
 
-Single-page React 19 + Vite + TypeScript site. The live pieces are WebGL shaders from
-[ThreeUI](https://github.com/MengTo/threeui), vendored under `src/background/`: RibbonField
-(wallpaper), StreamConvergence and BellField (project cards), and LiquidForm (contact). They
-share one runtime (`shaderLoop.ts`) that handles reduced motion, tab visibility, off-screen
-pausing, and context loss (see `THIRD_PARTY_NOTICES.md`).
+A static page rendered at build time from React components (`src/render.tsx`, wired in by the
+`prerender` plugin in `vite.config.ts`). The browser gets plain HTML, CSS and under 1 KB of
+JavaScript (`src/client/main.ts`) for the theme toggle, the motion toggle, the per-figure pause
+buttons, and pausing figures that are off screen or in a hidden tab.
+
+- All copy and facts live in `src/content.ts`. In case-study text, `{key|words}` colours those
+  words to match the part of the figure they name (keys are styled in `src/styles/layout.css`).
+- Each figure is an SVG component in `src/figures/`. Moving parts use CSS `offset-path`
+  keyframes generated at build time by `src/figures/motion.ts`.
+- `public/resume.pdf` is the résumé linked from the page; replace the file to update it.
+- The font is a subset of Source Serif 4 (see `THIRD_PARTY_NOTICES.md`).
 
 ## Develop
 
@@ -22,7 +28,14 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+CHROME_PATH=/path/to/chrome npm run e2e -- --url http://localhost:4173/
 ```
+
+`npm run e2e` runs axe in both themes at phone and desktop sizes, fails on console errors or
+horizontal overflow, and checks every link. Add `--shots <dir>` to save the screenshot set.
+
+`CHROME_PATH=/path/to/chrome npm run assets` re-renders `public/og.png` from `design/og.html` and
+the favicons from `public/favicon.svg`.
 
 ## Deploy
 

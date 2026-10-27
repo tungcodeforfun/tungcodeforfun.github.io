@@ -7,8 +7,9 @@
 }
 
 html {
+  background: var(--bg);
+  color: var(--fg);
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: 72px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -18,28 +19,31 @@ html {
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 17px;
-  line-height: 1.55;
-  font-variant-numeric: lining-nums;
+  font-family: var(--font);
+  font-size: 19px;
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  font-kerning: normal;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: clip;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
-h3,
-h4 {
-  font-weight: inherit;
-  font-size: inherit;
+h3 {
+  color: var(--strong);
+  font-weight: 600;
+  line-height: 1.3;
+  text-wrap: balance;
 }
 
-ul,
-ol {
-  list-style: none;
+p,
+li {
+  text-wrap: pretty;
+}
+
+b {
+  font-weight: 600;
 }
 
 img {
@@ -51,19 +55,20 @@ img {
 a {
   color: inherit;
   text-decoration-line: underline;
-  text-decoration-color: var(--accent);
   text-decoration-thickness: 1.5px;
-  text-underline-offset: 0.22em;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--deco);
+  transition: text-decoration-color 120ms;
 }
 
 a:hover {
-  color: var(--accent);
+  text-decoration-color: currentColor;
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 main:focus {
@@ -78,27 +83,15 @@ button {
   cursor: pointer;
 }
 
-.label {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 .skip-link {
   position: absolute;
   left: var(--gutter);
-  top: 8px;
-  z-index: 20;
-  padding: 8px 12px;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--mono);
-  font-size: 13px;
-  text-decoration: none;
+  top: 12px;
+  z-index: 10;
+  padding: 8px 14px;
+  background: var(--strong);
+  color: var(--bg);
+  border-radius: 6px;
   transform: translateY(-200%);
 }
 
@@ -106,7 +99,12 @@ button {
   transform: none;
 }
 
-::selection {
-  background: var(--accent);
-  color: var(--paper);
+.muted {
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 18px;
+  }
 }
