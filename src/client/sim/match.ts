@@ -424,7 +424,7 @@ function create(api: SimApi): Sim {
   function stageText(r: Rec) {
     if (r.state === 'fly') return `matched ${BY[r.next]}`
     if (r.state === 'drop') return 'going to review'
-    const stage = STAGES[r.next].toLowerCase()
+    const stage = ['marketplace ID', 'set and number', 'name score'][r.next]
     if (r.state === 'check') return r.next === 2 ? 'scoring the name' : `checking ${stage}`
     return r.next === 0 ? 'waiting for the ID check' : `no match yet; next ${stage}`
   }

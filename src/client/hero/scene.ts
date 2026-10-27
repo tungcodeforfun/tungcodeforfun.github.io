@@ -63,7 +63,7 @@ type Flight = {
 }
 type Shot = { radius: number; polar: number; azimuth: number; target: Vector3 }
 
-const WIDE: Shot = { radius: 19.5, polar: 1.0, azimuth: 0.42, target: new Vector3(0, 0.6, 0) }
+const WIDE: Shot = { radius: 24, polar: 1.04, azimuth: 0.42, target: new Vector3(0, 0.4, 0) }
 const CLOSE: Shot = { radius: 10.5, polar: 1.1, azimuth: 0.92, target: new Vector3(0.7, 1.1, 0.6) }
 
 function seeded(seed: number) {
@@ -206,6 +206,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
   )
   plate.rotation.x = -Math.PI / 2
   plate.position.y = -0.3
+  plate.renderOrder = -5
   scene.add(plate)
 
   const waves = Array.from({ length: WAVES }, () => new Vector4(0, 0, -1, 0))
@@ -223,6 +224,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     uFog: { value: fog },
     uLight: { value: new Vector3(-0.45, 0.75, 0.55) },
     uHalo: { value: 0 },
+    uAmbient: { value: 0.3 },
   }
   const endpointGeometry = endpointsGeometry()
   const endpoints = new Points(
@@ -315,7 +317,8 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     colors.bottom.set(p.bg)
     colors.top.set(p.bg).lerp(new Color(dark ? '#000000' : '#ffffff'), dark ? 0.35 : 0.5)
     colors.glow.set(p.bg).lerp(new Color(p.blue), dark ? 0.1 : 0.07)
-    colors.base.set(dark ? '#58647a' : '#7d8796')
+    colors.base.set(dark ? '#6c7a92' : '#b4bcc8')
+    endpointUniforms.uAmbient.value = dark ? 0.3 : 0.72
     colors.lit.set(p.blue)
     colors.fail.set(p.red)
     colors.orange.set(p.orange)
@@ -570,7 +573,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     if (narrow) camera.setViewOffset(w, h * 1.5, 0, h * 0.42, w, h)
-    else camera.setViewOffset(w * 1.36, h, 0, 0, w, h)
+    else camera.setViewOffset(w * 1.5, h, 0, 0, w, h)
     camera.fov = narrow ? 44 : 34
     camera.updateProjectionMatrix()
     const bu = (backdrop.material as ShaderMaterial).uniforms
@@ -590,6 +593,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
 
   applyTheme()
   resize()
+  let running = false
   new ResizeObserver(() => {
     resize()
     if (!running) render()
@@ -603,7 +607,6 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     return { progress() {} }
   }
 
-  let running = false
   let visible = true
   let raf = 0
   let last = 0

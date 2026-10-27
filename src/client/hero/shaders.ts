@@ -55,6 +55,7 @@ export const endpointFragment = `
 uniform vec3 uFog;
 uniform vec3 uLight;
 uniform float uHalo;
+uniform float uAmbient;
 varying vec3 vColor;
 varying float vGlow;
 varying float vFog;
@@ -72,7 +73,7 @@ void main() {
   vec3 l = normalize(uLight);
   float diff = max(dot(n, l), 0.0);
   float spec = pow(max(dot(reflect(-l, n), vec3(0.0, 0.0, 1.0)), 0.0), 22.0);
-  vec3 col = vColor * (0.3 + 0.82 * diff) + spec * (0.22 + 0.5 * vGlow);
+  vec3 col = vColor * (uAmbient + (1.12 - uAmbient) * diff) + spec * (0.22 + 0.5 * vGlow);
   col += vColor * vGlow * 0.55;
   col = mix(col, uFog, vFog * 0.8);
   gl_FragColor = vec4(col, smoothstep(1.0, 0.72, r2));
