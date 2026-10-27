@@ -469,7 +469,8 @@ function create(api: SimApi): Sim {
       }
     })
     const [lx, ly] = L.workers[0]
-    label(g, 'Workers', lx, ly - 36, p.green, 12, 560, L.portrait ? 'left' : 'center')
+    if (L.portrait) label(g, 'Workers', lx - 30, ly, p.green, 12, 560, 'right')
+    else label(g, 'Workers', lx, ly - 36, p.green, 12, 560, 'center')
     g.restore()
   }
 

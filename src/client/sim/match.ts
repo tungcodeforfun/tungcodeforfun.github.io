@@ -493,14 +493,12 @@ function create(api: SimApi): Sim {
   function drawReviewPath(g: CanvasRenderingContext2D, p: Palette) {
     const [gx, gy] = gatePoint(2)
     const top = L.tray.y - (L.card.h + 14) / 2
-    g.strokeStyle = alpha(p.red, 0.32)
+    g.strokeStyle = alpha(p.red, 0.26)
     g.lineWidth = 1.2
-    g.setLineDash([3, 4])
     g.beginPath()
     g.moveTo(gx, gy + (L.portrait ? 16 : 92))
     g.lineTo(gx, top - 2)
     g.stroke()
-    g.setLineDash([])
   }
 
   function drawSources(g: CanvasRenderingContext2D, p: Palette) {

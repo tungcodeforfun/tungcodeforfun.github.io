@@ -17,3 +17,9 @@ Copyright 2023 The Mona Sans Project Authors (https://github.com/github/mona-san
 The hero scene bundles three.js 0.186.1 (https://github.com/mrdoob/three.js).
 
 Copyright © 2010-2026 three.js authors. Licensed under the MIT License: https://github.com/mrdoob/three.js/blob/dev/LICENSE
+
+## IBM Plex Sans
+
+`design/comps3/fonts/ibm-plex-sans-latin-*.woff2` are the Latin subsets of IBM Plex Sans from the `@fontsource/ibm-plex-sans` 5.3.0 package, used only by the design comps.
+
+Copyright 2019 IBM Corp. All rights reserved. Licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/

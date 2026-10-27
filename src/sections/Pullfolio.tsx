@@ -3,14 +3,14 @@ import { CaseStudy } from './CaseStudy'
 
 type Shot = (typeof pullfolio.shots)[keyof typeof pullfolio.shots]
 
-function Screen({ shot, eager }: { shot: Shot; eager?: boolean }) {
+function Screen({ shot }: { shot: Shot }) {
   return (
     <img
       src={shot.src}
       width={shot.width}
       height={shot.height}
       alt={shot.alt}
-      loading={eager ? undefined : 'lazy'}
+      loading="lazy"
       decoding="async"
     />
   )

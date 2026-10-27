@@ -511,9 +511,8 @@ function create(api: SimApi): Sim {
   }
 
   function drawLinks(g: CanvasRenderingContext2D, p: Palette) {
-    g.strokeStyle = alpha(p.dot, p.dark ? 0.35 : 0.45)
+    g.strokeStyle = alpha(p.dot, p.dark ? 0.24 : 0.32)
     g.lineWidth = 1
-    g.setLineDash([2, 4])
     g.beginPath()
     for (const c of L.clients) {
       g.moveTo(c.x + 10, c.y)
@@ -530,7 +529,6 @@ function create(api: SimApi): Sim {
     g.lineTo(L.cache.x0 - 2, L.keys[KEYS - 1].y)
     g.stroke()
     g.globalAlpha = 1
-    g.setLineDash([])
   }
 
   function drawRequests(g: CanvasRenderingContext2D, p: Palette) {

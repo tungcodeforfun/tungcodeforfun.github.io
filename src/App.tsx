@@ -43,7 +43,7 @@ export default function App() {
         <Contact />
       </main>
       <footer className="footer">
-        © {new Date().getFullYear()} {profile.name}. <a href={profile.source}>Source on GitHub</a>.
+        © {new Date().getFullYear()} {profile.name}.
       </footer>
     </>
   )

@@ -1,4 +1,4 @@
-export type Spring = { value: number; target: number; velocity: number }
+type Spring = { value: number; target: number; velocity: number }
 
 export function spring(value: number): Spring {
   return { value, target: value, velocity: 0 }

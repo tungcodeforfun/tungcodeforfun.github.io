@@ -8,7 +8,6 @@ export const profile = {
   github: 'https://github.com/tungcodeforfun',
   linkedin: 'https://www.linkedin.com/in/tungngvyen',
   resume: '/resume.pdf',
-  source: 'https://github.com/tungcodeforfun/tungcodeforfun.github.io',
   site: 'https://tungcodeforfun.github.io/',
   title: 'Tung Nguyen, Senior Software Engineer, New York',
   description:

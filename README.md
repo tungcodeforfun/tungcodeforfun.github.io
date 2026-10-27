@@ -22,8 +22,10 @@ heavy parts load later, each in its own chunk:
 
 Notes:
 
-- All copy and facts live in `src/content.ts`. In case-study text, `{key|words}` colours those
+- Facts and prose live in `src/content.ts`. In case-study text, `{key|words}` colours those
   words to match the part of the simulation they name (keys are styled in `src/styles/layout.css`).
+  Section headings and short UI labels are in `src/sections/`, the labels drawn on the simulation
+  canvases are in `src/client/sim/`, and the OG card text is in `scripts/og.html`.
 - `public/resume.pdf` is the résumé linked from the page; replace the file to update it.
 - Fonts are subsets of Mona Sans and Source Serif 4 (see `THIRD_PARTY_NOTICES.md`).
 

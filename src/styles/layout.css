@@ -50,6 +50,10 @@
   background: color-mix(in srgb, var(--chip) 80%, transparent);
 }
 
+.control[hidden] {
+  display: none;
+}
+
 .controls {
   justify-self: end;
   display: flex;
@@ -97,7 +101,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: calc(1 - var(--p, 0) * 1.4);
+  opacity: calc(1 - max(0, var(--p, 0) - 0.6) * 2.5);
   background:
     linear-gradient(to top, var(--bg) 0, color-mix(in srgb, var(--bg) 60%, transparent) 16%, transparent 38%),
     linear-gradient(to right, color-mix(in srgb, var(--bg) 92%, transparent) 0, color-mix(in srgb, var(--bg) 72%, transparent) 34%, transparent 62%);
