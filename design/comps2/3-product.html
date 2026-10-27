@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comp 2-3: the product leads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet" />
+<style>
+* { box-sizing: border-box; margin: 0 }
+body { background: #f2f2f0; color: #191a1c; font: 19px/1.6 Literata, Georgia, serif }
+.head { max-width: 1240px; margin: 0 auto; padding: 56px 32px 0; display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap }
+h1 { font-size: 34px; font-weight: 600; line-height: 1.15 }
+.role { color: #50535a }
+.links a { color: inherit; margin-left: 20px; text-underline-offset: 3px; text-decoration-thickness: 1px }
+.intro { max-width: 1240px; margin: 14px auto 0; padding: 0 32px; color: #50535a }
+.plate { max-width: 1240px; margin: 44px auto 0; padding: 0 32px }
+.plate img { width: 100%; display: block; border-radius: 4px; box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 20px 50px -24px rgba(0,0,0,.35) }
+.cap { margin-top: 14px; max-width: 640px; font-size: 16px; color: #50535a }
+.cap b { color: #191a1c; font-weight: 600 }
+.pair { max-width: 1240px; margin: 56px auto 0; padding: 0 32px; display: grid; grid-template-columns: 1fr 0.29fr; gap: 32px; align-items: start }
+.pair img { width: 100%; display: block; border-radius: 4px; box-shadow: 0 20px 50px -24px rgba(0,0,0,.35) }
+.story { max-width: 660px; margin: 96px auto 120px; padding: 0 32px }
+.story h2 { font-size: 26px; font-weight: 600; line-height: 1.25 }
+.story p { margin-top: 14px }
+@media (max-width: 700px) {
+  .head, .intro, .plate, .pair, .story { padding-left: 20px; padding-right: 20px } h1 { font-size: 28px }
+  .links a { margin: 0 16px 0 0 } .pair { grid-template-columns: 1fr 0.45fr; gap: 14px } body { font-size: 17px }
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <div><h1>Tung Nguyen</h1><p class="role">Senior Software Engineer, New York</p></div>
+  <p class="links"><a href="#">Email</a><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Resume</a></p>
+</header>
+<p class="intro">Four years building Java/Spring Boot services and AWS event-driven systems, with Python, Go and TypeScript.</p>
+<figure class="plate">
+  <img src="../../public/work/pullfolio-home.webp" width="1280" height="800" alt="Pullfolio home page" />
+  <figcaption class="cap"><b>Pullfolio</b>, a trading-card collection app I designed, built and launched on my own: 5,000+ visitors in 3 weeks. Binders for every set, price alerts, Stripe subscriptions. pullfolio.app</figcaption>
+</figure>
+<div class="pair">
+  <figure><img src="../../public/work/pullfolio-card.webp" width="1280" height="800" alt="Pullfolio card page" /><figcaption class="cap">Each card page leads with an outlier-resistant headline price built from 5 sources.</figcaption></figure>
+  <figure><img src="../../public/work/pullfolio-phone.webp" width="390" height="844" alt="Pullfolio on a phone" /></figure>
+</div>
+<section class="story">
+  <h2>Under it: one catalog from five price sources</h2>
+  <p>Every day a pipeline merges 5 price sources into one catalog of 77,000+ cards and 144,000+ priced variants across 4 games. Records match by marketplace ID, then by set and number, then by a confidence-scored name; anything ambiguous goes to a review queue instead of becoming a duplicate.</p>
+  <h2 style="margin-top:56px">At EY: configuration over a queue</h2>
+  <p>Chain-wide configuration operations for a national quick-service restaurant chain ran over synchronous HTTP and timed out. I re-architected them as SQS batch processing with idempotent retries and a dead-letter queue that alerts. The timeouts across 3,500+ locations stopped.</p>
+</section>
+</body>
+</html>

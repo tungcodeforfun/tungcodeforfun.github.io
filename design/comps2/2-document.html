@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comp 2-2: a plain, well-set document</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<style>
+* { box-sizing: border-box; margin: 0 }
+html { background: #fff; color: #1a1a1a }
+body { font: 21px/1.5 'EB Garamond', Garamond, serif; font-variant-numeric: oldstyle-nums proportional-nums; font-kerning: normal; hanging-punctuation: first allow-end }
+main { max-width: 34em; margin: 0 auto; padding: 4.5em 1.25em 6em }
+h1 { font-size: 1em; font-weight: 500; font-variant-caps: all-small-caps; letter-spacing: 0.06em; font-size: 1.25em }
+.who { font-style: italic }
+p { text-wrap: pretty }
+p + p { text-indent: 1.4em }
+.lede { margin-top: 1.5em }
+a { color: inherit; text-decoration-thickness: 0.06em; text-underline-offset: 0.16em; text-decoration-color: #9a9a9a }
+h2 { font-size: 1em; font-weight: 500; font-variant-caps: all-small-caps; letter-spacing: 0.06em; margin-top: 3em; margin-bottom: 0.5em }
+h3 { font-size: 1em; font-style: italic; font-weight: 400; margin-top: 1.8em; margin-bottom: 0.3em }
+figure { margin: 1.4em 0 1.4em }
+svg { width: 100%; height: auto; display: block; overflow: visible }
+svg text { font-family: 'EB Garamond', serif; font-size: 17px; fill: #1a1a1a }
+svg text.i { font-style: italic; fill: #555 }
+svg .ln { fill: none; stroke: #1a1a1a; stroke-width: 0.9 }
+svg .ln.soft { stroke: #8a8a8a }
+figcaption { font-size: 0.82em; font-style: italic; color: #555; margin-top: 0.6em }
+.sc { font-variant-caps: all-small-caps; letter-spacing: 0.04em }
+.n { display: none }
+@media (max-width: 600px) { body { font-size: 19px } .w { display: none } .n { display: block } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tung Nguyen</h1>
+  <p class="who">Senior Software Engineer, New York</p>
+  <p class="lede">I have spent four years building Java/Spring Boot services and <span class="sc">AWS</span> event-driven systems, and I also write Python, Go and TypeScript. You can reach me at <a href="#">tungnguyen1651@gmail.com</a>; the rest is on <a href="#">GitHub</a>, <a href="#">LinkedIn</a> and in my <a href="#">résumé</a>.</p>
+
+  <h3>Configuration over a queue</h3>
+  <p>At <span class="sc">EY</span> I work on the <span class="sc">POS</span> and menu configuration platform for a national quick-service restaurant chain. Chain-wide configuration operations ran over synchronous <span class="sc">HTTP</span> and timed out.</p>
+  <p>I re-architected them as <span class="sc">SQS</span> batch processing. The worker applies each message idempotently, so a retry is safe; a message that keeps failing lands in a dead-letter queue, which raises an alert. The timeouts across 3,500+ locations stopped.</p>
+  <figure>
+    <svg class="w" viewBox="0 0 640 170" role="img" aria-label="config change, then SQS, then worker, then locations; the worker retries through SQS; failing messages go to the dead-letter queue, which alerts.">
+      <text x="0" y="60">config change</text>
+      <text x="168" y="60">SQS</text>
+      <text x="290" y="60">worker</text>
+      <text x="438" y="60">3,500+ locations</text>
+      <path class="ln" d="M104 55 H158 M153 51 L158 55 L153 59" />
+      <path class="ln" d="M206 55 H280 M275 51 L280 55 L275 59" />
+      <path class="ln" d="M342 55 H428 M423 51 L428 55 L423 59" />
+      <path class="ln soft" d="M315 40 C315 8 186 8 184 38 M180 33 L184 38 L188 33" />
+      <text class="i" x="214" y="16">retry</text>
+      <path class="ln" d="M184 66 V120 M180 115 L184 120 L188 115" />
+      <text x="140" y="142">dead-letter queue</text>
+      <path class="ln" d="M262 137 H320 M315 133 L320 137 L315 141" />
+      <text x="330" y="142">alert</text>
+    </svg>
+    <svg class="n" viewBox="0 0 320 300" role="img" aria-label="Same figure, top to bottom.">
+      <text x="0" y="20">config change</text><path class="ln" d="M40 30 V58 M36 53 L40 58 L44 53" />
+      <text x="24" y="80">SQS</text><path class="ln" d="M40 90 V118 M36 113 L40 118 L44 113" />
+      <text x="16" y="140">worker</text><path class="ln" d="M40 150 V178 M36 173 L40 178 L44 173" />
+      <text x="0" y="200">3,500+ locations</text>
+      <path class="ln soft" d="M10 134 C-14 120 -14 90 10 76" /><text class="i" x="-36" y="110">retry</text>
+      <path class="ln" d="M60 75 H150 M145 71 L150 75 L145 79" /><text x="158" y="80">dead-letter queue</text>
+      <path class="ln" d="M210 90 V118 M206 113 L210 118 L214 113" /><text x="192" y="140">alert</text>
+    </svg>
+    <figcaption>Configuration changes go through the queue. Retries are safe because the worker is idempotent; messages that keep failing park in the dead-letter queue.</figcaption>
+  </figure>
+  <p>The same period I cut <span class="sc">P</span>95 latency on the customer-facing <span class="sc">POS</span> endpoints by 65 percent, with Redis caching and query rewrites; more on that below.</p>
+</main>
+</body>
+</html>
