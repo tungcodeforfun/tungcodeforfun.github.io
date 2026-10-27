@@ -7,7 +7,6 @@ attribute float aRadius;
 uniform float uTime;
 uniform float uSize;
 uniform float uPixelRatio;
-uniform float uInner;
 uniform vec4 uWaves[${WAVES}];
 uniform vec3 uBase;
 uniform vec3 uLit;
@@ -25,12 +24,13 @@ void main() {
     vec4 w = uWaves[i];
     if (w.z < 0.0) continue;
     float d = abs(mod(aAngle - w.x + 3.14159265, 6.2831853) - 3.14159265);
-    float inside = 1.0 - smoothstep(w.y * 0.8, w.y, d);
-    float arrive = w.z + (aRadius - uInner) * 0.07 + aSeed * 0.3;
+    float band = 1.0 - smoothstep(1.1, 2.6, abs(aRadius - abs(w.w)));
+    float inside = (1.0 - smoothstep(w.y * 0.75, w.y, d)) * band;
+    float arrive = w.z + abs(aRadius - abs(w.w)) * 0.12 + aSeed * 0.3;
     float dt = uTime - arrive;
     if (dt > 0.0 && inside > 0.0) {
       float k = exp(-dt * 1.6) * inside;
-      if (w.w > 0.5) {
+      if (w.w < 0.0) {
         fail = max(fail, k);
       } else {
         glow = max(glow, k);
@@ -44,7 +44,7 @@ void main() {
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * mv;
   float twinkle = 0.9 + 0.1 * sin(uTime * 1.1 + aSeed * 37.0);
-  float size = uSize * (1.0 + vGlow * 0.7) * twinkle;
+  float size = uSize * (1.0 + vGlow * 0.35) * twinkle;
   if (uHalo > 0.5) size = vGlow < 0.03 ? 0.0 : uSize * 5.0 * vGlow;
   gl_PointSize = size * uPixelRatio / -mv.z;
   vFog = smoothstep(20.0, 46.0, -mv.z);

@@ -383,7 +383,6 @@
   font-family: var(--display);
   font-size: 15px;
   font-weight: 500;
-  font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
 
@@ -632,6 +631,7 @@
   }
 
   .device--phone {
+    z-index: 2;
     right: 0;
     top: 22%;
     width: 36%;

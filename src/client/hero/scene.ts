@@ -56,6 +56,7 @@ type Flight = {
   to: Vector3
   angle: number
   half: number
+  radius: number
   failAt: number
   back: boolean
   dlq: boolean
@@ -216,7 +217,6 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     uTime: { value: 0 },
     uSize: { value: 190 },
     uPixelRatio: pixelRatio,
-    uInner: { value: INNER },
     uWaves: { value: waves },
     uBase: { value: colors.base },
     uLit: { value: colors.lit },
@@ -343,8 +343,8 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     attr.needsUpdate = true
   }
 
-  function wave(angle: number, half: number, fail: boolean) {
-    waves[waveIndex].set(angle, half, clock, fail ? 1 : 0)
+  function wave(f: Flight, fail: boolean) {
+    waves[waveIndex].set(f.angle, fail ? f.half * 0.5 : f.half, clock, fail ? -f.radius : f.radius)
     waveIndex = (waveIndex + 1) % WAVES
   }
 
@@ -367,7 +367,8 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
       ctrl,
       to,
       angle,
-      half: 0.16 + random() * 0.2,
+      half: (1.2 + random() * 1.6) / r,
+      radius: r,
       failAt: msg.poison ? 0.42 : retry ? 0.62 : 2,
       back: false,
       dlq: false,
@@ -377,7 +378,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
 
   function fail(f: Flight, at: Vector3) {
     f.msg.attempts++
-    wave(f.angle, f.half * 0.5, true)
+    wave(f, true)
     f.from = at.clone()
     f.t = 0
     if (f.msg.poison && f.msg.attempts >= MAX_ATTEMPTS) {
@@ -405,7 +406,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
       queue.unshift(f.msg)
       return
     }
-    wave(f.angle, f.half, false)
+    wave(f, false)
   }
 
   const scratch = new Vector3()
@@ -551,7 +552,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     const drift = env.reduced ? 0 : Math.sin(clock * 0.06) * 0.05
     const azimuth = WIDE.azimuth + (CLOSE.azimuth - WIDE.azimuth) * e + pointer.x.value * 0.07 + drift
     const polar = WIDE.polar + (CLOSE.polar - WIDE.polar) * e + pointer.y.value * 0.04
-    const radius = WIDE.radius + (CLOSE.radius - WIDE.radius) * e
+    const radius = (WIDE.radius + (CLOSE.radius - WIDE.radius) * e) * (narrow ? 1.35 : 1)
     const look = scratch.copy(WIDE.target).lerp(CLOSE.target, e)
     camera.position.set(
       look.x + radius * Math.sin(polar) * Math.sin(azimuth),
@@ -572,7 +573,7 @@ export function createHero(hero: HTMLElement, initialProgress: number) {
     renderer.setPixelRatio(dpr)
     renderer.setSize(w, h, false)
     camera.aspect = w / h
-    if (narrow) camera.setViewOffset(w, h * 1.5, 0, h * 0.42, w, h)
+    if (narrow) camera.setViewOffset(w, h * 1.3, 0, h * 0.3, w, h)
     else camera.setViewOffset(w * 1.5, h, 0, 0, w, h)
     camera.fov = narrow ? 44 : 34
     camera.updateProjectionMatrix()

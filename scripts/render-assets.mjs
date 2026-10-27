@@ -34,10 +34,10 @@ async function webp(page, png, quality = 0.82) {
   )
   return Buffer.from(bytes)
 }
-
 const hideOverlays = `
   .hero__scrim, .hero__copy, .hero__scene, .topbar, .sim__still, .sim__stage::after { visibility: hidden !important; }
   .sim__stage { box-shadow: none !important; }
+  .hero__stage canvas { opacity: 1 !important; transition: none !important; }
 `
 
 async function renderStills(browser, url) {

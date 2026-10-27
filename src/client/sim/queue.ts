@@ -38,15 +38,15 @@ const TRANSIENT = 0.07
 function layout(w: number, h: number): Layout {
   const portrait = h > w * 0.95
   if (portrait) {
-    const fieldTop = h * 0.4
+    const fieldTop = h * 0.47
     return {
       portrait,
-      source: [w * 0.1, h * 0.12],
-      lane: { x0: w * 0.22, x1: w * 0.9, y: h * 0.12 },
-      workers: [0.3, 0.55, 0.8].map((x) => [w * x, h * 0.27] as [number, number]),
-      field: { x0: w * 0.08, y0: fieldTop, x1: w * 0.92, y1: h * 0.76, cols: 18, rows: 12 },
-      dlq: { x: w * 0.08, y: h * 0.86, w: w * 0.46 },
-      pager: [w * 0.78, h * 0.9],
+      source: [w * 0.1, h * 0.2],
+      lane: { x0: w * 0.22, x1: w * 0.92, y: h * 0.2 },
+      workers: [0.3, 0.57, 0.84].map((x) => [w * x, h * 0.34] as [number, number]),
+      field: { x0: w * 0.08, y0: fieldTop, x1: w * 0.92, y1: h * 0.77, cols: 18, rows: 11 },
+      dlq: { x: w * 0.08, y: h * 0.89, w: w * 0.46 },
+      pager: [w * 0.8, h * 0.88],
     }
   }
   return {
