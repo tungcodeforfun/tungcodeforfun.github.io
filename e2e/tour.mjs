@@ -16,6 +16,8 @@ await mkdir(values.out, { recursive: true })
 const only = new Set(values.only.split(','))
 const viewports = { 1440: { width: 1440, height: 900 }, 390: { width: 390, height: 844 } }
 const browser = await chromium.launch({ executablePath, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
+const live = new URL(values.url)
+live.searchParams.set('software-gl', '')
 const problems = []
 
 async function open(width, scheme, reducedMotion, extra = {}) {
@@ -30,7 +32,7 @@ async function open(width, scheme, reducedMotion, extra = {}) {
   const page = await context.newPage()
   page.on('console', (m) => ['error', 'warning'].includes(m.type()) && problems.push(`${width}/${scheme}: ${m.type()} ${m.text()}`))
   page.on('pageerror', (e) => problems.push(`${width}/${scheme}: pageerror ${e.message}`))
-  await page.goto(values.url, { waitUntil: 'networkidle' })
+  await page.goto(live.href, { waitUntil: 'networkidle' })
   return { context, page }
 }
 
@@ -75,7 +77,7 @@ async function shots() {
         const name = `${values.out}/site-${width}-${scheme}-${rm === 'reduce' ? 'rm' : 'motion'}`
         await settle(page, 6000)
         await page.screenshot({ path: `${name}-first.png` })
-        await page.addStyleTag({ content: '*{animation-timeline:auto!important;animation:none!important}' })
+        await page.addStyleTag({ content: '*{animation-timeline:auto!important;animation:none!important}.case__sim{position:static!important}' })
         await fullPage(page, `${name}-full.png`)
         console.log(`shot ${name}-{first,full}.png`)
         await context.close()
@@ -253,7 +255,7 @@ async function frames() {
       })
   })
   const page = await context.newPage()
-  await page.goto(values.url, { waitUntil: 'networkidle' })
+  await page.goto(live.href, { waitUntil: 'networkidle' })
   await page.waitForSelector('.hero[data-live]', { state: 'attached', timeout: 30000 })
   await settle(page, 2000)
   await page.evaluate(() => (window.__cost.length = 0))
@@ -301,26 +303,33 @@ async function frames() {
 }
 
 async function fallback() {
-  const context = await browser.newContext({ viewport: viewports[1440], colorScheme: 'dark' })
-  await context.addInitScript(() => {
-    HTMLCanvasElement.prototype.getContext = new Proxy(HTMLCanvasElement.prototype.getContext, {
-      apply(target, self, args) {
-        return String(args[0]).startsWith('webgl') ? null : Reflect.apply(target, self, args)
-      },
-    })
-  })
-  const page = await context.newPage()
-  page.on('pageerror', (e) => problems.push(`fallback: pageerror ${e.message}`))
-  await page.goto(values.url, { waitUntil: 'networkidle' })
-  await settle(page, 4000)
-  const state = await page.evaluate(() => ({
-    canvases: document.querySelectorAll('.hero canvas').length,
-    cached: localStorage.getItem('webgl'),
-    still: getComputedStyle(document.querySelector('.hero__still')).backgroundImage,
-  }))
-  await page.screenshot({ path: `${values.out}/site-1440-dark-webgl-fallback.png` })
-  console.log(`fallback: ${JSON.stringify(state)}`)
-  await context.close()
+  for (const [name, noWebgl] of [
+    ['software-renderer', false],
+    ['no-webgl', true],
+  ]) {
+    const context = await browser.newContext({ viewport: viewports[1440], colorScheme: 'dark' })
+    if (noWebgl)
+      await context.addInitScript(() => {
+        HTMLCanvasElement.prototype.getContext = new Proxy(HTMLCanvasElement.prototype.getContext, {
+          apply(target, self, args) {
+            return String(args[0]).startsWith('webgl') ? null : Reflect.apply(target, self, args)
+          },
+        })
+      })
+    const page = await context.newPage()
+    page.on('pageerror', (e) => problems.push(`fallback ${name}: pageerror ${e.message}`))
+    await page.goto(values.url, { waitUntil: 'networkidle' })
+    await settle(page, 4000)
+    const state = await page.evaluate(() => ({
+      canvases: document.querySelectorAll('.hero canvas').length,
+      cached: localStorage.getItem('webgl'),
+      still: getComputedStyle(document.querySelector('.hero__still')).backgroundImage,
+    }))
+    await page.screenshot({ path: `${values.out}/site-1440-dark-fallback-${name}.png` })
+    console.log(`fallback ${name}: ${JSON.stringify(state)}`)
+    if (state.canvases || state.cached !== 'fail') problems.push(`fallback ${name}: hero did not fall back`)
+    await context.close()
+  }
 }
 
 if (only.has('shots')) await shots()

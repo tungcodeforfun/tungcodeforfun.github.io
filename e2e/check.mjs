@@ -29,7 +29,7 @@ async function open(viewport, scheme, reducedMotion) {
   page.on('console', (m) => ['error', 'warning'].includes(m.type()) && messages.push(`${m.type()}: ${m.text()}`))
   page.on('pageerror', (e) => messages.push(`pageerror: ${e.message}`))
   page.on('requestfailed', (r) => messages.push(`requestfailed: ${r.url()}`))
-  await page.goto(values.url, { waitUntil: 'networkidle' })
+  await page.goto(`${values.url}?software-gl`, { waitUntil: 'networkidle' })
   return { context, page, messages }
 }
 

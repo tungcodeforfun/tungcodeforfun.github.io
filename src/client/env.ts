@@ -17,6 +17,10 @@ export const env = {
   get still() {
     return new URLSearchParams(location.search).has('still')
   },
+  get softwareGl() {
+    const params = new URLSearchParams(location.search)
+    return params.has('still') || params.has('software-gl')
+  },
 }
 
 export function onEnvChange(listener: () => void) {

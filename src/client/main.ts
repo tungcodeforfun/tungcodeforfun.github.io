@@ -3,7 +3,7 @@ import '../styles/tokens.css'
 import '../styles/base.css'
 import '../styles/layout.css'
 import '../styles/sim.css'
-import { recall, remember, whenVisible } from './env'
+import { env, recall, remember, whenVisible } from './env'
 import { setupHeroProgress, setupMotion, setupTheme, setupTilt, setupTopbar } from './chrome'
 import type { SimId } from '../content'
 
@@ -34,13 +34,17 @@ if (hero) {
   })
 }
 
+const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software|basic render/i
+
 function webglAvailable() {
   if (recall('webgl') === 'fail') return false
-  const probe = document.createElement('canvas')
-  const gl = probe.getContext('webgl2')
+  const gl = document.createElement('canvas').getContext('webgl2')
+  const info = gl?.getExtension('WEBGL_debug_renderer_info')
+  const renderer = gl && info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : ''
   gl?.getExtension('WEBGL_lose_context')?.loseContext()
-  if (!gl) remember('webgl', 'fail')
-  return !!gl
+  const ok = !!gl && (env.softwareGl || !SOFTWARE_RENDERER.test(renderer))
+  if (!ok) remember('webgl', 'fail')
+  return ok
 }
 
 function startHero(el: HTMLElement) {
