@@ -85,7 +85,7 @@ export function createPond(seed = 11): Pond {
     { x: 0, y: 0 },
     { x: 0, y: 0 },
   ]
-  const water: Water = { width: 1, height: 1, fence: null }
+  const water: Water = { width: 1, height: 1, fence: null, rival: null }
 
   function settle(L: number) {
     const { width, height, keepOut } = layout
@@ -111,7 +111,10 @@ export function createPond(seed = 11): Pond {
     const L = next.length
     settle(L)
     if (koi.length) koi.forEach((k, i) => resizeKoi(k, L * SIZES[i], steady ? 1 : sx, steady ? 1 : sy))
-    else koi = [createKoi(KOHAKU, L, home.x + home.rx, home.y, Math.PI / 2), createKoi(SUMI, L * SIZES[1], home.x - home.rx, home.y, -Math.PI / 2)]
+    else {
+      const turn = rand() * TAU
+      koi = [createKoi(KOHAKU, L, orbit(L, 0), turn, water), createKoi(SUMI, L * SIZES[1], orbit(L * SIZES[1], 1), turn + Math.PI, water)]
+    }
     const count = Math.round((next.width * next.height) / 9000)
     specks.length = Math.min(specks.length, count)
     while (specks.length < count) specks.push(respawn({ x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 1, glyph: '' }, rand()))
@@ -145,12 +148,17 @@ export function createPond(seed = 11): Pond {
     return box ? Math.hypot(x - clamp(x, box.x, box.x + box.w), y - clamp(y, box.y, box.y + box.h)) : Infinity
   }
 
-  function circle(k: Koi, i: number) {
+  function orbit(L: number, i: number) {
     const lane = (1 + 0.18 * Math.sin(time * 0.071 + i * 2.1)) * LANES[i]
     centre.x = home.x + home.rx * 0.25 * Math.sin(time * 0.043)
     centre.y = home.y + home.ry * 0.2 * Math.cos(time * 0.031)
-    centre.rx = Math.max(k.length * 0.45, home.rx) * lane
-    centre.ry = Math.max(k.length * 0.42, home.ry) * lane
+    centre.rx = Math.max(L * 0.45, home.rx) * lane
+    centre.ry = Math.max(L * 0.42, home.ry) * lane
+    return centre
+  }
+
+  function circle(k: Koi, i: number) {
+    orbit(k.length, i)
     const qx = (k.x - centre.x) / centre.rx
     const qy = (k.y - centre.y) / centre.ry
     const tangent = Math.hypot(qy * centre.rx, qx * centre.ry) || 1
@@ -194,12 +202,11 @@ export function createPond(seed = 11): Pond {
   }
 
   function shoulder(k: Koi, other: Koi) {
-    const min = k.length * 0.32
     nearest(other, k.x, k.y)
-    if (gap.d >= min) return
-    k.x += (gap.x / gap.d) * (min - gap.d)
-    k.y += (gap.y / gap.d) * (min - gap.d)
-    k.pressed = true
+    const near = 1 - smooth((gap.d - k.length * 0.32) / (k.length * 0.15))
+    k.shy.x = (gap.x / gap.d) * near
+    k.shy.y = (gap.y / gap.d) * near
+    k.pressed ||= near > 0.5
   }
 
   function curiosity(k: Koi, i: number) {
@@ -214,7 +221,7 @@ export function createPond(seed = 11): Pond {
   }
 
   function stayIn(k: Koi) {
-    const margin = k.length * 0.45
+    const margin = k.length * 0.6
     const { width, height } = layout
     for (const reach of WALL_PROBES) {
       look(k, reach)
@@ -252,6 +259,7 @@ export function createPond(seed = 11): Pond {
     }
     const gliding = glide[i] > 0 && !(interest && interest.age < 4)
     const eager = interest ? 1 + 0.35 * (1 - smooth((interest.age - 3) / 3)) : 1
+    water.rival = other.chain
     swim(k, dt, Math.atan2(urge.y, urge.x), gliding ? cruise * 0.5 : cruise * eager, gliding, urge.urgency, water)
   }
 

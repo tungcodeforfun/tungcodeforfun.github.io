@@ -1,9 +1,10 @@
 import { put, type Grid, type InkId } from './grid.ts'
-import { TAU, clamp, clear, ease, inside, smooth, wrap, type Rect } from './math.ts'
+import { TAU, clamp, clear, distance, ease, inside, smooth, wrap, type Rect } from './math.ts'
 
 export type Patch = { along: number; across: number; alongRadius: number; acrossRadius: number }
 export type Look = { body: InkId; patch: InkId; fin: InkId; eye: InkId; patches: readonly Patch[] }
-export type Water = { width: number; height: number; fence: Rect | null }
+export type Water = { width: number; height: number; fence: Rect | null; rival: Float64Array | null }
+export type Orbit = { x: number; y: number; rx: number; ry: number }
 
 export type Koi = {
   look: Look
@@ -19,6 +20,7 @@ export type Koi = {
   scull: number
   chain: Float64Array
   pressed: boolean
+  shy: { x: number; y: number }
 }
 
 const N = 30
@@ -28,6 +30,9 @@ const WIDTH = 0.118
 const WAIST = 0.26
 const FAN = 0.12
 const BEND = 0.5
+const LIMIT = 0.3
+const STEP = LIMIT / 6
+const CURL = 3.6
 
 const qx = new Float64Array(N + 1)
 const qy = new Float64Array(N + 1)
@@ -36,7 +41,6 @@ const sy = new Float64Array(N)
 const sl = new Float64Array(N)
 const hit = { s: 0, d: 0, tx: 1, ty: 0, ex: 0, ey: 0 }
 const at = { x: 0, y: 0 }
-const held = { x: 0, y: 0 }
 const root = { x: 0, y: 0 }
 const norm = { x: 0, y: 0, g: 1 }
 const span = { c0: 0, c1: 0, r0: 0, r1: 0 }
@@ -44,13 +48,18 @@ const SIDES = [-1, 1]
 let target: Grid
 let clip: Rect | null = null
 
-export function createKoi(look: Look, length: number, x: number, y: number, heading: number): Koi {
+export function createKoi(look: Look, length: number, orbit: Orbit, angle: number, water: Water): Koi {
   const chain = new Float64Array((N + 1) * 2)
+  let a = angle
   for (let i = 0; i <= N; i++) {
-    chain[i * 2] = x - Math.cos(heading) * (length / N) * i
-    chain[i * 2 + 1] = y - Math.sin(heading) * (length / N) * i
+    chain[i * 2] = orbit.x + orbit.rx * Math.cos(a)
+    chain[i * 2 + 1] = orbit.y + orbit.ry * Math.sin(a)
+    a -= length / N / (Math.hypot(orbit.rx * Math.sin(a), orbit.ry * Math.cos(a)) || 1)
   }
-  return { look, length, x, y, heading, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain, pressed: false }
+  const heading = Math.atan2(orbit.ry * Math.cos(angle), -orbit.rx * Math.sin(angle))
+  const koi = { look, length, x: chain[0], y: chain[1], heading, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain, pressed: false, shy: { x: 0, y: 0 } }
+  follow(koi, water)
+  return koi
 }
 
 export function resizeKoi(koi: Koi, length: number, scaleX: number, scaleY: number) {
@@ -74,40 +83,103 @@ export function swim(koi: Koi, dt: number, heading: number, speed: number, glidi
   koi.turn += (want - koi.turn) * ease(1.8, dt)
   koi.heading = wrap(koi.heading + koi.turn * dt)
   koi.speed += (speed - koi.speed) * ease(gliding ? 0.25 : 0.8, dt)
-  koi.x += Math.cos(koi.heading) * koi.speed * dt
-  koi.y += Math.sin(koi.heading) * koi.speed * dt
+  const vx = Math.cos(koi.heading) * koi.speed
+  const vy = Math.sin(koi.heading) * koi.speed
+  const into = Math.min(0, vx * koi.shy.x + vy * koi.shy.y)
+  koi.x += (vx - into * koi.shy.x) * dt
+  koi.y += (vy - into * koi.shy.y) * dt
   const curl = clamp((koi.turn * L * BEND) / Math.max(koi.speed, 1), -1, 1)
   koi.bank += (curl - koi.bank) * ease(2.5, dt)
   koi.effort += ((gliding ? 0.15 : 1) - koi.effort) * ease(1.1, dt)
   koi.phase += TAU * (0.2 + (1.6 * koi.speed) / L) * (0.3 + 0.7 * koi.effort) * dt
   koi.scull += TAU * (0.3 + 0.35 * Math.abs(koi.bank) + 0.2 * koi.effort) * dt
+  follow(koi, water)
+}
+
+function follow(koi: Koi, water: Water) {
   const c = koi.chain
-  const link = L / N
-  c[0] = koi.x
-  c[1] = koi.y
-  koi.pressed = hold(c, 0, L, water)
+  const L = koi.length
+  hold(koi.x, koi.y, L * margin(1), water)
+  koi.pressed = at.x !== koi.x || at.y !== koi.y
+  c[0] = at.x
+  c[1] = at.y
+  let back = Math.atan2(c[3] - c[1], c[2] - c[0])
+  let bent = 0
   for (let i = 1; i <= N; i++) {
-    const dx = c[i * 2] - c[i * 2 - 2]
-    const dy = c[i * 2 + 1] - c[i * 2 - 1]
-    const m = Math.hypot(dx, dy) || 1
-    c[i * 2] = c[i * 2 - 2] + (dx / m) * link
-    c[i * 2 + 1] = c[i * 2 - 1] + (dy / m) * link
-    hold(c, i, L, water)
+    const bend = place(c, i, L, back, bent, water)
+    back += bend
+    if (i > 1) bent += bend
   }
+  koi.pressed = nudge(c, L, water) || koi.pressed
   koi.x = c[0]
   koi.y = c[1]
 }
 
-function hold(c: Float64Array, i: number, L: number, water: Water) {
-  const s = i / N
-  const m = L * (0.03 + (s < TAIL ? halfWidth(s) : fanWidth((s - TAIL) / (1 - TAIL))))
-  held.x = clamp(c[i * 2], m, water.width - m)
-  held.y = clamp(c[i * 2 + 1], m, water.height - m)
-  if (water.fence) clear(water.fence, held, m)
-  const moved = held.x !== c[i * 2] || held.y !== c[i * 2 + 1]
-  c[i * 2] = held.x
-  c[i * 2 + 1] = held.y
-  return moved
+function hold(x: number, y: number, m: number, water: Water) {
+  at.x = clamp(x, m, water.width - m)
+  at.y = clamp(y, m, water.height - m)
+  if (water.fence) clear(water.fence, at, m)
+}
+
+function nudge(c: Float64Array, L: number, water: Water) {
+  let left = 0
+  let right = 0
+  let up = 0
+  let down = 0
+  for (let i = 1; i <= N; i++) {
+    hold(c[i * 2], c[i * 2 + 1], L * margin(i / N), water)
+    left = Math.min(left, at.x - c[i * 2])
+    right = Math.max(right, at.x - c[i * 2])
+    up = Math.min(up, at.y - c[i * 2 + 1])
+    down = Math.max(down, at.y - c[i * 2 + 1])
+  }
+  const dx = clamp(left + right, -L * 0.01, L * 0.01)
+  const dy = clamp(up + down, -L * 0.01, L * 0.01)
+  if (!dx && !dy) return false
+  for (let i = 0; i <= N; i++) {
+    c[i * 2] += dx
+    c[i * 2 + 1] += dy
+  }
+  return true
+}
+
+function margin(s: number) {
+  return 0.03 + (s < TAIL ? halfWidth(s) : fanWidth((s - TAIL) / (1 - TAIL)))
+}
+
+function place(c: Float64Array, i: number, L: number, back: number, bent: number, water: Water) {
+  const m = L * margin(i / N)
+  const link = L / N
+  const lo = Math.max(-LIMIT, -CURL - bent)
+  const hi = Math.min(LIMIT, CURL - bent)
+  const px = c[i * 2 - 2]
+  const py = c[i * 2 - 1]
+  const start = clamp(wrap(Math.atan2(c[i * 2 + 1] - py, c[i * 2] - px) - back), lo, hi)
+  let best = start
+  let least = Infinity
+  for (let k = 0; k <= 24 && least; k++) {
+    const d = start + ((k + 1) >> 1) * STEP * (k & 1 ? 1 : -1)
+    if (d < lo || d > hi) continue
+    const over = crowd(px + Math.cos(back + d) * link, py + Math.sin(back + d) * link, m, m + L * WIDTH, water)
+    if (over < least) {
+      least = over
+      best = d
+    }
+  }
+  c[i * 2] = px + Math.cos(back + best) * link
+  c[i * 2 + 1] = py + Math.sin(back + best) * link
+  return best
+}
+
+function crowd(x: number, y: number, m: number, apart: number, water: Water) {
+  let over = Math.max(0, m - x, x - water.width + m) + Math.max(0, m - y, y - water.height + m)
+  if (water.fence) over += Math.max(0, m - distance(water.fence, x, y))
+  over *= 4
+  const r = water.rival
+  if (!r) return over
+  let near = Infinity
+  for (let j = 0; j < r.length; j += 4) near = Math.min(near, Math.hypot(x - r[j], y - r[j + 1]))
+  return over + Math.max(0, apart - near)
 }
 
 function halfWidth(s: number) {

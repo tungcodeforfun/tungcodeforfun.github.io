@@ -35,6 +35,12 @@ export function clear(box: Rect, p: Point, margin: number) {
   } else p.y = box.y - margin
 }
 
+export function distance(box: Rect, x: number, y: number) {
+  const dx = Math.max(box.x - x, x - box.x - box.w)
+  const dy = Math.max(box.y - y, y - box.y - box.h)
+  return dx > 0 || dy > 0 ? Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) : Math.max(dx, dy)
+}
+
 export function random(seed: number) {
   let a = seed >>> 0
   return () => {
