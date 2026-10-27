@@ -12,7 +12,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <div className="topbar">
+      <header className="topbar">
         <nav aria-label="Sections">
           <ul>
             {navigation.map((item) => (
@@ -30,7 +30,7 @@ export default function App() {
             Dark
           </button>
         </div>
-      </div>
+      </header>
       <main id="main" className="page" tabIndex={-1}>
         <Hero />
         <Work />

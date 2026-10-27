@@ -21,39 +21,55 @@
 :root[data-motion='paused'] :is(.motion, .spin),
 :root[data-hidden] :is(.motion, .spin),
 .is-offscreen :is(.motion, .spin),
-.is-paused :is(.motion, .spin) {
+.fig:has(.fig__toggle:checked) :is(.motion, .spin) {
   animation-play-state: paused;
 }
 
 .fig {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 8px 14px;
   margin-top: 36px;
 }
 
 .fig__svg {
+  grid-column: 1 / -1;
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
 }
 
-.fig__bar {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 8px;
+.fig figcaption {
   font-size: 16px;
   line-height: 1.45;
   color: var(--muted);
 }
 
 .fig__pause {
-  flex: none;
+  position: relative;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background: var(--region);
   display: grid;
   place-items: center;
+}
+
+.fig__pause:has(:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.fig__toggle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .fig__pause::before {
@@ -63,7 +79,7 @@
   border-inline: 4px solid var(--strong);
 }
 
-.fig__pause[aria-pressed='true']::before {
+.fig__pause:has(:checked)::before {
   width: 0;
   height: 0;
   margin-left: 4px;

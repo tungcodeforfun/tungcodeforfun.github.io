@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import App from './App'
-import { education, experience, profile } from './content'
+import { profile } from './content'
 
 function personJsonLd() {
   return JSON.stringify({
@@ -9,11 +9,7 @@ function personJsonLd() {
     name: profile.name,
     jobTitle: profile.role,
     url: profile.site,
-    email: `mailto:${profile.email}`,
     sameAs: [profile.github, profile.linkedin],
-    address: { '@type': 'PostalAddress', addressLocality: 'New York', addressRegion: 'NY', addressCountry: 'US' },
-    worksFor: { '@type': 'Organization', name: experience.company },
-    alumniOf: { '@type': 'CollegeOrUniversity', name: education.school },
   }).replace(/</g, '\\u003c')
 }
 

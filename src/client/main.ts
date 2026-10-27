@@ -37,7 +37,6 @@ function setupMotion(button: HTMLButtonElement) {
   const sync = () => {
     const paused = root.dataset.motion === 'paused'
     button.textContent = paused ? 'Play motion' : 'Pause motion'
-    button.setAttribute('aria-pressed', String(paused))
   }
   button.addEventListener('click', () => {
     const paused = root.dataset.motion !== 'paused'
@@ -50,7 +49,7 @@ function setupMotion(button: HTMLButtonElement) {
   button.hidden = false
 }
 
-function pauseOffscreen() {
+function pauseWhenHidden() {
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) entry.target.classList.toggle('is-offscreen', !entry.isIntersecting)
   })
@@ -60,21 +59,8 @@ function pauseOffscreen() {
   syncVisibility()
 }
 
-function setupFigurePauses() {
-  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-pause]')) {
-    const figure = button.closest('figure')
-    if (!figure) continue
-    button.addEventListener('click', () => {
-      const paused = figure.classList.toggle('is-paused')
-      button.setAttribute('aria-pressed', String(paused))
-    })
-    button.hidden = false
-  }
-}
-
 const themeButton = document.querySelector<HTMLButtonElement>('[data-toggle="theme"]')
 const motionButton = document.querySelector<HTMLButtonElement>('[data-toggle="motion"]')
 if (themeButton) setupTheme(themeButton)
 if (motionButton) setupMotion(motionButton)
-pauseOffscreen()
-setupFigurePauses()
+pauseWhenHidden()

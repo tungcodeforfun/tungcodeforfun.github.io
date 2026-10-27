@@ -79,7 +79,7 @@ async function checkLinks() {
       continue
     }
     if (href.startsWith('#')) {
-      const found = href === '#top' || (await page.locator(href).count()) > 0
+      const found = (await page.locator(href).count()) > 0
       console.log(`link ${found ? 'anchor ok' : 'ANCHOR MISSING'} ${href}`)
       if (!found) failed = true
       continue

@@ -1,5 +1,5 @@
-import { css, toggle, travel, type Track } from './motion'
-import { Figure, type FigureProps } from './Figure'
+import { toggle, travel, type Track } from './motion'
+import { Figure, Token, type FigureProps } from './Figure'
 
 const CYCLE = 12
 const SOURCES = [0, 1, 2, 3, 4]
@@ -23,14 +23,19 @@ const tracks: Track[] = [
 
 export function MatchFigure({ meta }: FigureProps) {
   return (
-    <Figure meta={meta} width={680} height={310} cycle={CYCLE} keyframes={css(CYCLE, tracks)}>
+    <Figure meta={meta} width={680} height={310} cycle={CYCLE} tracks={tracks}>
       {SOURCES.map((i) =>
         RECORDS.map((j) => <circle key={`${i}-${j}`} className="c-ink" cx={24 + i * 16} cy={66 + j * 16} r="4.5" />),
       )}
       <path className="ln" d="M104 90 H174 M226 90 H304 M356 90 H434 M486 90 H560 M200 116 V200 M330 116 V200 M460 116 V200" />
-      <circle className="c-blue" cx={STAGES[0]} cy="90" r="26" />
-      <circle className="c-green" cx={STAGES[1]} cy="90" r="26" />
-      <circle className="c-purple" cx={STAGES[2]} cy="90" r="26" />
+      {STAGES.map((x, i) => (
+        <g key={x}>
+          <circle className="c-green" cx={x} cy="90" r="26" />
+          {Array.from({ length: i + 1 }, (_, p) => (
+            <circle key={p} className="glyph-fill" cx={x + (p - i / 2) * 11} cy="90" r="3.5" />
+          ))}
+        </g>
+      ))}
       <rect className="soft-red" x="560" y="68" width="100" height="44" rx="22" />
       <rect className="c-ink" x="150" y="200" width="360" height="100" rx="16" />
       {ROWS.map((r) =>
@@ -42,9 +47,9 @@ export function MatchFigure({ meta }: FigureProps) {
         <rect key={c} className={`card card--new motion p-n${i}`} x={166 + c * 26} y="212" width="16" height="22" rx="3" />
       ))}
       {STAGES.map((x, i) => (
-        <circle key={x} className={`tok c-ink motion p-r${i}`} r="7" style={{ offsetPath: `path('M104 90 H${x} V222')` }} />
+        <Token key={x} path={`M104 90 H${x} V222`} track={`p-r${i}`} color="c-ink" />
       ))}
-      <circle className="tok c-ink motion p-r3" r="7" style={{ offsetPath: "path('M104 90 H600')" }} />
+      <Token path="M104 90 H600" track="p-r3" color="c-ink" />
     </Figure>
   )
 }

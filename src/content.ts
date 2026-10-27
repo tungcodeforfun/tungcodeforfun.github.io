@@ -3,7 +3,7 @@ export const profile = {
   role: 'Senior Software Engineer',
   location: 'New York',
   intro:
-    'I have spent four years building backend Java/Spring Boot services, event-driven systems and AWS infrastructure.',
+    'I have spent four years building backend Java/Spring Boot services, event-driven systems and AWS infrastructure, and I also write Python, Go and TypeScript.',
   email: 'tungnguyen1651@gmail.com',
   github: 'https://github.com/tungcodeforfun',
   linkedin: 'https://www.linkedin.com/in/tungngvyen',
@@ -32,7 +32,6 @@ export type CaseStudy = {
 }
 
 export const ey = {
-  company: 'Ernst & Young (EY)',
   intro:
     'At EY (Technology Consulting) I work for a national quick-service restaurant chain on its POS and menu configuration platform, which spans 3,500+ locations. I own the menu configuration and POS control services from API design through production, and as release owner of the core Java/Spring Boot service I have shipped 18+ releases and same-day hotfixes.',
 }
@@ -58,14 +57,14 @@ export const caseStudies: CaseStudy[] = [
     title: 'Narrowing venue menus',
     body: [
       'Venue menus listed 1,300+ items. I led the event-driven integration with an upstream {source|menu-eligibility platform}: its data comes in over {queue|SNS and SQS} and is served by {worker|venue-aware APIs}.',
-      'A cross-account backfill of 1,000+ locations ran idempotently, behind {flag|per-store flags}. Venue {item|menus} went from 1,300+ items to about 130.',
+      'A cross-account backfill of 1,000+ locations ran idempotently, behind {flag|per-store flags}. Venue {ink|menus} went from 1,300+ items to about 130.',
     ],
     figure: {
       id: 'menu',
       title: 'A venue menu narrowing as eligibility data arrives',
       description:
-        'Eligibility events from the upstream platform pass through SNS and SQS to the venue-aware APIs, and a menu of 1,300 items thins out to 130. Below, a backfill switches on per-store flags one store at a time.',
-      caption: 'Each dot is a menu item: 1,300 at the start, 130 at the end.',
+        'Eligibility events from the upstream platform pass through SNS and SQS to the venue-aware APIs, and a menu of 1,300+ items thins out to about 130. Below, a backfill raises per-store flags.',
+      caption: 'Each dot is a menu item, drawn at the rounded counts: 1,300 before and 130 after.',
     },
   },
   {
@@ -78,7 +77,7 @@ export const caseStudies: CaseStudy[] = [
       id: 'cache',
       title: 'Cache hits and a cache miss',
       description:
-        'Requests reach the POS API, which asks the cache in another VPC. Hits come straight back. A miss reads the database, then fills the cache while holding a lock, and returns.',
+        'Requests reach the POS API, which asks the cache in another VPC. Hits come straight back. A miss reads the database, fills the cache and returns. The amber ring marks the distributed lock.',
       caption: 'The two shaded areas are the two VPCs.',
     },
   },
@@ -109,7 +108,7 @@ export const pullfolio = {
     id: 'pullfolio-pipeline',
     title: 'One catalog from five price sources',
     body: [
-      'Every day a pipeline merges 5 price sources into one {catalog|catalog} of 77,000+ cards and 144,000+ priced variants across 4 card games. Each record is matched by {change|marketplace ID}, then by {worker|set and number}, then by a {source|confidence-scored name}; an ambiguous match goes to a {fail|review queue} instead of creating a duplicate.',
+      'Every day a pipeline merges 5 price sources into one {ink|catalog} of 77,000+ cards and 144,000+ priced variants across 4 card games. Each record is matched by {worker|marketplace ID}, then by {worker|set and number}, then by a {worker|confidence-scored name}; an ambiguous match goes to a {fail|review queue} instead of creating a duplicate.',
       'The headline price on each card is built to resist outliers across ~700K price points: source priority, freshness windows, sales preferred over asking prices, and spike checks.',
     ],
     figure: {
@@ -132,10 +131,9 @@ export const projects = [
   },
 ]
 
-export type Role = { title: string; period: string; bullets: string[] }
+type Role = { title: string; period: string; bullets: string[] }
 
 export const experience = {
-  company: ey.company,
   heading: 'Ernst & Young (EY), Technology Consulting, New York',
   period: '08/2022 – present',
   client: 'For a national quick-service restaurant chain.',
@@ -181,7 +179,6 @@ export const skills = [
 ]
 
 export const education = {
-  school: 'Virginia Tech',
   text: 'Virginia Tech, B.S. Computer Science, 06/2022. Dean’s List (2020, 2021, 2022) and the Beyond Boundaries Scholarship. Certified in Microsoft Azure Fundamentals (AZ-900).',
 }
 
@@ -203,7 +200,7 @@ export const contract = {
   ],
   process:
     'Every project starts with a written scope before any code. You own the repo from day one, every delivery comes with tests and a README, and you get a short async update each working day.',
-  bookingUrl: 'mailto:tungnguyen1651@gmail.com?subject=Project%20inquiry',
+  bookingUrl: `mailto:${profile.email}?subject=Project%20inquiry`,
   bookingLabel: 'Email me about a project',
 }
 

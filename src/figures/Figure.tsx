@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { CaseStudy } from '../content'
+import { keyframes, type Track } from './motion'
 
 export type FigureProps = { meta: CaseStudy['figure'] }
 
@@ -8,9 +9,9 @@ export function Figure({
   width,
   height,
   cycle,
-  keyframes,
+  tracks,
   children,
-}: FigureProps & { width: number; height: number; cycle: number; keyframes: string; children: ReactNode }) {
+}: FigureProps & { width: number; height: number; cycle: number; tracks: Track[]; children: ReactNode }) {
   const id = `fig-${meta.id}`
   return (
     <figure className="fig motion-scope">
@@ -23,13 +24,17 @@ export function Figure({
       >
         <title id={`${id}-title`}>{meta.title}</title>
         <desc id={`${id}-desc`}>{meta.description}</desc>
-        <style dangerouslySetInnerHTML={{ __html: keyframes }} />
+        <style dangerouslySetInnerHTML={{ __html: keyframes(cycle, tracks) }} />
         {children}
       </svg>
-      <div className="fig__bar">
-        <button type="button" className="fig__pause" data-pause hidden aria-pressed="false" aria-label={`Pause: ${meta.title}`} />
-        <figcaption>{meta.caption}</figcaption>
-      </div>
+      <label className="fig__pause">
+        <input type="checkbox" className="fig__toggle" aria-label={`Pause: ${meta.title}`} />
+      </label>
+      <figcaption>{meta.caption}</figcaption>
     </figure>
   )
+}
+
+export function Token({ path, track, color }: { path: string; track: string; color: string }) {
+  return <circle className={`tok ${color} motion ${track}`} r="7" style={{ offsetPath: `path('${path}')` }} />
 }

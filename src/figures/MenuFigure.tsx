@@ -1,5 +1,5 @@
-import { css, toggle, travel, type Track } from './motion'
-import { Figure, type FigureProps } from './Figure'
+import { toggle, travel, type Track } from './motion'
+import { Figure, Token, type FigureProps } from './Figure'
 
 const CYCLE = 13
 const EVENTS = 'M72 122 H372'
@@ -39,7 +39,7 @@ const tracks: Track[] = [
 
 export function MenuFigure({ meta }: FigureProps) {
   return (
-    <Figure meta={meta} width={680} height={300} cycle={CYCLE} keyframes={css(CYCLE, tracks)}>
+    <Figure meta={meta} width={680} height={300} cycle={CYCLE} tracks={tracks}>
       <path className="ln" d="M72 122 H110 M240 122 H270 M330 122 H372 M46 148 V230 H104 M276 230 H300 V152" />
       <rect className="c-purple" x="20" y="96" width="52" height="52" rx="12" />
       <path className="glyph-fill" d="M34 110h10v10h-10z M50 110h10v10h-10z M34 126h10v10h-10z M50 126h10v10h-10z" />
@@ -55,9 +55,9 @@ export function MenuFigure({ meta }: FigureProps) {
         <path key={i} className={`flag motion m-f${i}`} d={`M${116 + i * 21} 204 l14 5 l-14 5 z`} />
       ))}
       {arrivals.map((_, i) => (
-        <circle key={i} className={`tok c-purple motion m-e${i}`} r="7" style={{ offsetPath: `path('${EVENTS}')` }} />
+        <Token key={i} path={EVENTS} track={`m-e${i}`} color="c-purple" />
       ))}
-      <circle className="tok c-amber motion m-bf" r="7" style={{ offsetPath: `path('${BACKFILL}')` }} />
+      <Token path={BACKFILL} track="m-bf" color="c-amber" />
     </Figure>
   )
 }

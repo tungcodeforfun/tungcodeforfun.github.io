@@ -1,5 +1,5 @@
-import { css, toggle, travel, type Track } from './motion'
-import { Figure, type FigureProps } from './Figure'
+import { toggle, travel, type Track } from './motion'
+import { Figure, Token, type FigureProps } from './Figure'
 
 const CYCLE = 11.5
 const HIT = 'M20 110 H490 H20'
@@ -20,7 +20,7 @@ const tracks: Track[] = [
 
 export function CacheFigure({ meta }: FigureProps) {
   return (
-    <Figure meta={meta} width={680} height={270} cycle={CYCLE} keyframes={css(CYCLE, tracks)}>
+    <Figure meta={meta} width={680} height={270} cycle={CYCLE} tracks={tracks}>
       <rect className="region" x="180" y="40" width="140" height="140" rx="28" />
       <rect className="region" x="440" y="40" width="200" height="140" rx="28" />
       <path className="ln" d="M20 110 H220 M280 110 H490 M250 140 V197" />
@@ -34,9 +34,9 @@ export function CacheFigure({ meta }: FigureProps) {
       <path className="c-slate" d="M218 206 v34 a32 9 0 0 0 64 0 v-34 a32 9 0 0 0 -64 0z" />
       <ellipse className="glyph" cx="250" cy="206" rx="32" ry="9" />
       {hits.map((_, i) => (
-        <circle key={i} className={`tok c-ink motion c-h${i}`} r="7" style={{ offsetPath: `path('${HIT}')` }} />
+        <Token key={i} path={HIT} track={`c-h${i}`} color="c-ink" />
       ))}
-      <circle className="tok c-ink motion c-miss" r="7" style={{ offsetPath: `path('${MISS}')` }} />
+      <Token path={MISS} track="c-miss" color="c-ink" />
     </Figure>
   )
 }

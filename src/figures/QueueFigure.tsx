@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
-import { css, travel, type Track } from './motion'
-import { Figure, type FigureProps } from './Figure'
+import { travel, type Track } from './motion'
+import { Figure, Token, type FigureProps } from './Figure'
 
 const CYCLE = 9
 const MAIN = 'M76 150 H436'
@@ -56,7 +56,7 @@ const tracks: Track[] = [
 
 export function QueueFigure({ meta }: FigureProps) {
   return (
-    <Figure meta={meta} width={680} height={300} cycle={CYCLE} keyframes={css(CYCLE, tracks)}>
+    <Figure meta={meta} width={680} height={300} cycle={CYCLE} tracks={tracks}>
       <path className="ln" d="M360 120 C360 66 210 66 210 128 M204 120 l6 9 l6 -9 M210 172 V232 M76 150 H120 M300 150 H330 M390 150 H430" />
       <rect className="c-blue" x="24" y="124" width="52" height="52" rx="12" />
       <path className="glyph" d="M38 140 h24 M38 150 h24 M38 160 h16" />
@@ -73,9 +73,9 @@ export function QueueFigure({ meta }: FigureProps) {
           ))}
         </g>
       ))}
-      <circle className="tok c-blue motion q-a" r="8" style={{ offsetPath: `path('${MAIN}')` }} />
-      <circle className="tok c-blue motion q-b" r="8" style={{ offsetPath: `path('${RETRY}')` }} />
-      <circle className="tok c-blue motion q-c" r="8" style={{ offsetPath: `path('${DEAD}')` }} />
+      <Token path={MAIN} track="q-a" color="c-blue" />
+      <Token path={RETRY} track="q-b" color="c-blue" />
+      <Token path={DEAD} track="q-c" color="c-blue" />
     </Figure>
   )
 }

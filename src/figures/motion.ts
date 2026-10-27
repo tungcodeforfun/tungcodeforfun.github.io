@@ -1,8 +1,8 @@
-export type Stop = readonly [seconds: number, declarations: string]
+type Stop = readonly [seconds: number, declarations: string]
 
 export type Track = { name: string; stops: Stop[] }
 
-export function css(cycle: number, tracks: Track[]): string {
+export function keyframes(cycle: number, tracks: Track[]): string {
   const at = (s: number) => `${+((Math.min(Math.max(s, 0), cycle) / cycle) * 100).toFixed(3)}%`
   return tracks
     .map(({ name, stops }) => {

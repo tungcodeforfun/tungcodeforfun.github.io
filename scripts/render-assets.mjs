@@ -21,7 +21,7 @@ function ico(png) {
 
 const browser = await chromium.launch({ executablePath })
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } })
-await page.goto(`file://${root}design/og.html`)
+await page.goto(`file://${root}scripts/og.html`)
 await page.evaluate(() => document.fonts.ready)
 await writeFile(`${root}public/og.png`, await page.screenshot())
 
