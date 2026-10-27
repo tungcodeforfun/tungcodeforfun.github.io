@@ -1,342 +1,141 @@
-import { mkdir, rename, writeFile } from 'node:fs/promises'
+import { mkdir, rename } from 'node:fs/promises'
 import { parseArgs } from 'node:util'
 import { chromium } from 'playwright-core'
 
 const { values } = parseArgs({
   options: {
-    url: { type: 'string', default: 'http://localhost:4181/' },
-    out: { type: 'string' },
-    only: { type: 'string', default: 'shots,sims,video,frames,fallback' },
+    url: { type: 'string', default: 'http://localhost:4185/' },
+    out: { type: 'string', default: 'tour' },
+    only: { type: 'string', default: 'shots,tap,nojs,video,frames' },
+    wait: { type: 'string', default: '8000' },
   },
 })
 const executablePath = process.env.CHROME_PATH
 if (!executablePath) throw new Error('Set CHROME_PATH to a Chrome or Chromium binary')
-if (!values.out) throw new Error('Pass --out <dir>')
-await mkdir(values.out, { recursive: true })
-const only = new Set(values.only.split(','))
-const viewports = { 1440: { width: 1440, height: 900 }, 390: { width: 390, height: 844 } }
-const browser = await chromium.launch({ executablePath, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
-const live = new URL(values.url)
-live.searchParams.set('software-gl', '')
-const problems = []
+const parts = new Set(values.only.split(','))
+const out = values.out.replace(/\/$/, '')
+await mkdir(out, { recursive: true })
+const browser = await chromium.launch({ executablePath })
+const sizes = [
+  ['1440', { width: 1440, height: 900 }, 1],
+  ['390', { width: 390, height: 844 }, 3],
+]
 
-async function open(width, scheme, reducedMotion, extra = {}) {
-  const context = await browser.newContext({
-    viewport: viewports[width],
-    colorScheme: scheme,
-    reducedMotion,
-    isMobile: width === 390,
-    hasTouch: width === 390,
-    ...extra,
-  })
-  const page = await context.newPage()
-  page.on('console', (m) => ['error', 'warning'].includes(m.type()) && problems.push(`${width}/${scheme}: ${m.type()} ${m.text()}`))
-  page.on('pageerror', (e) => problems.push(`${width}/${scheme}: pageerror ${e.message}`))
-  await page.goto(live.href, { waitUntil: 'networkidle' })
-  return { context, page }
-}
-
-async function settle(page, ms) {
-  await page.waitForTimeout(ms)
-}
-
-async function fullPage(page, path) {
-  const { height, total } = await page.evaluate(() => ({ height: innerHeight, total: document.documentElement.scrollHeight }))
-  const tiles = []
-  for (let y = 0; y < total; y += height) {
-    const top = Math.min(y, total - height)
-    await page.evaluate((t) => window.scrollTo(0, t), top)
-    await settle(page, 700)
-    tiles.push({ y, offset: y - top, data: (await page.screenshot()).toString('base64') })
-    if (y === 0) await page.addStyleTag({ content: '.topbar{visibility:hidden!important}' })
-  }
-  const composer = await page.context().newPage()
-  const png = await composer.evaluate(
-    async ({ tiles, total, height }) => {
-      const images = await Promise.all(
-        tiles.map(async (t) => ({ ...t, bitmap: await createImageBitmap(await (await fetch(`data:image/png;base64,${t.data}`)).blob()) })),
-      )
-      const scale = images[0].bitmap.height / height
-      const canvas = new OffscreenCanvas(images[0].bitmap.width, Math.round(total * scale))
-      const g = canvas.getContext('2d')
-      for (const t of images) g.drawImage(t.bitmap, 0, t.offset * scale, t.bitmap.width, (height - t.offset) * scale, 0, t.y * scale, t.bitmap.width, (height - t.offset) * scale)
-      const blob = await canvas.convertToBlob({ type: 'image/png' })
-      return [...new Uint8Array(await blob.arrayBuffer())]
-    },
-    { tiles, total, height },
-  )
-  await composer.close()
-  await writeFile(path, Buffer.from(png))
+async function context(viewport, scale, options = {}) {
+  return browser.newContext({ viewport, deviceScaleFactor: scale, isMobile: scale > 1, hasTouch: scale > 1, ...options })
 }
 
 async function shots() {
-  for (const width of [1440, 390]) {
-    for (const scheme of ['dark', 'light']) {
-      for (const rm of ['no-preference', 'reduce']) {
-        const { context, page } = await open(width, scheme, rm)
-        const name = `${values.out}/site-${width}-${scheme}-${rm === 'reduce' ? 'rm' : 'motion'}`
-        await settle(page, 6000)
-        await page.screenshot({ path: `${name}-first.png` })
-        await page.addStyleTag({ content: '*{animation-timeline:auto!important;animation:none!important}.case__sim{position:static!important}' })
-        await fullPage(page, `${name}-full.png`)
-        console.log(`shot ${name}-{first,full}.png`)
-        await context.close()
+  for (const [label, viewport, scale] of sizes) {
+    for (const scheme of ['light', 'dark']) {
+      for (const reducedMotion of ['no-preference', 'reduce']) {
+        const ctx = await context(viewport, scale, { colorScheme: scheme, reducedMotion })
+        const page = await ctx.newPage()
+        await page.goto(values.url)
+        await page.waitForSelector('html.live')
+        await page.waitForTimeout(Number(values.wait))
+        const name = `koi-${label}-${scheme}-${reducedMotion === 'reduce' ? 'reduced' : 'motion'}.png`
+        await page.screenshot({ path: `${out}/${name}` })
+        console.log(`shot ${name}`)
+        await ctx.close()
       }
     }
   }
 }
 
-async function scrollToSim(page, id) {
-  const figure = page.locator(`.sim[data-sim="${id}"]`)
-  await figure.scrollIntoViewIfNeeded()
-  await page.evaluate((sel) => {
-    const el = document.querySelector(sel)
-    window.scrollBy(0, el.getBoundingClientRect().top - 90)
-  }, `.sim[data-sim="${id}"]`)
-  await page.waitForSelector(`.sim[data-sim="${id}"][data-live]`, { state: 'attached' })
-  return figure
+async function tap() {
+  for (const [label, viewport, scale] of sizes) {
+    const ctx = await context(viewport, scale, { colorScheme: 'dark' })
+    const page = await ctx.newPage()
+    await page.goto(values.url)
+    await page.waitForSelector('html.live')
+    await page.waitForTimeout(3000)
+    const x = viewport.width * 0.62
+    const y = viewport.height * 0.3
+    if (scale > 1) await page.touchscreen.tap(x, y)
+    else await page.mouse.click(x, y)
+    await page.waitForTimeout(700)
+    await page.screenshot({ path: `${out}/koi-${label}-dark-tap-ripple.png` })
+    await page.waitForTimeout(2800)
+    await page.screenshot({ path: `${out}/koi-${label}-dark-tap-turn.png` })
+    console.log(`tap ${label} at ${Math.round(x)},${Math.round(y)}`)
+    await ctx.close()
+  }
 }
 
-async function hover(page, figure, fx, fy) {
-  const box = await figure.locator('canvas').boundingBox()
-  await page.mouse.move(box.x + box.width * fx, box.y + box.height * fy, { steps: 6 })
-}
-
-async function readout(figure) {
-  return (await figure.locator('.sim__readout').textContent()).trim()
-}
-
-const scripts = {
-  async queue(page, figure, width, scheme) {
-    await figure.getByRole('button', { name: 'Inject a poisoned message' }).click()
-    await settle(page, 2600)
-    await figure.screenshot({ path: `${values.out}/sim-queue-${width}-${scheme}-retrying.png` })
-    await page.waitForFunction(
-      () => document.querySelector('.sim[data-sim="queue"] .sim__readout').textContent.includes('moved to the dead-letter queue'),
-      null,
-      { timeout: 40000 },
-    )
-    await settle(page, 600)
-    if (width === 1440) await hover(page, figure, 0.32, 0.78)
-    await figure.screenshot({ path: `${values.out}/sim-queue-${width}-${scheme}-dead-lettered.png` })
-    console.log(`queue ${width}/${scheme}: ${await readout(figure)}`)
-    await figure.getByRole('radio', { name: 'Synchronous HTTP' }).check()
-    await settle(page, 400)
-    await figure.getByRole('button', { name: 'Send a batch' }).click()
-    await settle(page, 6500)
-    await figure.screenshot({ path: `${values.out}/sim-queue-${width}-${scheme}-sync-timeouts.png` })
-    console.log(`queue sync ${width}/${scheme}: ${await readout(figure)}`)
-    await figure.getByRole('radio', { name: 'SQS batches' }).check()
-  },
-  async menu(page, figure, width, scheme) {
-    const slider = figure.locator('input[type="range"]')
-    const box = await slider.boundingBox()
-    await page.mouse.move(box.x + 12, box.y + box.height / 2)
-    await page.mouse.down()
-    await page.mouse.move(box.x + box.width * 0.55, box.y + box.height / 2, { steps: 12 })
-    await settle(page, 1200)
-    await figure.screenshot({ path: `${values.out}/sim-menu-${width}-${scheme}-dragging.png` })
-    await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2, { steps: 12 })
-    await page.mouse.up()
-    await settle(page, 3500)
-    await figure.getByRole('radio', { name: 'Venue B' }).check()
-    await settle(page, 2000)
-    if (width === 1440) await hover(page, figure, 0.5, 0.5)
-    await figure.screenshot({ path: `${values.out}/sim-menu-${width}-${scheme}-narrowed.png` })
-    console.log(`menu ${width}/${scheme}: ${await readout(figure)}`)
-    await figure.getByRole('button', { name: 'Run the backfill' }).click()
-    await settle(page, 4000)
-    await figure.getByRole('button', { name: 'Run the backfill' }).click()
-    await settle(page, 4000)
-    console.log(`menu backfill ${width}/${scheme}: ${await readout(figure)}`)
-  },
-  async cache(page, figure, width, scheme) {
-    await settle(page, 1500)
-    await figure.screenshot({ path: `${values.out}/sim-cache-${width}-${scheme}-on.png` })
-    await figure.getByRole('button', { name: 'Redis cache' }).click()
-    await settle(page, 9000)
-    if (width === 1440) await hover(page, figure, 0.7, 0.82)
-    await figure.screenshot({ path: `${values.out}/sim-cache-${width}-${scheme}-off.png` })
-    console.log(`cache off ${width}/${scheme}: ${await readout(figure)}`)
-    await figure.getByRole('button', { name: 'Redis cache' }).click()
-    await settle(page, 9000)
-    console.log(`cache on ${width}/${scheme}: ${await readout(figure)}`)
-  },
-  async match(page, figure, width, scheme) {
-    await figure.getByRole('button', { name: 'Feed an ambiguous record' }).click()
-    await figure.getByRole('button', { name: 'Feed 12 records' }).click()
-    await settle(page, 4000)
-    await figure.screenshot({ path: `${values.out}/sim-match-${width}-${scheme}-matching.png` })
-    await settle(page, 9000)
-    await figure.screenshot({ path: `${values.out}/sim-match-${width}-${scheme}-review.png` })
-    console.log(`match ${width}/${scheme}: ${await readout(figure)}`)
-  },
-}
-
-async function sims() {
-  for (const width of [1440, 390]) {
-    for (const scheme of ['dark', 'light']) {
-      const { context, page } = await open(width, scheme, 'no-preference')
-      for (const id of Object.keys(scripts)) {
-        const figure = await scrollToSim(page, id)
-        await settle(page, 800)
-        await scripts[id](page, figure, width, scheme)
-      }
-      await context.close()
+async function nojs() {
+  for (const [label, viewport, scale] of sizes) {
+    for (const scheme of ['light', 'dark']) {
+      const ctx = await context(viewport, scale, { colorScheme: scheme, javaScriptEnabled: false })
+      const page = await ctx.newPage()
+      await page.goto(values.url, { waitUntil: 'networkidle' })
+      await page.screenshot({ path: `${out}/koi-${label}-${scheme}-nojs.png` })
+      console.log(`no-js ${label} ${scheme}`)
+      await ctx.close()
     }
   }
-  const { context, page } = await open(1440, 'dark', 'no-preference')
-  const figure = await scrollToSim(page, 'queue')
-  await figure.locator('[data-action="poison"]').focus()
-  await page.keyboard.press('Enter')
-  await page.keyboard.press('Shift+Tab')
-  await page.keyboard.press('Shift+Tab')
-  await page.keyboard.press('ArrowRight')
-  await settle(page, 600)
-  await figure.screenshot({ path: `${values.out}/sim-queue-1440-dark-keyboard-focus.png` })
-  console.log(`keyboard queue: ${await readout(figure)}`)
-  await context.close()
 }
 
 async function video() {
-  for (const [name, setup] of [
-    ['hero', async (page) => {
-      await settle(page, 7000)
-      for (let y = 0; y <= 900; y += 30) {
-        await page.mouse.wheel(0, 30)
-        await settle(page, 60)
-      }
-      await settle(page, 2500)
-      for (let y = 900; y >= 0; y -= 60) {
-        await page.mouse.wheel(0, -60)
-        await settle(page, 40)
-      }
-      await settle(page, 2000)
-    }],
-    ['sim-queue', async (page) => {
-      const figure = await scrollToSim(page, 'queue')
-      await settle(page, 1500)
-      await figure.getByRole('button', { name: 'Inject a poisoned message' }).click()
-      await settle(page, 11000)
-      await figure.getByRole('radio', { name: 'Synchronous HTTP' }).check()
-      await figure.getByRole('button', { name: 'Send a batch' }).click()
-      await settle(page, 7000)
-    }],
-    ['sim-cache', async (page) => {
-      const figure = await scrollToSim(page, 'cache')
-      await settle(page, 2000)
-      await figure.getByRole('button', { name: 'Redis cache' }).click()
-      await settle(page, 9000)
-      await figure.getByRole('button', { name: 'Redis cache' }).click()
-      await settle(page, 9000)
-    }],
-  ]) {
-    const { context, page } = await open(1440, 'dark', 'no-preference', {
-      recordVideo: { dir: values.out, size: { width: 1440, height: 900 } },
-    })
-    await setup(page)
-    const path = await page.video().path()
-    await context.close()
-    await rename(path, `${values.out}/${name}.webm`)
-    console.log(`video ${values.out}/${name}.webm`)
-  }
+  const ctx = await context({ width: 1440, height: 900 }, 1, { colorScheme: 'dark', recordVideo: { dir: out, size: { width: 1440, height: 900 } } })
+  const page = await ctx.newPage()
+  await page.goto(values.url)
+  await page.waitForSelector('html.live')
+  await page.waitForTimeout(6000)
+  await page.mouse.click(900, 300)
+  await page.waitForTimeout(9000)
+  const file = await page.video().path()
+  await ctx.close()
+  await rename(file, `${out}/koi.webm`)
+  console.log(`video ${out}/koi.webm`)
+}
+
+function quantile(list, q) {
+  const sorted = [...list].sort((a, b) => a - b)
+  return sorted[Math.floor(q * (sorted.length - 1))]
 }
 
 async function frames() {
-  const context = await browser.newContext({ viewport: viewports[1440], colorScheme: 'dark' })
-  await context.addInitScript(() => {
-    window.__cost = []
-    const raf = window.requestAnimationFrame.bind(window)
-    window.requestAnimationFrame = (fn) =>
-      raf((t) => {
-        const start = performance.now()
-        fn(t)
-        window.__cost.push(performance.now() - start)
-      })
-  })
-  const page = await context.newPage()
-  await page.goto(live.href, { waitUntil: 'networkidle' })
-  await page.waitForSelector('.hero[data-live]', { state: 'attached', timeout: 30000 })
-  await settle(page, 2000)
-  await page.evaluate(() => (window.__cost.length = 0))
-  const stats = await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        const deltas = []
-        let last = performance.now()
-        const tick = (now) => {
-          deltas.push(now - last)
-          last = now
-          if (deltas.length < 400) requestAnimationFrame(tick)
-          else {
-            const s = deltas.slice(10).sort((a, b) => a - b)
-            const at = (q) => s[Math.min(s.length - 1, Math.floor(q * s.length))]
-            resolve({ frames: s.length, p50: at(0.5), p95: at(0.95), fps: 1000 / at(0.5) })
-          }
-        }
-        requestAnimationFrame(tick)
-      }),
-  )
-  console.log(`frames hero 1440 dark: ${JSON.stringify(stats)}`)
-  const cost = await page.evaluate(() => {
-    const s = window.__cost.filter((v) => v > 0.05).sort((a, b) => a - b)
-    const at = (q) => s[Math.min(s.length - 1, Math.floor(q * s.length))]
-    return { callbacks: s.length, p50: at(0.5), p95: at(0.95) }
-  })
-  console.log(`hero main-thread work per frame (rAF callbacks, ms): ${JSON.stringify(cost)}`)
-  const offscreen = await page.evaluate(async () => {
-    window.scrollTo(0, document.querySelector('#experience').offsetTop)
-    await new Promise((r) => setTimeout(r, 600))
-    const canvas = document.querySelector('.hero canvas')
-    const gl = canvas.getContext('webgl2')
-    let draws = 0
-    const original = gl.drawArrays.bind(gl)
-    gl.drawArrays = (...args) => {
-      draws++
-      return original(...args)
-    }
-    await new Promise((r) => setTimeout(r, 1500))
-    return draws
-  })
-  console.log(`hero draw calls in 1.5 s while scrolled away: ${offscreen}`)
-  await context.close()
-}
-
-async function fallback() {
-  for (const [name, noWebgl] of [
-    ['software-renderer', false],
-    ['no-webgl', true],
-  ]) {
-    const context = await browser.newContext({ viewport: viewports[1440], colorScheme: 'dark' })
-    if (noWebgl)
-      await context.addInitScript(() => {
-        HTMLCanvasElement.prototype.getContext = new Proxy(HTMLCanvasElement.prototype.getContext, {
-          apply(target, self, args) {
-            return String(args[0]).startsWith('webgl') ? null : Reflect.apply(target, self, args)
-          },
+  for (const [label, viewport, scale] of sizes) {
+    const ctx = await context(viewport, scale, { colorScheme: 'dark' })
+    await ctx.addInitScript(() => {
+      const raf = window.requestAnimationFrame.bind(window)
+      window.__probe = { stamps: [], work: [] }
+      window.requestAnimationFrame = (callback) =>
+        raf((time) => {
+          const start = performance.now()
+          callback(time)
+          window.__probe.work.push(performance.now() - start)
+          window.__probe.stamps.push(time)
         })
-      })
-    const page = await context.newPage()
-    page.on('pageerror', (e) => problems.push(`fallback ${name}: pageerror ${e.message}`))
-    await page.goto(values.url, { waitUntil: 'networkidle' })
-    await settle(page, 4000)
-    const state = await page.evaluate(() => ({
-      canvases: document.querySelectorAll('.hero canvas').length,
-      cached: localStorage.getItem('webgl'),
-      still: getComputedStyle(document.querySelector('.hero__still')).backgroundImage,
-    }))
-    await page.screenshot({ path: `${values.out}/site-1440-dark-fallback-${name}.png` })
-    console.log(`fallback ${name}: ${JSON.stringify(state)}`)
-    if (state.canvases || state.cached !== 'fail') problems.push(`fallback ${name}: hero did not fall back`)
-    await context.close()
+    })
+    const page = await ctx.newPage()
+    await page.goto(values.url)
+    await page.waitForSelector('html.live')
+    await page.waitForTimeout(2000)
+    await page.evaluate(() => (window.__probe = { stamps: [], work: [] }))
+    await page.waitForTimeout(10000)
+    const { stamps, work } = await page.evaluate(() => window.__probe)
+    const gaps = stamps.slice(1).map((t, i) => t - stamps[i])
+    const fmt = (n) => n.toFixed(1)
+    console.log(
+      `frames ${label}: ${stamps.length} in 10 s, interval p50 ${fmt(quantile(gaps, 0.5))} ms p95 ${fmt(quantile(gaps, 0.95))} ms, callback work p50 ${quantile(work, 0.5).toFixed(2)} ms p95 ${quantile(work, 0.95).toFixed(2)} ms`,
+    )
+    const hidden = await page.evaluate(async () => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true })
+      document.dispatchEvent(new Event('visibilitychange'))
+      const before = window.__probe.stamps.length
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      return window.__probe.stamps.length - before
+    })
+    console.log(`frames ${label}: ${hidden} rAF callbacks in 1.5 s while the tab reports hidden`)
+    await ctx.close()
   }
 }
 
-if (only.has('shots')) await shots()
-if (only.has('sims')) await sims()
-if (only.has('video')) await video()
-if (only.has('frames')) await frames()
-if (only.has('fallback')) await fallback()
+if (parts.has('shots')) await shots()
+if (parts.has('tap')) await tap()
+if (parts.has('nojs')) await nojs()
+if (parts.has('video')) await video()
+if (parts.has('frames')) await frames()
 await browser.close()
-console.log(problems.length ? `PROBLEMS\n${problems.join('\n')}` : 'console clean')
-process.exit(problems.length ? 1 : 0)
