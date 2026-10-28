@@ -55,20 +55,22 @@ export function createKoi(look: Look, length: number, orbit: Orbit, angle: numbe
   let best = 0
   let least = Infinity
   for (let k = 0; k < 32 && least; k++) {
-    const over = lay(koi, orbit, angle + (k * TAU) / 16, k < 16 ? 1 : 0.4, water)
+    const over = layStraight(koi, orbit, angle, k, water)
     if (over < least) {
       least = over
       best = k
     }
   }
-  if (least) lay(koi, orbit, angle + (best * TAU) / 16, best < 16 ? 1 : 0.4, water)
+  if (least) layStraight(koi, orbit, angle, best, water)
   follow(koi, water)
   return koi
 }
 
-function lay(koi: Koi, orbit: Orbit, angle: number, reach: number, water: Water) {
+function layStraight(koi: Koi, orbit: Orbit, phase: number, attempt: number, water: Water) {
   const L = koi.length
   const c = koi.chain
+  const angle = phase + (attempt * TAU) / 16
+  const reach = attempt < 16 ? 1 : 0.4
   koi.heading = Math.atan2(orbit.ry * Math.cos(angle), -orbit.rx * Math.sin(angle))
   const dx = (Math.cos(koi.heading) * L) / N
   const dy = (Math.sin(koi.heading) * L) / N
@@ -127,12 +129,13 @@ function follow(koi: Koi, water: Water) {
   c[0] = at.x
   c[1] = at.y
   let back = Math.atan2(c[3] - c[1], c[2] - c[0])
-  koi.bent = 0
+  let bent = 0
   for (let i = 1; i <= N; i++) {
-    const bend = place(c, i, L, back, koi.bent, water)
+    const bend = place(c, i, L, back, bent, water)
     back += bend
-    if (i > 1) koi.bent += bend
+    if (i > 1) bent += bend
   }
+  koi.bent = bent
   koi.pressed = nudge(c, L, water) || koi.pressed
   koi.x = c[0]
   koi.y = c[1]

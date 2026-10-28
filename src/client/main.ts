@@ -95,7 +95,7 @@ async function boot() {
   await document.fonts.load("15px 'Koi Mono'").catch(() => [])
   readInks()
   layout()
-  for (let i = 0; i < 240; i++) pond.step(1 / 60)
+  for (let i = 0; i < 60; i++) pond.step(1 / 60)
   draw()
   root.classList.add('live')
   start()
