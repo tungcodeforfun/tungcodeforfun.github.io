@@ -59,7 +59,7 @@ const RINGS = [
 ]
 
 export function metrics(width: number, height: number, top: number) {
-  const length = Math.round(Math.min(width * 0.68, height * 0.5, Math.sqrt(width * top) * 0.48, 470))
+  const length = Math.round(Math.min(width * 0.68, height * 0.5, Math.sqrt(width * top) * 0.48, Math.max(width * 0.44, top * 0.37), 470))
   const fontSize = clamp(Math.round(length / 32), 8, 15)
   return { length, fontSize, cellW: (fontSize * 1233) / 2048, cellH: Math.round(fontSize * 1.1) }
 }

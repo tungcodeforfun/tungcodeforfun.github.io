@@ -104,7 +104,9 @@ export function swim(koi: Koi, dt: number, heading: number, speed: number, glidi
   const delta = wrap(heading - koi.heading)
   const behind = koi.pressed && Math.abs(delta) > 2.6 && koi.turn * delta < 0
   const aim = clamp((behind ? delta - Math.sign(delta) * TAU : delta) * 1.2, -agility, agility)
-  const want = aim * clamp((CURL + Math.sign(aim) * koi.bent) / (CURL * 0.3), facingWall(koi, water) ? 1 : 0, 1)
+  const room = clamp((CURL + Math.sign(aim) * koi.bent) / (CURL * 0.3), facingWall(koi, water) ? 1 : 0, 1)
+  const blocked = Math.cos(koi.heading) * koi.shy.x + Math.sin(koi.heading) * koi.shy.y < -0.5
+  const want = blocked && room < 1 ? -Math.sign(aim) * agility * (1 - room) : aim * room
   koi.turn += (want - koi.turn) * ease(1.8, dt)
   koi.heading = wrap(koi.heading + koi.turn * dt)
   koi.speed += (speed - koi.speed) * ease(gliding ? 0.25 : 0.8, dt)
