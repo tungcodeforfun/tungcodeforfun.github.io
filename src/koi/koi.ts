@@ -33,6 +33,7 @@ const FAN = 0.12
 const BEND = 0.5
 const LIMIT = 0.21
 const STEP = LIMIT / 6
+const TWIST = 3
 const CURL = 3
 
 const qx = new Float64Array(N + 1)
@@ -40,9 +41,11 @@ const qy = new Float64Array(N + 1)
 const sx = new Float64Array(N)
 const sy = new Float64Array(N)
 const sl = new Float64Array(N)
+const was = new Float64Array(N + 1)
 const hit = { s: 0, d: 0, tx: 1, ty: 0, ex: 0, ey: 0 }
 const at = { x: 0, y: 0 }
 const root = { x: 0, y: 0 }
+const push = { left: 0, right: 0, up: 0, down: 0 }
 const norm = { x: 0, y: 0, g: 1 }
 const span = { c0: 0, c1: 0, r0: 0, r1: 0 }
 const SIDES = [-1, 1]
@@ -62,7 +65,7 @@ export function createKoi(look: Look, length: number, orbit: Orbit, angle: numbe
     }
   }
   if (least) layStraight(koi, orbit, angle, best, water)
-  follow(koi, water)
+  follow(koi, water, 0)
   return koi
 }
 
@@ -120,7 +123,7 @@ export function swim(koi: Koi, dt: number, heading: number, speed: number, glidi
   koi.effort += ((gliding ? 0.15 : 1) - koi.effort) * ease(1.1, dt)
   koi.phase += TAU * (0.2 + (1.6 * koi.speed) / L) * (0.3 + 0.7 * koi.effort) * dt
   koi.scull += TAU * (0.3 + 0.35 * Math.abs(koi.bank) + 0.2 * koi.effort) * dt
-  follow(koi, water)
+  follow(koi, water, TWIST * dt)
 }
 
 function facingWall(koi: Koi, water: Water) {
@@ -131,9 +134,10 @@ function facingWall(koi: Koi, water: Water) {
   return at.x !== x || at.y !== y
 }
 
-function follow(koi: Koi, water: Water) {
+function follow(koi: Koi, water: Water, swing: number) {
   const c = koi.chain
   const L = koi.length
+  for (let i = 1; i <= N; i++) was[i] = Math.atan2(c[i * 2 + 1] - c[i * 2 - 1], c[i * 2] - c[i * 2 - 2])
   hold(koi.x, koi.y, L * margin(1), water)
   koi.pressed = at.x !== koi.x || at.y !== koi.y
   c[0] = at.x
@@ -141,7 +145,10 @@ function follow(koi: Koi, water: Water) {
   let back = Math.atan2(c[3] - c[1], c[2] - c[0])
   let bent = 0
   for (let i = 1; i <= N; i++) {
-    const bend = place(c, i, L, back, bent, water)
+    const lo = Math.max(-LIMIT, -CURL - bent)
+    const hi = Math.min(LIMIT, CURL - bent)
+    const turn = wrap(was[i] - back)
+    const bend = place(c, i, L, back, clamp(turn - swing, lo, hi), clamp(turn + swing, lo, hi), water)
     back += bend
     if (i > 1) bent += bend
   }
@@ -158,44 +165,59 @@ function hold(x: number, y: number, m: number, water: Water) {
 }
 
 function nudge(c: Float64Array, L: number, water: Water) {
-  let left = 0
-  let right = 0
-  let up = 0
-  let down = 0
+  push.left = push.right = push.up = push.down = 0
   for (let i = 1; i <= N; i++) {
     hold(c[i * 2], c[i * 2 + 1], L * margin(i / N), water)
-    left = Math.min(left, at.x - c[i * 2])
-    right = Math.max(right, at.x - c[i * 2])
-    up = Math.min(up, at.y - c[i * 2 + 1])
-    down = Math.max(down, at.y - c[i * 2 + 1])
+    shift(at.x - c[i * 2], at.y - c[i * 2 + 1])
   }
-  const dx = clamp(left + right, -L * 0.01, L * 0.01)
-  const dy = clamp(up + down, -L * 0.01, L * 0.01)
-  if (!dx && !dy) return false
+  const walled = push.left + push.right !== 0 || push.up + push.down !== 0
+  if (water.rival) for (let i = 0; i <= N; i++) shove(c[i * 2], c[i * 2 + 1], L * (margin(i / N) + WIDTH), water.rival)
+  const dx = clamp(push.left + push.right, -L * 0.01, L * 0.01)
+  const dy = clamp(push.up + push.down, -L * 0.01, L * 0.01)
   for (let i = 0; i <= N; i++) {
     c[i * 2] += dx
     c[i * 2 + 1] += dy
   }
-  return true
+  return walled
+}
+
+function shove(x: number, y: number, apart: number, r: Float64Array) {
+  let near = Infinity
+  let nx = 0
+  let ny = 0
+  for (let j = 0; j < r.length; j += 4) {
+    const d = Math.hypot(x - r[j], y - r[j + 1])
+    if (d < near) {
+      near = d
+      nx = x - r[j]
+      ny = y - r[j + 1]
+    }
+  }
+  if (near < apart && near > 0) shift((nx * (apart - near)) / near, (ny * (apart - near)) / near)
+}
+
+function shift(dx: number, dy: number) {
+  push.left = Math.min(push.left, dx)
+  push.right = Math.max(push.right, dx)
+  push.up = Math.min(push.up, dy)
+  push.down = Math.max(push.down, dy)
 }
 
 function margin(s: number) {
   return 0.03 + (s < TAIL ? halfWidth(s) : fanWidth((s - TAIL) / (1 - TAIL)))
 }
 
-function place(c: Float64Array, i: number, L: number, back: number, bent: number, water: Water) {
+function place(c: Float64Array, i: number, L: number, back: number, min: number, max: number, water: Water) {
   const m = L * margin(i / N)
   const link = L / N
-  const lo = Math.max(-LIMIT, -CURL - bent)
-  const hi = Math.min(LIMIT, CURL - bent)
   const px = c[i * 2 - 2]
   const py = c[i * 2 - 1]
-  const start = clamp(wrap(Math.atan2(c[i * 2 + 1] - py, c[i * 2] - px) - back), lo, hi)
+  const start = clamp(wrap(Math.atan2(c[i * 2 + 1] - py, c[i * 2] - px) - back), min, max)
   let best = start
   let least = Infinity
   for (let k = 0; k <= 24 && least; k++) {
     const d = start + ((k + 1) >> 1) * STEP * (k & 1 ? 1 : -1)
-    if (d < lo || d > hi) continue
+    if (d < min || d > max) continue
     const over = crowd(px + Math.cos(back + d) * link, py + Math.sin(back + d) * link, m, m + L * WIDTH, water)
     if (over < least) {
       least = over
