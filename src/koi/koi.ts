@@ -19,6 +19,7 @@ export type Koi = {
   effort: number
   scull: number
   chain: Float64Array
+  bent: number
   pressed: boolean
   shy: { x: number; y: number }
 }
@@ -30,9 +31,9 @@ const WIDTH = 0.118
 const WAIST = 0.26
 const FAN = 0.12
 const BEND = 0.5
-const LIMIT = 0.3
+const LIMIT = 0.21
 const STEP = LIMIT / 6
-const CURL = 3.6
+const CURL = 3
 
 const qx = new Float64Array(N + 1)
 const qy = new Float64Array(N + 1)
@@ -50,16 +51,37 @@ let clip: Rect | null = null
 
 export function createKoi(look: Look, length: number, orbit: Orbit, angle: number, water: Water): Koi {
   const chain = new Float64Array((N + 1) * 2)
-  let a = angle
-  for (let i = 0; i <= N; i++) {
-    chain[i * 2] = orbit.x + orbit.rx * Math.cos(a)
-    chain[i * 2 + 1] = orbit.y + orbit.ry * Math.sin(a)
-    a -= length / N / (Math.hypot(orbit.rx * Math.sin(a), orbit.ry * Math.cos(a)) || 1)
+  const koi = { look, length, x: 0, y: 0, heading: 0, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain, bent: 0, pressed: false, shy: { x: 0, y: 0 } }
+  let best = 0
+  let least = Infinity
+  for (let k = 0; k < 32 && least; k++) {
+    const over = lay(koi, orbit, angle + (k * TAU) / 16, k < 16 ? 1 : 0.4, water)
+    if (over < least) {
+      least = over
+      best = k
+    }
   }
-  const heading = Math.atan2(orbit.ry * Math.cos(angle), -orbit.rx * Math.sin(angle))
-  const koi = { look, length, x: chain[0], y: chain[1], heading, speed: 0, turn: 0, bank: 0, phase: 0, effort: 1, scull: 0, chain, pressed: false, shy: { x: 0, y: 0 } }
+  if (least) lay(koi, orbit, angle + (best * TAU) / 16, best < 16 ? 1 : 0.4, water)
   follow(koi, water)
   return koi
+}
+
+function lay(koi: Koi, orbit: Orbit, angle: number, reach: number, water: Water) {
+  const L = koi.length
+  const c = koi.chain
+  koi.heading = Math.atan2(orbit.ry * Math.cos(angle), -orbit.rx * Math.sin(angle))
+  const dx = (Math.cos(koi.heading) * L) / N
+  const dy = (Math.sin(koi.heading) * L) / N
+  koi.x = orbit.x + orbit.rx * reach * Math.cos(angle)
+  koi.y = orbit.y + orbit.ry * reach * Math.sin(angle)
+  let over = 0
+  for (let i = 0; i <= N; i++) {
+    const m = L * margin(i ? i / N : 1)
+    c[i * 2] = koi.x - dx * i
+    c[i * 2 + 1] = koi.y - dy * i
+    over += crowd(c[i * 2], c[i * 2 + 1], m, L * 0.6, water)
+  }
+  return over
 }
 
 export function resizeKoi(koi: Koi, length: number, scaleX: number, scaleY: number) {
@@ -79,7 +101,8 @@ export function swim(koi: Koi, dt: number, heading: number, speed: number, glidi
   const agility = (Math.max(koi.speed, L * 0.08) / (L * BEND)) * (1 + 1.5 * urgency)
   const delta = wrap(heading - koi.heading)
   const behind = koi.pressed && Math.abs(delta) > 2.6 && koi.turn * delta < 0
-  const want = clamp((behind ? delta - Math.sign(delta) * TAU : delta) * 1.2, -agility, agility)
+  const aim = clamp((behind ? delta - Math.sign(delta) * TAU : delta) * 1.2, -agility, agility)
+  const want = aim * clamp((CURL + Math.sign(aim) * koi.bent) / (CURL * 0.3), 0, 1)
   koi.turn += (want - koi.turn) * ease(1.8, dt)
   koi.heading = wrap(koi.heading + koi.turn * dt)
   koi.speed += (speed - koi.speed) * ease(gliding ? 0.25 : 0.8, dt)
@@ -104,11 +127,11 @@ function follow(koi: Koi, water: Water) {
   c[0] = at.x
   c[1] = at.y
   let back = Math.atan2(c[3] - c[1], c[2] - c[0])
-  let bent = 0
+  koi.bent = 0
   for (let i = 1; i <= N; i++) {
-    const bend = place(c, i, L, back, bent, water)
+    const bend = place(c, i, L, back, koi.bent, water)
     back += bend
-    if (i > 1) bent += bend
+    if (i > 1) koi.bent += bend
   }
   koi.pressed = nudge(c, L, water) || koi.pressed
   koi.x = c[0]

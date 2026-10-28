@@ -113,7 +113,9 @@ export function createPond(seed = 11): Pond {
     if (koi.length) koi.forEach((k, i) => resizeKoi(k, L * SIZES[i], steady ? 1 : sx, steady ? 1 : sy))
     else {
       const turn = rand() * TAU
-      koi = [createKoi(KOHAKU, L, orbit(L, 0), turn, water), createKoi(SUMI, L * SIZES[1], orbit(L * SIZES[1], 1), turn + Math.PI, water)]
+      const kohaku = createKoi(KOHAKU, L, orbit(L, 0), turn, water)
+      water.rival = kohaku.chain
+      koi = [kohaku, createKoi(SUMI, L * SIZES[1], orbit(L * SIZES[1], 1), turn + Math.PI, water)]
     }
     const count = Math.round((next.width * next.height) / 9000)
     specks.length = Math.min(specks.length, count)
@@ -217,7 +219,7 @@ export function createPond(seed = 11): Pond {
     const shy = smooth(textGap(k.x, k.y) / (k.length * 0.6))
     const pull = smooth(interest.age / 0.6) * (1 - smooth((interest.age - 4) / 3)) * shy
     push(dx / d, dy / d, pull * (d > k.length * 0.45 ? 4 : 0.5))
-    urge.urgency = Math.max(urge.urgency, pull * 0.7)
+    urge.urgency = Math.max(urge.urgency, pull * 0.3)
   }
 
   function stayIn(k: Koi) {
