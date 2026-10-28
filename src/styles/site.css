@@ -1,0 +1,163 @@
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/source-serif.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Koi Mono';
+  src: url('/fonts/koi-mono.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+  --bg: #f1eee7;
+  --fg: #1b1e1e;
+  --muted: #4f5554;
+  --k1: #7d9591;
+  --k2: #557571;
+  --k3: #575e60;
+  --k4: #d23f22;
+  --k5: #71797b;
+  --k6: #262a2c;
+  --k7: #b07c22;
+  --k8: #6a7173;
+  --k9: #262a2c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c1112;
+    --fg: #ece8df;
+    --muted: #a9aca6;
+    --k1: #56706d;
+    --k2: #8fb0ab;
+    --k3: #efebe2;
+    --k4: #f2643c;
+    --k5: #a3a59e;
+    --k6: #8a9497;
+    --k7: #e2ad4f;
+    --k8: #687275;
+    --k9: #7d8c8f;
+  }
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  margin: 0;
+  font: 400 1rem/1.5 'Source Serif 4', Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  min-height: 100svh;
+  display: grid;
+  align-content: end;
+}
+
+.pond {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.pond canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.live .pond canvas {
+  opacity: 1;
+}
+
+.still {
+  margin: 0;
+  font-family: 'Koi Mono', ui-monospace, monospace;
+  white-space: pre;
+}
+
+.still--narrow,
+.js .still {
+  display: none;
+}
+
+.k1 { color: var(--k1); }
+.k2 { color: var(--k2); }
+.k3 { color: var(--k3); }
+.k4 { color: var(--k4); }
+.k5 { color: var(--k5); }
+.k6 { color: var(--k6); }
+.k7 { color: var(--k7); }
+.k8 { color: var(--k8); }
+.k9 { color: var(--k9); }
+.f { opacity: 0.55; }
+
+.card {
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  max-width: 30rem;
+}
+
+h1 {
+  margin: 0 0 0.2rem;
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+}
+
+ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .still--wide {
+    display: none;
+  }
+
+  .still--narrow {
+    display: block;
+  }
+
+  .js .still--narrow {
+    display: none;
+  }
+}

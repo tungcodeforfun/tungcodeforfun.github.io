@@ -1,95 +1,118 @@
-import '../styles/fonts.css'
-import '../styles/tokens.css'
-import '../styles/base.css'
-import '../styles/layout.css'
-import '../styles/sim.css'
-import { env, recall, remember, whenVisible } from './env'
-import { setupHeroProgress, setupMotion, setupTheme, setupTilt, setupTopbar } from './chrome'
-import type { SimId } from '../content'
+import '../styles/site.css'
+import { createPond, metrics } from '../koi/pond.ts'
 
-const loaders: Record<SimId, () => Promise<{ mount: (figure: HTMLElement) => void }>> = {
-  queue: () => import('./sim/queue'),
-  menu: () => import('./sim/menu'),
-  cache: () => import('./sim/cache'),
-  match: () => import('./sim/match'),
+const root = document.documentElement
+const canvas = document.querySelector<HTMLCanvasElement>('.pond canvas')
+const card = document.querySelector<HTMLElement>('.card')
+const ctx = canvas?.getContext('2d')
+const reduced = matchMedia('(prefers-reduced-motion: reduce)')
+const dark = matchMedia('(prefers-color-scheme: dark)')
+const pond = createPond(Math.floor(Math.random() * 2 ** 31))
+const glyphs = new Map<number, string>()
+let inks: string[] = []
+let width = 0
+let height = 0
+let frame = 0
+let last = 0
+const pointer = { x: -1e4, y: -1e4 }
+
+function readInks() {
+  const style = getComputedStyle(root)
+  inks = Array.from({ length: 10 }, (_, i) => style.getPropertyValue(`--k${i}`).trim())
 }
 
-const themeButton = document.querySelector<HTMLButtonElement>('[data-toggle="theme"]')
-const motionButton = document.querySelector<HTMLButtonElement>('[data-toggle="motion"]')
-const hero = document.querySelector<HTMLElement>('.hero')
-const topbar = document.querySelector<HTMLElement>('.topbar')
-const tilt = document.querySelector<HTMLElement>('[data-tilt]')
+function layout() {
+  if (!canvas || !ctx || !card) return
+  width = innerWidth
+  height = innerHeight
+  const dpr = Math.min(devicePixelRatio || 1, 3)
+  canvas.width = Math.round(width * dpr)
+  canvas.height = Math.round(height * dpr)
+  const box = card.getBoundingClientRect()
+  const { length, fontSize, cellW, cellH } = metrics(width, height, box.top)
+  const pad = cellH
+  pond.setLayout({
+    width,
+    height,
+    length,
+    cellW,
+    cellH,
+    keepOut: { x: box.left - pad, y: box.top - pad, w: box.width + pad * 2, h: box.height + pad * 2 },
+  })
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  ctx.font = `${fontSize}px 'Koi Mono', ui-monospace, monospace`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+}
 
-if (themeButton) setupTheme(themeButton)
-if (motionButton) setupMotion(motionButton)
-if (tilt) setupTilt(tilt)
+function draw() {
+  if (!ctx) return
+  const grid = pond.paint()
+  ctx.clearRect(0, 0, width, height)
+  for (let ink = 1; ink < inks.length; ink++) {
+    ctx.fillStyle = inks[ink]
+    let alpha = -1
+    for (let n = 0; n < grid.count; n++) {
+      const cell = grid.used[n]
+      if (grid.ink[cell] !== ink) continue
+      const a = grid.alpha[cell] >> 4
+      if (a !== alpha) {
+        alpha = a
+        ctx.globalAlpha = (a + 1) / 16
+      }
+      const code = grid.glyph[cell]
+      let glyph = glyphs.get(code)
+      if (!glyph) glyphs.set(code, (glyph = String.fromCharCode(code)))
+      const col = cell % grid.cols
+      const row = (cell - col) / grid.cols
+      ctx.fillText(glyph, (col + 0.5) * grid.cellW, (row + 0.5) * grid.cellH)
+    }
+  }
+  ctx.globalAlpha = 1
+}
 
-let heroProgress = 0
-let onHeroProgress: ((p: number) => void) | undefined
-if (hero) {
-  if (topbar) setupTopbar(topbar, hero)
-  setupHeroProgress(hero, (p) => {
-    heroProgress = p
-    onHeroProgress?.(p)
+function tick(now: number) {
+  const dt = Math.min(0.05, (now - last) / 1000)
+  last = now
+  pond.step(reduced.matches ? dt / 3 : dt)
+  draw()
+  frame = requestAnimationFrame(tick)
+}
+
+function start() {
+  if (frame || document.hidden) return
+  last = performance.now()
+  frame = requestAnimationFrame(tick)
+}
+
+function stop() {
+  cancelAnimationFrame(frame)
+  frame = 0
+}
+
+async function boot() {
+  if (!canvas || !ctx || !card) return
+  await document.fonts.load("15px 'Koi Mono'").catch(() => [])
+  readInks()
+  layout()
+  for (let i = 0; i < 240; i++) pond.step(1 / 60)
+  draw()
+  root.classList.add('live')
+  start()
+  addEventListener('resize', layout)
+  document.fonts.ready.then(layout)
+  dark.addEventListener('change', readInks)
+  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()))
+  addEventListener('pointerdown', (e) => {
+    if (!card.contains(e.target as Node)) pond.tap(e.clientX, e.clientY)
+  })
+  addEventListener('pointermove', (e) => {
+    if (reduced.matches || e.pointerType !== 'mouse') return
+    if (Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y) < 28) return
+    pointer.x = e.clientX
+    pointer.y = e.clientY
+    pond.stir(e.clientX, e.clientY)
   })
 }
 
-const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software|basic render/i
-
-function webglAvailable() {
-  if (recall('webgl') === 'fail') return false
-  const gl = document.createElement('canvas').getContext('webgl2')
-  const info = gl?.getExtension('WEBGL_debug_renderer_info')
-  const renderer = gl && info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : ''
-  gl?.getExtension('WEBGL_lose_context')?.loseContext()
-  const ok = !!gl && (env.softwareGl || !SOFTWARE_RENDERER.test(renderer))
-  if (!ok) remember('webgl', 'fail')
-  return ok
-}
-
-function startHero(el: HTMLElement) {
-  if (!webglAvailable()) return
-  import('./hero/scene')
-    .then(({ createHero }) => {
-      const handle = createHero(el, heroProgress)
-      onHeroProgress = handle.progress
-    })
-    .catch(() => delete el.dataset.live)
-}
-
-function afterFirstPaint(run: () => void) {
-  const go = () => ('requestIdleCallback' in window ? requestIdleCallback(run, { timeout: 2500 }) : setTimeout(run, 400))
-  if (document.readyState === 'complete') go()
-  else addEventListener('load', go, { once: true })
-}
-
-if (hero) afterFirstPaint(() => startHero(hero))
-
-for (const figure of document.querySelectorAll<HTMLElement>('.sim[data-sim]')) {
-  const id = figure.dataset.sim as SimId
-  const stop = whenVisible(
-    figure,
-    (visible) => {
-      if (!visible) return
-      stop()
-      loaders[id]().then(({ mount }) => mount(figure))
-    },
-    '600px 0px',
-  )
-}
-
-const cueObserver = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue
-      cueObserver.unobserve(entry.target)
-      const el = entry.target as HTMLElement
-      const figure = el.closest('.case')?.querySelector<HTMLElement>('.sim')
-      if (!figure) continue
-      if (figure.hasAttribute('data-live')) figure.dispatchEvent(new CustomEvent('cue', { detail: el.dataset.cue }))
-      else figure.dataset.pendingCue = el.dataset.cue
-    }
-  },
-  { rootMargin: '0px 0px -45% 0px' },
-)
-for (const el of document.querySelectorAll('[data-cue]')) cueObserver.observe(el)
+boot()

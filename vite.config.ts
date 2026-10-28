@@ -9,7 +9,7 @@ function prerender(): Plugin {
     transformIndexHtml: {
       order: 'pre',
       async handler(html, ctx) {
-        const entry = '/src/render.tsx'
+        const entry = '/src/render.ts'
         const { render } = ctx.server
           ? ((await ctx.server.ssrLoadModule(entry)) as { render: Render })
           : (await runnerImport<{ render: Render }>(entry, { configFile: false, logLevel: 'error' })).module
@@ -23,9 +23,7 @@ function prerender(): Plugin {
 export default defineConfig({
   plugins: [prerender()],
   test: {
-    environment: 'jsdom',
+    environment: 'node',
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
-    css: false,
   },
 })
