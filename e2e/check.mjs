@@ -104,7 +104,7 @@ async function checkLinks() {
       console.log(`link mailto ${href}`)
       continue
     }
-    const url = new URL(href.replace('https://tungcodeforfun.github.io/', values.url), values.url)
+    const url = new URL(href.replace('https://tungthanhnguyen.com/', values.url), values.url)
     const response = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 link-check' } })
     const bot = response.status === 999 && url.hostname.endsWith('linkedin.com')
     console.log(`link ${response.status}${bot ? ' (LinkedIn refuses bots)' : ''} ${href}${url.href !== href ? ` (checked ${url.href})` : ''}`)

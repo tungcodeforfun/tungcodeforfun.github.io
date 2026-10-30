@@ -6,7 +6,7 @@ export const profile = {
   github: 'https://github.com/tungcodeforfun',
   linkedin: 'https://linkedin.com/in/tungngvyen',
   resume: '/resume.pdf',
-  site: 'https://tungcodeforfun.github.io/',
+  site: 'https://tungthanhnguyen.com/',
   title: 'Tung Nguyen, Senior Software Engineer, New York',
   description: 'Tung Nguyen, Senior Software Engineer in New York.',
 } as const

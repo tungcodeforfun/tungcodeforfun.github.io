@@ -52,4 +52,7 @@ and the favicons from `public/favicon.svg`.
 
 ## Deploy
 
-Pushes to `main` build and publish to GitHub Pages via `.github/workflows/deploy.yml`.
+Pushes to `main` build and deploy to Cloudflare Workers static assets (`wrangler.jsonc`) via
+`.github/workflows/deploy.yml`, served at https://tungthanhnguyen.com. The workflow needs the repo
+secret `CLOUDFLARE_API_TOKEN` (account: Workers Scripts Write, Account Settings Read; zone
+`tungthanhnguyen.com`: Workers Routes Write, Zone Read) and the variable `CLOUDFLARE_ACCOUNT_ID`.
