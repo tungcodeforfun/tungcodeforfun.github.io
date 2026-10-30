@@ -1,6 +1,6 @@
 import { clearGrid, createGrid, Ink, put, type Grid } from './grid.ts'
 import { createKoi, line, paintKoi, resizeKoi, swim, type Koi, type Look, type Water } from './koi.ts'
-import { TAU, clamp, clear, inside, random, smooth, wrap, type Point, type Rect } from './math.ts'
+import { TAU, clamp, clear, random, smooth, wrap, type Point, type Rect } from './math.ts'
 
 export type Layout = {
   width: number
@@ -8,19 +8,17 @@ export type Layout = {
   length: number
   cellW: number
   cellH: number
-  keepOut: Rect | null
 }
 
 export type Pond = {
   setLayout(layout: Layout): void
+  steer(home: Rect, avoid: Rect | null): void
   step(dt: number): void
   tap(x: number, y: number): void
-  stir(x: number, y: number): void
   paint(): Grid
+  fish(): readonly Koi[]
 }
 
-type Speck = { x: number; y: number; vx: number; vy: number; age: number; life: number; glyph: string }
-type Mote = { x: number; y: number; age: number; life: number; glyph: string }
 type Moment = { x: number; y: number; age: number }
 
 const KOHAKU: Look = {
@@ -47,35 +45,33 @@ const SUMI: Look = {
   ],
 }
 
-const WATER = '·˙·~'
 const SIZES = [1, 0.94]
 const LANES = [1.04, 0.84]
 const WALL_PROBES = [0, 0.5]
-const TEXT_PROBES = [0, 0.4, 0.8]
+const AVOID_PROBES = [0, 0.4, 0.8]
 const ROOM_PROBES = [0, 0.35]
 const RINGS = [
   [0, 1],
   [0.45, 0.55],
 ]
 
-export function metrics(width: number, height: number, top: number) {
-  const length = Math.round(Math.min(width * 0.68, height * 0.5, Math.sqrt(width * top) * 0.48, Math.max(width * 0.44, top * 0.37), 470))
-  const fontSize = clamp(Math.round(length / 32), 8, 15)
-  return { length, fontSize, cellW: (fontSize * 1233) / 2048, cellH: Math.round(fontSize * 1.1) }
+export function cells(length: number) {
+  const fontSize = clamp(Math.round(length / 30), 6, 15)
+  return { fontSize, cellW: (fontSize * 1233) / 2048, cellH: Math.round(fontSize * 1.1) }
 }
 
 export function createPond(seed = 11): Pond {
   const rand = random(seed)
-  let layout: Layout = { width: 1, height: 1, length: 1, cellW: 1, cellH: 1, keepOut: null }
+  let layout: Layout = { width: 1, height: 1, length: 1, cellW: 1, cellH: 1 }
   let grid: Grid = createGrid(1, 1, 1, 1)
   let koi: Koi[] = []
   let time = rand() * 1000
   let interest: Moment | null = null
+  let avoid: Rect | null = null
+  let steered = false
   const glide = [0, 0]
   const nextGlide = [6 + rand() * 8, 10 + rand() * 8]
-  const specks: Speck[] = []
   const ripples: Moment[] = []
-  const motes: Mote[] = []
   const urge = { x: 0, y: 0, urgency: 0 }
   const home = { x: 0, y: 0, rx: 0, ry: 0 }
   const centre = { x: 0, y: 0, rx: 0, ry: 0 }
@@ -85,21 +81,15 @@ export function createPond(seed = 11): Pond {
     { x: 0, y: 0 },
     { x: 0, y: 0 },
   ]
-  const water: Water = { width: 1, height: 1, fence: null, rival: null }
+  const water: Water = { width: 1, height: 1, rival: null }
 
-  function settle(L: number) {
-    const { width, height, keepOut } = layout
-    const top = keepOut ? keepOut.y : height
-    const side = keepOut ? width - keepOut.x - keepOut.w : 0
-    const right = smooth((side - L) / L) * side * height
-    const share = right / (width * top + right || 1)
-    home.x = width / 2 + share * (width - side) * 0.5
-    home.y = (top / 2) * (1 - share) + (height / 2) * share
-    home.rx = width * 0.18
-    home.ry = (top * (1 - share) + height * share) * 0.27
-    water.width = width
-    water.height = height
-    water.fence = keepOut && side < L ? { ...keepOut, w: width - keepOut.x + L } : keepOut
+  function steer(region: Rect, keepClear: Rect | null) {
+    steered = true
+    home.x = region.x + region.w / 2
+    home.y = region.y + region.h / 2
+    home.rx = region.w * 0.3
+    home.ry = region.h * 0.3
+    avoid = keepClear
   }
 
   function setLayout(next: Layout) {
@@ -108,8 +98,10 @@ export function createPond(seed = 11): Pond {
     const steady = Math.abs(sx - 1) < 0.2 && Math.abs(sy - 1) < 0.2
     layout = next
     grid = createGrid(Math.ceil(next.width / next.cellW), Math.ceil(next.height / next.cellH), next.cellW, next.cellH)
+    water.width = next.width
+    water.height = next.height
+    if (!steered) steer({ x: 0, y: 0, w: next.width, h: next.height }, null)
     const L = next.length
-    settle(L)
     if (koi.length) koi.forEach((k, i) => resizeKoi(k, L * SIZES[i], steady ? 1 : sx, steady ? 1 : sy))
     else {
       const turn = rand() * TAU
@@ -117,22 +109,6 @@ export function createPond(seed = 11): Pond {
       water.rival = kohaku.chain
       koi = [kohaku, createKoi(SUMI, L * SIZES[1], orbit(L * SIZES[1], 1), turn + Math.PI, water)]
     }
-    const count = Math.round((next.width * next.height) / 9000)
-    specks.length = Math.min(specks.length, count)
-    while (specks.length < count) specks.push(respawn({ x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 1, glyph: '' }, rand()))
-  }
-
-  function respawn(s: Speck, age: number) {
-    const a = rand() * TAU
-    const v = 1.5 + rand() * 4
-    s.x = rand() * layout.width
-    s.y = rand() * layout.height
-    s.vx = Math.cos(a) * v + 2
-    s.vy = Math.sin(a) * v * 0.5
-    s.life = 7 + rand() * 9
-    s.age = age * s.life
-    s.glyph = WATER[Math.floor(rand() * WATER.length)]
-    return s
   }
 
   function push(x: number, y: number, weight: number) {
@@ -145,9 +121,8 @@ export function createPond(seed = 11): Pond {
     probe.y = k.y + Math.sin(k.heading) * k.length * reach
   }
 
-  function textGap(x: number, y: number) {
-    const box = water.fence
-    return box ? Math.hypot(x - clamp(x, box.x, box.x + box.w), y - clamp(y, box.y, box.y + box.h)) : Infinity
+  function avoidGap(x: number, y: number) {
+    return avoid ? Math.hypot(x - clamp(x, avoid.x, avoid.x + avoid.w), y - clamp(y, avoid.y, avoid.y + avoid.h)) : Infinity
   }
 
   function orbit(L: number, i: number) {
@@ -216,7 +191,7 @@ export function createPond(seed = 11): Pond {
     const dx = goals[i].x - k.x
     const dy = goals[i].y - k.y
     const d = Math.hypot(dx, dy) || 1
-    const shy = smooth(textGap(k.x, k.y) / (k.length * 0.6))
+    const shy = smooth(avoidGap(k.x, k.y) / (k.length * 0.6))
     const pull = smooth(interest.age / 0.6) * (1 - smooth((interest.age - 4) / 3)) * shy
     push(dx / d, dy / d, pull * (d > k.length * 0.45 ? 4 : 0.5))
     urge.urgency = Math.max(urge.urgency, pull * 0.3)
@@ -234,18 +209,19 @@ export function createPond(seed = 11): Pond {
     }
   }
 
-  function skirtText(k: Koi) {
-    const box = water.fence
+  function keepClear(k: Koi) {
+    const box = avoid
     if (!box) return
     const room = k.length * 0.75
-    for (const reach of TEXT_PROBES) {
+    for (const reach of AVOID_PROBES) {
       look(k, reach)
-      const d = textGap(probe.x, probe.y)
+      const d = avoidGap(probe.x, probe.y)
       if (d >= room) continue
       const vx = probe.x - clamp(probe.x, box.x, box.x + box.w)
       const vy = probe.y - clamp(probe.y, box.y, box.y + box.h)
       const closeness = (room - d) / room
-      push(d ? vx / d : 0, d ? vy / d : -1, closeness * (reach ? 4 : 6))
+      const out = d ? 1 / d : 0
+      push(d ? vx * out : Math.sign(probe.x - box.x - box.w / 2), d ? vy * out : 0, closeness * (reach ? 4 : 6))
       urge.urgency = Math.max(urge.urgency, closeness)
     }
   }
@@ -275,24 +251,18 @@ export function createPond(seed = 11): Pond {
       giveRoom(k, other)
       curiosity(k, i)
       stayIn(k)
-      skirtText(k)
+      keepClear(k)
       shoulder(k, other)
       pace(k, i, other, dt)
     }
     if (interest && (interest.age += dt) > 7) interest = null
-    for (const s of specks) {
-      s.x += s.vx * dt
-      s.y += s.vy * dt
-      if ((s.age += dt) > s.life) respawn(s, 0)
-    }
     for (let i = ripples.length - 1; i >= 0; i--) if ((ripples[i].age += dt) > 3.2) ripples.splice(i, 1)
-    for (let i = motes.length - 1; i >= 0; i--) if ((motes[i].age += dt) > motes[i].life) motes.splice(i, 1)
   }
 
   function aim(goal: Point, x: number, y: number, L: number) {
     goal.x = clamp(x, L * 0.5, layout.width - L * 0.5)
     goal.y = clamp(y, L * 0.5, layout.height - L * 0.5)
-    if (water.fence) clear(water.fence, goal, L * 0.9)
+    if (avoid) clear(avoid, goal, L * 0.9)
   }
 
   function tap(x: number, y: number) {
@@ -310,19 +280,10 @@ export function createPond(seed = 11): Pond {
       dx = -dx
       dy = -dy
     }
-    const gap = (L * 0.45) / (Math.hypot(dx, dy) || 1)
-    aim(goals[0], spot.x + dx * gap, spot.y + dy * gap, L)
-    aim(goals[1], spot.x - dx * gap, spot.y - dy * gap, L)
+    const apart = (L * 0.45) / (Math.hypot(dx, dy) || 1)
+    aim(goals[0], spot.x + dx * apart, spot.y + dy * apart, L)
+    aim(goals[1], spot.x - dx * apart, spot.y - dy * apart, L)
     interest = spot
-  }
-
-  function stir(x: number, y: number) {
-    if (motes.length > 40) motes.shift()
-    motes.push({ x, y, age: 0, life: 1.4, glyph: rand() < 0.5 ? '·' : '˙' })
-  }
-
-  function mark(x: number, y: number, glyph: string, ink: number, alpha: number) {
-    if (!inside(layout.keepOut, x, y)) put(grid, Math.floor(x / layout.cellW), Math.floor(y / layout.cellH), glyph, ink, alpha)
   }
 
   function ripple(rp: Moment) {
@@ -335,22 +296,19 @@ export function createPond(seed = 11): Pond {
       for (let j = 0; j < steps; j++) {
         const a = (j / steps) * TAU
         const glyph = delay ? '·' : line(-Math.sin(a), Math.cos(a) * 0.82)
-        mark(rp.x + Math.cos(a) * radius, rp.y + Math.sin(a) * radius * 0.82, glyph === '-' ? '~' : glyph, Ink.Ripple, alpha)
+        const x = rp.x + Math.cos(a) * radius
+        const y = rp.y + Math.sin(a) * radius * 0.82
+        put(grid, Math.floor(x / layout.cellW), Math.floor(y / layout.cellH), glyph === '-' ? '~' : glyph, Ink.Ripple, alpha)
       }
     }
   }
 
   function paint() {
     clearGrid(grid)
-    for (const s of specks) {
-      const fade = Math.sin((s.age / s.life) * Math.PI)
-      if (fade > 0.05) mark(s.x, s.y, s.glyph, Ink.Water, Math.round(255 * fade))
-    }
-    for (const m of motes) mark(m.x, m.y, m.glyph, Ink.Ripple, Math.round(160 * (1 - m.age / m.life)))
     for (const rp of ripples) ripple(rp)
-    for (const k of koi) paintKoi(k, grid, layout.keepOut)
+    for (const k of koi) paintKoi(k, grid)
     return grid
   }
 
-  return { setLayout, step, tap, stir, paint }
+  return { setLayout, steer, step, tap, paint, fish: () => koi }
 }

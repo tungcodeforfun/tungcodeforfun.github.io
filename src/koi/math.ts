@@ -20,10 +20,6 @@ export function ease(rate: number, dt: number) {
   return 1 - Math.exp(-rate * dt)
 }
 
-export function inside(rect: Rect | null, x: number, y: number) {
-  return !!rect && x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h
-}
-
 export function clear(box: Rect, p: Point, margin: number) {
   const dx = p.x - clamp(p.x, box.x, box.x + box.w)
   const dy = p.y - clamp(p.y, box.y, box.y + box.h)
@@ -33,12 +29,6 @@ export function clear(box: Rect, p: Point, margin: number) {
     p.x += (dx / d) * (margin - d)
     p.y += (dy / d) * (margin - d)
   } else p.y = box.y - margin
-}
-
-export function distance(box: Rect, x: number, y: number) {
-  const dx = Math.max(box.x - x, x - box.x - box.w)
-  const dy = Math.max(box.y - y, y - box.y - box.h)
-  return dx > 0 || dy > 0 ? Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) : Math.max(dx, dy)
 }
 
 export function random(seed: number) {

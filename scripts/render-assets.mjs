@@ -28,11 +28,15 @@ function ico(png) {
 
 const browser = await chromium.launch({ executablePath })
 
-const og = await browser.newContext({ viewport: { width: 1200, height: 630 }, colorScheme: 'dark' })
+const og = await browser.newContext({ viewport: { width: 1200, height: 630 }, colorScheme: 'light', deviceScaleFactor: 1 })
 const page = await og.newPage()
 await page.goto(values.url)
 await page.waitForSelector('html.live')
-await page.addStyleTag({ content: '.card ul { visibility: hidden }' })
+await page.addStyleTag({
+  content:
+    'html { font-size: 28px } :root { --read: 58vh } main > section { max-width: none } .contact, .flow, main > section + section, .side, .colophon { visibility: hidden }',
+})
+await page.evaluate(() => dispatchEvent(new Event('resize')))
 await page.waitForTimeout(Number(values.wait))
 await writeFile(`${root}public/og.png`, await page.screenshot())
 await og.close()

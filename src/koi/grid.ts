@@ -1,13 +1,12 @@
 export const Ink = {
-  Water: 1,
-  Ripple: 2,
-  White: 3,
-  Red: 4,
-  WhiteFin: 5,
-  Sumi: 6,
-  Gold: 7,
-  SumiFin: 8,
-  Eye: 9,
+  Ripple: 1,
+  White: 2,
+  Red: 3,
+  WhiteFin: 4,
+  Sumi: 5,
+  Gold: 6,
+  SumiFin: 7,
+  Eye: 8,
 } as const
 
 export type InkId = (typeof Ink)[keyof typeof Ink]
