@@ -7,7 +7,7 @@ export type Reading = {
 }
 
 const SCROLL_HOLD = 1000
-const IDLE_AFTER = 12000
+const IDLE_AFTER = 7000
 const CALM_AFTER = 3000
 const RISE = 900
 const FALL = 600
