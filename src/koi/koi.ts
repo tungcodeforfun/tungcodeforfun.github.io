@@ -1,9 +1,9 @@
 import { put, type Grid, type InkId } from './grid.ts'
-import { TAU, clamp, clear, distance, ease, inside, smooth, wrap, type Rect } from './math.ts'
+import { TAU, clamp, ease, smooth, wrap } from './math.ts'
 
 export type Patch = { along: number; across: number; alongRadius: number; acrossRadius: number }
 export type Look = { body: InkId; patch: InkId; fin: InkId; eye: InkId; patches: readonly Patch[] }
-export type Water = { width: number; height: number; fence: Rect | null; rival: Float64Array | null }
+export type Water = { width: number; height: number; rival: Float64Array | null }
 export type Orbit = { x: number; y: number; rx: number; ry: number }
 
 export type Koi = {
@@ -50,7 +50,6 @@ const norm = { x: 0, y: 0, g: 1 }
 const span = { c0: 0, c1: 0, r0: 0, r1: 0 }
 const SIDES = [-1, 1]
 let target: Grid
-let clip: Rect | null = null
 
 export function createKoi(look: Look, length: number, orbit: Orbit, angle: number, water: Water): Koi {
   const chain = new Float64Array((N + 1) * 2)
@@ -161,7 +160,6 @@ function follow(koi: Koi, water: Water, swing: number) {
 function hold(x: number, y: number, m: number, water: Water) {
   at.x = clamp(x, m, water.width - m)
   at.y = clamp(y, m, water.height - m)
-  if (water.fence) clear(water.fence, at, m)
 }
 
 function nudge(c: Float64Array, L: number, water: Water) {
@@ -231,7 +229,6 @@ function place(c: Float64Array, i: number, L: number, back: number, min: number,
 
 function crowd(x: number, y: number, m: number, apart: number, water: Water) {
   let over = Math.max(0, m - x, x - water.width + m) + Math.max(0, m - y, y - water.height + m)
-  if (water.fence) over += Math.max(0, m - distance(water.fence, x, y))
   over *= 4
   const r = water.rival
   if (!r) return over
@@ -371,7 +368,7 @@ function fin(koi: Koi, s: number, side: number, angle: number, size: number, spr
       const vy = py - ry
       const dist = Math.hypot(vx, vy)
       const lean = Math.atan2((ax * vy - ay * vx) * side, ax * vx + ay * vy) + spread * 0.25
-      if (dist < cellW * 0.5 || Math.abs(lean) > spread || inside(clip, px, py)) continue
+      if (dist < cellW * 0.5 || Math.abs(lean) > spread) continue
       const sd = dist - len * Math.pow(Math.cos((lean / spread) * Math.PI * 0.5), 0.35)
       const edgeBand = band(vx / dist, vy / dist)
       if (sd > edgeBand) continue
@@ -441,9 +438,8 @@ function bounds(pad: number) {
   cells(minX - pad, minY - pad, maxX + pad, maxY + pad)
 }
 
-export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
+export function paintKoi(koi: Koi, grid: Grid) {
   target = grid
-  clip = keepOut
   spine(koi)
   const L = koi.length
   for (const side of SIDES) {
@@ -461,7 +457,6 @@ export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
     for (let c = c0; c <= c1; c++) {
       const px = (c + 0.5) * grid.cellW
       const py = (r + 0.5) * grid.cellH
-      if (inside(clip, px, py)) continue
       locate(px, py)
       if (hit.s >= TAIL) tail(koi, c, r, px, py)
       else skin(koi, c, r, narrow)
@@ -469,6 +464,6 @@ export function paintKoi(koi: Koi, grid: Grid, keepOut: Rect | null) {
   }
   for (const side of SIDES) {
     point(0.08, side * L * halfWidth(0.08) * 0.62)
-    if (!inside(clip, at.x, at.y)) put(grid, Math.floor(at.x / grid.cellW), Math.floor(at.y / grid.cellH), 'o', koi.look.eye)
+    put(grid, Math.floor(at.x / grid.cellW), Math.floor(at.y / grid.cellH), 'o', koi.look.eye)
   }
 }

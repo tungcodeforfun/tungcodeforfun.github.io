@@ -20,25 +20,21 @@ export function ease(rate: number, dt: number) {
   return 1 - Math.exp(-rate * dt)
 }
 
-export function inside(rect: Rect | null, x: number, y: number) {
-  return !!rect && x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h
+export const fromBox = { x: 0, y: 0 }
+
+export function boxDistance(box: Rect, x: number, y: number, pad = 0) {
+  fromBox.x = x - clamp(x, box.x - pad, box.x + box.w + pad)
+  fromBox.y = y - clamp(y, box.y - pad, box.y + box.h + pad)
+  return Math.hypot(fromBox.x, fromBox.y)
 }
 
 export function clear(box: Rect, p: Point, margin: number) {
-  const dx = p.x - clamp(p.x, box.x, box.x + box.w)
-  const dy = p.y - clamp(p.y, box.y, box.y + box.h)
-  const d = Math.hypot(dx, dy)
+  const d = boxDistance(box, p.x, p.y)
   if (d >= margin) return
   if (d) {
-    p.x += (dx / d) * (margin - d)
-    p.y += (dy / d) * (margin - d)
+    p.x += (fromBox.x / d) * (margin - d)
+    p.y += (fromBox.y / d) * (margin - d)
   } else p.y = box.y - margin
-}
-
-export function distance(box: Rect, x: number, y: number) {
-  const dx = Math.max(box.x - x, x - box.x - box.w)
-  const dy = Math.max(box.y - y, y - box.y - box.h)
-  return dx > 0 || dy > 0 ? Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) : Math.max(dx, dy)
 }
 
 export function random(seed: number) {

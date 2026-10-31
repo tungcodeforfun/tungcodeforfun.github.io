@@ -1,13 +1,13 @@
 # Third-party notices
 
-## Source Serif 4
+## Hanken Grotesk
 
-`public/fonts/source-serif.woff2` is a Latin subset of Source Serif 4 version 4.004 (variable, weight 400–600, optical size 8–60), taken from the `@fontsource-variable/source-serif-4` package.
+`public/fonts/hanken-grotesk.woff2` is Hanken Grotesk version 3.013, taken from the `@fontsource-variable/hanken-grotesk` 5.3.0 package, instanced at weight 400 and subset to Latin (Basic Latin, Latin-1, general punctuation, arrows).
 
-© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’. Licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
+Copyright 2021 The Hanken Grotesk Project Authors (https://github.com/marcologous/hanken-grotesk). Licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
 
 ## DejaVu Sans Mono
 
-`public/fonts/koi-mono.woff2` is a subset of DejaVu Sans Mono (printable ASCII plus `· ˙ ‿ ⌒ ≈`), used for the koi glyphs. The two fish in `public/favicon.svg` are its `∝` outline.
+`public/fonts/koi-mono.woff2` is a subset of DejaVu Sans Mono (printable ASCII plus `· ˙ ‿ ⌒ ≈`), used for the koi glyphs and the commit stamp. The two fish in `public/favicon.svg` are its `∝` outline.
 
 Fonts are © Bitstream (Bitstream Vera license); DejaVu changes are in the public domain. License: https://dejavu-fonts.github.io/License.html
