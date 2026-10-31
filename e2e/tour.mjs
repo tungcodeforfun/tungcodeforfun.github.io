@@ -84,7 +84,7 @@ async function ripple() {
   await page.mouse.move(80, 450)
   await page.waitForTimeout(2500)
   const lifted = () =>
-    page.evaluate(() => [...document.querySelectorAll('main .w')].map((w) => [w, Math.abs(parseFloat(w.style.translate.split(' ')[1] || 0))]).filter(([, y]) => y > 3).map(([w]) => w.getBoundingClientRect()))
+    page.evaluate(() => [...document.querySelectorAll('main .w')].map((w) => [w, Math.abs(parseFloat(w.style.translate.split(' ')[1] || 0))]).filter(([, y]) => y > 2).map(([w]) => w.getBoundingClientRect()))
   let clip = null
   for (let i = 0; i < 240 && !clip; i++) {
     await page.waitForTimeout(100)

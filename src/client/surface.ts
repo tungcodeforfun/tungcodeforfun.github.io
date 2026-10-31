@@ -7,7 +7,7 @@ export type Surface = {
   still(): void
 }
 
-export const SWELL = 5
+export const SWELL = 3
 const REACH = 0.35
 const WAVELENGTH = 1.2
 const PERIOD = 1400

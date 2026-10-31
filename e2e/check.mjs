@@ -54,7 +54,7 @@ async function audit(viewport, scheme) {
   const { context, page, messages } = await open(viewport, scheme)
   await page.waitForTimeout(1500)
   await page.addScriptTag({ content: axeSource })
-  const results = await page.evaluate(() => window.axe.run(document, { resultTypes: ['violations'] }))
+  const results = await page.evaluate(() => window.axe.run(document, { resultTypes: ['violations'], rules: { 'target-size': { enabled: true } } }))
   for (const v of results.violations) console.log(`  [${v.impact}] ${v.id}: ${v.nodes.length} node(s) ${v.nodes[0]?.target}`)
   fail(results.violations.length > 0, `axe ${viewport}/${scheme}: ${results.violations.length} violations`)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
@@ -286,7 +286,7 @@ async function legibility(viewport, scheme) {
     } else await page.touchscreen.tap(x, column.gapY)
   }
   await lure()
-  await page.waitForTimeout(2500)
+  await page.waitForTimeout(3500)
   const calm = await sample(page, frames, false)
   fail(calm.shifted === 0, `${viewport}/${scheme} calm (pointer in the margin, no input): words rippled in ${calm.shifted}/${frames} frames, max ${calm.maxShift.toFixed(2)} px`)
   fail(calm.underFish === 0, `${viewport}/${scheme} calm: text over fish ink in ${calm.underFish} word-frames`)
@@ -294,21 +294,62 @@ async function legibility(viewport, scheme) {
   let reading
   if (desktop) {
     await lure()
-    await page.waitForTimeout(1800)
+    await page.waitForTimeout(3500)
     await page.mouse.move(column.left + column.width / 2, 420, { steps: 4 })
+    await page.waitForTimeout(3000)
     reading = await sample(page, frames, false)
     fail(reading.maxShift > 0, `pointer over the column ${viewport}/${scheme}: max displacement ${reading.maxShift.toFixed(2)} px over ${frames} frames (${reading.underFish} word-frames over fish)`)
     fail(reading.worst < 4.5, `contrast ${viewport}/${scheme} reading: worst ${reading.worst.toFixed(2)}:1`)
     await page.mouse.move(margin.x, margin.y)
   }
   await lure()
-  await page.waitForTimeout(1800)
+  await page.waitForTimeout(3500)
   const scrolling = await sample(page, frames, true)
   fail(
     scrolling.maxShift > 0 || scrolling.longest >= 1000,
     `within 1 s of a scroll ${viewport}/${scheme}: max displacement ${scrolling.maxShift.toFixed(2)} px over ${frames} frames, each ≤ ${Math.round(scrolling.longest)} ms after a scroll (${scrolling.underFish} word-frames over fish)`,
   )
   fail(scrolling.worst < 4.5, `contrast ${viewport}/${scheme} scrolling: worst ${scrolling.worst.toFixed(2)}:1`)
+  await context.close()
+}
+
+async function hold(scheme) {
+  const { context, page } = await open('phone', scheme)
+  const cdp = await context.newCDPSession(page)
+  await page.evaluate(() => scrollTo({ top: innerHeight * 0.7, behavior: 'instant' }))
+  let moved = 0
+  let count = 0
+  for (const band of [0.1, 0.85, 0.15, 0.8]) {
+    await page.waitForTimeout(4000)
+    const point = await page.evaluate((band) => {
+      const y = innerHeight * band
+      const mid = (r) => (r.top + r.bottom) / 2
+      const rects = [...document.querySelectorAll('main .w')].map((w) => w.getBoundingClientRect()).filter((r) => r.bottom > 0 && r.top < innerHeight)
+      const r = rects.reduce((a, b) => (Math.abs(mid(b) - y) < Math.abs(mid(a) - y) ? b : a))
+      return { x: r.left + r.width / 2, y: mid(r) }
+    }, band)
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] })
+    const held = await page.evaluate(
+      () =>
+        new Promise((resolve) => {
+          const words = [...document.querySelectorAll('main .w')]
+          const start = performance.now()
+          let max = 0
+          let n = 0
+          const step = () => {
+            for (const w of words) if (w.style.translate) max = Math.max(max, Math.hypot(...w.style.translate.split(' ').map(parseFloat)))
+            n++
+            if (performance.now() - start < 5000) requestAnimationFrame(step)
+            else resolve({ max, n })
+          }
+          requestAnimationFrame(step)
+        }),
+    )
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    moved = Math.max(moved, held.max)
+    count += held.n
+  }
+  fail(moved > 0, `finger held still 5 s on a word, phone/${scheme}, 4 holds in the top and bottom bands: max displacement ${moved.toFixed(2)} px over ${count} frames`)
   await context.close()
 }
 
@@ -350,6 +391,7 @@ async function soak() {
 for (const viewport of Object.keys(viewports)) for (const scheme of ['light', 'dark']) await audit(viewport, scheme)
 await stamps()
 for (const viewport of Object.keys(viewports)) for (const scheme of ['light', 'dark']) await legibility(viewport, scheme)
+for (const scheme of ['light', 'dark']) await hold(scheme)
 for (const mode of ['reduced motion', 'no JavaScript']) for (const viewport of Object.keys(viewports)) for (const scheme of ['light', 'dark']) await stillFrame(viewport, scheme, mode)
 await checkLinks()
 await soak()

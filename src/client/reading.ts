@@ -8,6 +8,7 @@ export type Reading = {
 
 const SCROLL_HOLD = 1000
 const IDLE_AFTER = 12000
+const CALM_AFTER = 3000
 const RISE = 900
 const FALL = 600
 
@@ -16,6 +17,7 @@ export function createReading(column: () => { left: number; right: number }, mai
   let lastScroll = -Infinity
   let lastInput = performance.now()
   let selecting = false
+  let held = false
   let focused = false
   let calmSince = -1
   let level = 0
@@ -27,8 +29,21 @@ export function createReading(column: () => { left: number; right: number }, mai
   addEventListener('scroll', scrolled, { passive: true })
   addEventListener('wheel', scrolled, { passive: true })
   addEventListener('keydown', scrolled)
-  addEventListener('touchstart', scrolled, { passive: true })
+  addEventListener(
+    'touchstart',
+    () => {
+      held = true
+      scrolled()
+    },
+    { passive: true },
+  )
   addEventListener('touchmove', scrolled, { passive: true })
+  const lifted = (e: TouchEvent) => {
+    held = e.touches.length > 0
+    scrolled()
+  }
+  addEventListener('touchend', lifted, { passive: true })
+  addEventListener('touchcancel', lifted, { passive: true })
   addEventListener('pointermove', (e) => {
     lastInput = performance.now()
     if (e.pointerType === 'touch') return
@@ -50,7 +65,7 @@ export function createReading(column: () => { left: number; right: number }, mai
   })
 
   function engaged(now: number) {
-    if (selecting || focused || now - lastScroll < SCROLL_HOLD) return true
+    if (held || selecting || focused || now - lastScroll < SCROLL_HOLD) return true
     if (!pointer.here) return false
     const { left, right } = column()
     return pointer.x > left - 24 && pointer.x < right + 24
@@ -63,7 +78,7 @@ export function createReading(column: () => { left: number; right: number }, mai
   function strength(now: number) {
     const dt = now - lastCall
     lastCall = now
-    if (engaged(now)) {
+    if (engaged(now) || now - lastInput < CALM_AFTER) {
       calmSince = -1
       level = 0
       return 0
