@@ -84,33 +84,109 @@ async function stamps() {
   await context.close()
 }
 
+function installProbe() {
+  const parse = (c) => c.match(/\d+(\.\d+)?/g).map(Number).slice(0, 3)
+  const hex = (h) => {
+    const s = h.replace('#', '')
+    const f = s.length === 3 ? [...s].map((c) => c + c).join('') : s
+    return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16))
+  }
+  const lum = ([r, g, b]) => {
+    const l = (v) => ((v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * l(r) + 0.7152 * l(g) + 0.0722 * l(b)
+  }
+  const ratio = (a, b) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
+    return (x + 0.05) / (y + 0.05)
+  }
+  const base = hex(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim())
+  const texts = [...document.querySelectorAll('main .w, main a, main h1, .role, .side .clock span, .side nav a, .colophon > *')]
+  const blend = (rgb, a) => rgb.map((v, k) => v * a + base[k] * (1 - a))
+
+  function canvasInk(count) {
+    const canvas = document.querySelector('.pond canvas')
+    const box = canvas.getBoundingClientRect()
+    const scale = canvas.width / box.width
+    const image = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data
+    let inked = 0
+    if (count) for (let i = 3; i < image.length; i += 4) if (image[i] && box.top + Math.floor((i - 3) / 4 / canvas.width) / scale < innerHeight) inked++
+    const darkest = (r, color) => {
+      let low = null
+      const x0 = Math.max(0, Math.floor((r.left - box.left) * scale))
+      const x1 = Math.min(canvas.width - 1, Math.ceil((r.right - box.left) * scale))
+      const y0 = Math.max(0, Math.floor((r.top - box.top) * scale))
+      const y1 = Math.min(canvas.height - 1, Math.ceil((r.bottom - box.top) * scale))
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const i = (y * canvas.width + x) * 4
+          if (!image[i + 3]) continue
+          const c = ratio(color, blend([image[i], image[i + 1], image[i + 2]], image[i + 3] / 255))
+          if (low === null || c < low) low = c
+        }
+      }
+      return low
+    }
+    return { inked, darkest }
+  }
+
+  function glyphInk() {
+    const glyphs = []
+    const range = document.createRange()
+    for (const pre of document.querySelectorAll('pre.still')) {
+      if (getComputedStyle(pre).display === 'none') continue
+      const walker = document.createTreeWalker(pre, NodeFilter.SHOW_TEXT)
+      while (walker.nextNode()) {
+        const node = walker.currentNode
+        const style = getComputedStyle(node.parentElement)
+        const px = blend(parse(style.color), Number(style.opacity))
+        for (let i = 0; i < node.length; i++) {
+          if (/\s/.test(node.data[i])) continue
+          range.setStart(node, i)
+          range.setEnd(node, i + 1)
+          const r = range.getBoundingClientRect()
+          if (r.bottom > 0 && r.top < innerHeight) glyphs.push({ r, px })
+        }
+      }
+    }
+    const darkest = (r, color) => {
+      let low = null
+      for (const g of glyphs) {
+        if (g.r.right <= r.left || g.r.left >= r.right || g.r.bottom <= r.top || g.r.top >= r.bottom) continue
+        const c = ratio(color, g.px)
+        if (low === null || c < low) low = c
+      }
+      return low
+    }
+    return { inked: glyphs.length, darkest }
+  }
+
+  window.__measure = (count = false) => {
+    const { inked, darkest } = document.documentElement.classList.contains('live') ? canvasInk(count) : glyphInk()
+    let worst = Infinity
+    let worstText = ''
+    let shift = 0
+    let underFish = 0
+    for (const el of texts) {
+      const r = el.getBoundingClientRect()
+      if (r.bottom < 0 || r.top > innerHeight || !r.width) continue
+      if (el.style.translate) shift = Math.max(shift, Math.hypot(...el.style.translate.split(' ').map(parseFloat)))
+      const low = darkest(r, parse(getComputedStyle(el).color))
+      if (low === null) continue
+      underFish++
+      if (low < worst) {
+        worst = low
+        worstText = el.textContent.trim().slice(0, 24)
+      }
+    }
+    return { worst, worstText, shift, underFish, inked }
+  }
+}
+
 async function sample(page, count, scroll) {
+  await page.evaluate(installProbe)
   return page.evaluate(
     ({ count, scroll }) =>
       new Promise((resolve) => {
-        const canvas = document.querySelector('.pond canvas')
-        const ctx = canvas.getContext('2d')
-        const scale = canvas.width / innerWidth
-        const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
-        const parse = (c) => {
-          const m = c.match(/\d+(\.\d+)?/g).map(Number)
-          return m.slice(0, 3)
-        }
-        const hex = (h) => {
-          const s = h.replace('#', '')
-          const f = s.length === 3 ? [...s].map((c) => c + c).join('') : s
-          return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16))
-        }
-        const lum = ([r, g, b]) => {
-          const l = (v) => ((v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
-          return 0.2126 * l(r) + 0.7152 * l(g) + 0.0722 * l(b)
-        }
-        const ratio = (a, b) => {
-          const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
-          return (x + 0.05) / (y + 0.05)
-        }
-        const base = hex(bg)
-        const texts = [...document.querySelectorAll('main .w, main h1, .role, .contact a, .side .clock span, .side nav a, .colophon > *')]
         let worst = Infinity
         let worstText = ''
         let maxShift = 0
@@ -138,44 +214,14 @@ async function sample(page, count, scroll) {
           }
           if (!landed) return requestAnimationFrame(step)
           longest = Math.max(longest, now - scrolledAt)
-          const image = ctx.getImageData(0, 0, canvas.width, canvas.height).data
-          let frameShift = 0
-          for (const el of texts) {
-            const r = el.getBoundingClientRect()
-            if (r.bottom < 0 || r.top > innerHeight || !r.width) continue
-            if (el.classList.contains('w')) {
-              const t = el.style.translate
-              if (t) {
-                const [x, y = 0] = t.split(' ').map(parseFloat)
-                frameShift = Math.max(frameShift, Math.hypot(x, y))
-              }
-            }
-            const color = parse(getComputedStyle(el).color)
-            let darkest = null
-            const x0 = Math.max(0, Math.floor(r.left * scale))
-            const x1 = Math.min(canvas.width - 1, Math.ceil(r.right * scale))
-            const y0 = Math.max(0, Math.floor(r.top * scale))
-            const y1 = Math.min(canvas.height - 1, Math.ceil(r.bottom * scale))
-            for (let y = y0; y <= y1; y += 1) {
-              for (let x = x0; x <= x1; x += 1) {
-                const i = (y * canvas.width + x) * 4
-                const a = image[i + 3] / 255
-                if (!a) continue
-                const px = [0, 1, 2].map((k) => image[i + k] * a + base[k] * (1 - a))
-                const c = ratio(color, px)
-                if (!darkest || c < darkest) darkest = c
-              }
-            }
-            if (darkest !== null) {
-              underFish++
-              if (darkest < worst) {
-                worst = darkest
-                worstText = el.textContent.trim().slice(0, 24)
-              }
-            }
+          const frame = window.__measure()
+          underFish += frame.underFish
+          if (frame.worst < worst) {
+            worst = frame.worst
+            worstText = frame.worstText
           }
-          if (frameShift > 0) shifted++
-          maxShift = Math.max(maxShift, frameShift)
+          if (frame.shift > 0) shifted++
+          maxShift = Math.max(maxShift, frame.shift)
           if (++n < count) requestAnimationFrame(step)
           else resolve({ worst, worstText, maxShift, shifted, underFish, longest })
         }
@@ -183,6 +229,42 @@ async function sample(page, count, scroll) {
       }),
     { count, scroll },
   )
+}
+
+async function stillFrame(viewport, scheme, mode) {
+  const context = await browser.newContext({
+    viewport: viewports[viewport],
+    colorScheme: scheme,
+    isMobile: viewport === 'phone',
+    hasTouch: viewport === 'phone',
+    ...(mode === 'reduced motion' ? { reducedMotion: 'reduce' } : { javaScriptEnabled: false }),
+  })
+  const page = await context.newPage()
+  await page.goto(values.url, { waitUntil: 'networkidle' })
+  if (mode === 'reduced motion') await page.waitForSelector('html.live')
+  await page.waitForTimeout(300)
+  await page.evaluate(installProbe)
+  let worst = Infinity
+  let worstText = ''
+  let underFish = 0
+  let inkedAtTop = 0
+  for (let top = 0; top <= 3000; top += 150) {
+    await page.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), top)
+    await page.waitForTimeout(60)
+    const frame = await page.evaluate((count) => window.__measure(count), top === 0)
+    if (!top) inkedAtTop = frame.inked
+    underFish += frame.underFish
+    if (frame.worst < worst) {
+      worst = frame.worst
+      worstText = frame.worstText
+    }
+  }
+  fail(inkedAtTop === 0, `${mode} ${viewport}/${scheme}: still koi drawn at the top (${inkedAtTop} ink ${mode === 'reduced motion' ? 'pixels' : 'glyphs'})`)
+  fail(
+    worst < 4.5,
+    `contrast ${viewport}/${scheme} ${mode}, scrolled 0–3000 px: ${worst === Infinity ? 'no text over fish' : `worst ${worst.toFixed(2)}:1 ("${worstText}")`} (${underFish} word-positions over fish)`,
+  )
+  await context.close()
 }
 
 async function legibility(viewport, scheme) {
@@ -206,9 +288,8 @@ async function legibility(viewport, scheme) {
   await lure()
   await page.waitForTimeout(2500)
   const calm = await sample(page, frames, false)
-  console.log(
-    `     ${viewport}/${scheme} calm (pointer in the margin, no input): words displaced in ${calm.shifted}/${frames} frames, max ${calm.maxShift.toFixed(2)} px; text over fish ink in ${calm.underFish} word-frames`,
-  )
+  fail(calm.shifted === 0, `${viewport}/${scheme} calm (pointer in the margin, no input): words rippled in ${calm.shifted}/${frames} frames, max ${calm.maxShift.toFixed(2)} px`)
+  fail(calm.underFish === 0, `${viewport}/${scheme} calm: text over fish ink in ${calm.underFish} word-frames`)
   fail(calm.worst < 4.5, `contrast ${viewport}/${scheme} calm: worst ${calm.worst.toFixed(2)}:1 ("${calm.worstText}") over ${frames} frames`)
   let reading
   if (desktop) {
@@ -269,6 +350,7 @@ async function soak() {
 for (const viewport of Object.keys(viewports)) for (const scheme of ['light', 'dark']) await audit(viewport, scheme)
 await stamps()
 for (const viewport of Object.keys(viewports)) for (const scheme of ['light', 'dark']) await legibility(viewport, scheme)
+for (const mode of ['reduced motion', 'no JavaScript']) for (const viewport of Object.keys(viewports)) for (const scheme of ['light', 'dark']) await stillFrame(viewport, scheme, mode)
 await checkLinks()
 await soak()
 await browser.close()

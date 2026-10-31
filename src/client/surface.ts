@@ -1,35 +1,40 @@
 import type { Koi } from '../koi/koi.ts'
+import { TAU, smooth } from '../koi/math.ts'
 
 export type Surface = {
   measure(): void
-  part(fish: readonly Koi[], strength: number, band: boolean): void
+  part(fish: readonly Koi[], strength: number, band: boolean, now: number): void
   still(): void
 }
 
-const LIFT = 2.4
-const REACH = 0.15
+export const SWELL = 5
+const REACH = 0.35
+const WAVELENGTH = 1.2
+const PERIOD = 1400
+const RISE = 160
+const SETTLE = 480
 const QUIET_BAND = [0.22, 0.78]
 
 export function createSurface(root: HTMLElement): Surface {
   let words: HTMLElement[] = []
   let xs = new Float64Array(0)
   let ys = new Float64Array(0)
-  let dx = new Float32Array(0)
   let dy = new Float32Array(0)
-  let tx = new Float32Array(0)
-  let ty = new Float32Array(0)
+  let goal = new Float32Array(0)
+  let level = new Float32Array(0)
+  let along = new Float32Array(0)
   let stamp = new Uint32Array(0)
   let frame = 0
-  const hits: number[] = []
-  const moved = new Set<number>()
+  let last = 0
+  const active = new Set<number>()
   const box = { x0: 0, y0: 0, x1: 0, y1: 0 }
 
   function still() {
-    for (const i of moved) {
+    for (const i of active) {
       words[i].style.translate = ''
-      dx[i] = dy[i] = 0
+      dy[i] = level[i] = 0
     }
-    moved.clear()
+    active.clear()
   }
 
   function measure() {
@@ -37,10 +42,10 @@ export function createSurface(root: HTMLElement): Surface {
     words = [...root.querySelectorAll<HTMLElement>('.w')]
     xs = new Float64Array(words.length)
     ys = new Float64Array(words.length)
-    dx = new Float32Array(words.length)
     dy = new Float32Array(words.length)
-    tx = new Float32Array(words.length)
-    ty = new Float32Array(words.length)
+    goal = new Float32Array(words.length)
+    level = new Float32Array(words.length)
+    along = new Float32Array(words.length)
     stamp = new Uint32Array(words.length)
     words.forEach((w, i) => {
       const r = w.getBoundingClientRect()
@@ -76,57 +81,54 @@ export function createSurface(root: HTMLElement): Surface {
     box.y1 += reach
   }
 
-  function set(i: number, x: number, y: number) {
-    if (Math.abs(x - dx[i]) < 0.04 && Math.abs(y - dy[i]) < 0.04) return
-    dx[i] = x
+  function set(i: number, y: number) {
+    if (y ? Math.abs(y - dy[i]) < 0.04 : !dy[i]) return
     dy[i] = y
-    if (x || y) {
-      words[i].style.translate = `${x.toFixed(2)}px ${y.toFixed(2)}px`
-      moved.add(i)
-    } else {
-      words[i].style.translate = ''
-      moved.delete(i)
+    words[i].style.translate = y ? `0 ${y.toFixed(2)}px` : ''
+  }
+
+  function touch(k: Koi, top: number, height: number, band: boolean) {
+    const reach = k.length * REACH
+    const c = k.chain
+    const ux = Math.cos(k.heading) / (k.length * WAVELENGTH)
+    const uy = Math.sin(k.heading) / (k.length * WAVELENGTH)
+    bounds(k, reach)
+    for (let i = first(box.y0 + top); i < ys.length && ys[i] - top <= box.y1; i++) {
+      const x = xs[i] - scrollX
+      const y = ys[i] - top
+      if (x < box.x0 || x > box.x1) continue
+      let near = Infinity
+      for (let j = 0; j < c.length; j += 2) near = Math.min(near, Math.hypot(x - c[j], y - c[j + 1]))
+      if (near >= reach) continue
+      const pull = (1 - smooth(near / reach)) * (band ? quietness(y / height) : 1)
+      if (stamp[i] !== frame) {
+        stamp[i] = frame
+        goal[i] = 0
+        active.add(i)
+      }
+      if (pull > goal[i]) {
+        goal[i] = pull
+        along[i] = (x - c[0]) * ux + (y - c[1]) * uy
+      }
     }
   }
 
-  function part(fish: readonly Koi[], strength: number, band: boolean) {
+  function part(fish: readonly Koi[], strength: number, band: boolean, now: number) {
+    const dt = Math.min(50, now - last)
+    last = now
     if (strength <= 0) return still()
-    const top = scrollY
-    const height = innerHeight
     frame++
-    for (const k of fish) {
-      const reach = k.length * REACH
-      bounds(k, reach)
-      const c = k.chain
-      for (let i = first(box.y0 + top); i < ys.length && ys[i] - top <= box.y1; i++) {
-        const x = xs[i] - scrollX
-        const y = ys[i] - top
-        if (x < box.x0 || x > box.x1) continue
-        let near = Infinity
-        let nx = 0
-        let ny = 0
-        for (let j = 0; j < c.length; j += 2) {
-          const d = Math.hypot(x - c[j], y - c[j + 1])
-          if (d < near) {
-            near = d
-            nx = x - c[j]
-            ny = y - c[j + 1]
-          }
-        }
-        if (near >= reach) continue
-        const f = (1 - near / reach) ** 2 * strength * (band ? quietness(y / height) : 1) * LIFT
-        if (stamp[i] !== frame) {
-          stamp[i] = frame
-          tx[i] = ty[i] = 0
-          hits.push(i)
-        }
-        tx[i] += near ? (nx / near) * f : 0
-        ty[i] += near ? (ny / near) * f * 0.5 : 0
+    for (const k of fish) touch(k, scrollY, innerHeight, band)
+    const phase = (TAU * now) / PERIOD
+    for (const i of active) {
+      const want = stamp[i] === frame ? goal[i] : 0
+      level[i] = want > level[i] ? Math.min(want, level[i] + dt / RISE) : Math.max(want, level[i] - dt / SETTLE)
+      if (level[i]) set(i, SWELL * smooth(level[i]) * strength * Math.sin(phase + TAU * along[i]))
+      else {
+        set(i, 0)
+        active.delete(i)
       }
     }
-    for (const i of moved) if (stamp[i] !== frame) set(i, 0, 0)
-    for (const i of hits) set(i, tx[i], ty[i])
-    hits.length = 0
   }
 
   function quietness(t: number) {

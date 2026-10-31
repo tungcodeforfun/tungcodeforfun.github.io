@@ -1,6 +1,6 @@
 import { clearGrid, createGrid, Ink, put, type Grid } from './grid.ts'
 import { createKoi, line, paintKoi, resizeKoi, swim, type Koi, type Look, type Water } from './koi.ts'
-import { TAU, clamp, clear, random, smooth, wrap, type Point, type Rect } from './math.ts'
+import { TAU, boxDistance, clamp, clear, fromBox, random, smooth, wrap, type Point, type Rect } from './math.ts'
 
 export type Layout = {
   width: number
@@ -122,7 +122,7 @@ export function createPond(seed = 11): Pond {
   }
 
   function avoidGap(x: number, y: number) {
-    return avoid ? Math.hypot(x - clamp(x, avoid.x, avoid.x + avoid.w), y - clamp(y, avoid.y, avoid.y + avoid.h)) : Infinity
+    return avoid ? boxDistance(avoid, x, y) : Infinity
   }
 
   function orbit(L: number, i: number) {
@@ -215,13 +215,11 @@ export function createPond(seed = 11): Pond {
     const room = k.length * 0.75
     for (const reach of AVOID_PROBES) {
       look(k, reach)
-      const d = avoidGap(probe.x, probe.y)
+      const d = boxDistance(box, probe.x, probe.y)
       if (d >= room) continue
-      const vx = probe.x - clamp(probe.x, box.x, box.x + box.w)
-      const vy = probe.y - clamp(probe.y, box.y, box.y + box.h)
       const closeness = (room - d) / room
       const out = d ? 1 / d : 0
-      push(d ? vx * out : Math.sign(probe.x - box.x - box.w / 2), d ? vy * out : 0, closeness * (reach ? 4 : 6))
+      push(d ? fromBox.x * out : Math.sign(probe.x - box.x - box.w / 2), d ? fromBox.y * out : 0, closeness * (reach ? 4 : 6))
       urge.urgency = Math.max(urge.urgency, closeness)
     }
   }

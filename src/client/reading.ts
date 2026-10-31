@@ -43,7 +43,7 @@ export function createReading(column: () => { left: number; right: number }, mai
     selecting = !(getSelection()?.isCollapsed ?? true)
   })
   document.addEventListener('focusin', (e) => {
-    focused = main.contains(e.target as Node)
+    focused = main.contains(e.target as Node) && (e.target as Element).matches(':focus-visible')
   })
   document.addEventListener('focusout', () => {
     focused = false

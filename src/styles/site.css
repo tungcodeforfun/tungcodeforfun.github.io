@@ -93,6 +93,7 @@ a {
   text-decoration-thickness: 1px;
   text-underline-offset: 0.24em;
   text-decoration-color: var(--line);
+  padding-block: 3px;
   transition: text-decoration-color 0.15s ease, color 0.15s ease;
 }
 
@@ -111,6 +112,18 @@ a:focus-visible {
   position: fixed;
   inset: 0;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pond {
+    position: absolute;
+    height: 100vh;
+  }
+}
+
+html:not(.js) .pond {
+  position: absolute;
+  height: 100vh;
 }
 
 .pond canvas {
@@ -177,10 +190,6 @@ main > section + section {
 
 .w {
   display: inline-block;
-}
-
-a .w {
-  text-decoration: inherit;
 }
 
 .role,
@@ -255,7 +264,7 @@ p + .entry {
 .side nav {
   display: grid;
   justify-items: start;
-  gap: 0.55em;
+  gap: 0.12em;
   margin-top: 3.2em;
 }
 
@@ -267,10 +276,6 @@ p + .entry {
 .side nav a:hover,
 .side nav a[aria-current='true'] {
   color: var(--fg);
-}
-
-.side .top {
-  display: none;
 }
 
 .colophon {
@@ -298,7 +303,7 @@ p + .entry {
   text-decoration: none;
 }
 
-@media (max-width: 899px) {
+@media not all and (min-width: 768px) {
   html {
     font-size: 15px;
   }
@@ -332,15 +337,20 @@ p + .entry {
   }
 
   .side {
-    position: static;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: auto;
-    padding: 4.5em var(--gutter) 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.3em 1em;
+    padding: var(--gutter) var(--gutter) 0;
   }
 
   .clock {
-    position: absolute;
-    top: var(--gutter);
-    left: var(--gutter);
+    gap: 0.6em;
   }
 
   .clock span:first-child {
@@ -349,13 +359,8 @@ p + .entry {
 
   .side nav {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.3em 1.3em;
+    gap: 0 1em;
     margin: 0;
-  }
-
-  .side .top {
-    display: inline;
   }
 
   .colophon {

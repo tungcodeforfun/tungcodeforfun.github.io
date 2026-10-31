@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { chromium } from 'playwright-core'
+import { still } from '../src/render.ts'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const executablePath = process.env.CHROME_PATH
@@ -9,7 +10,6 @@ if (!executablePath) throw new Error('Set CHROME_PATH to a Chrome or Chromium bi
 const { values } = parseArgs({
   options: {
     url: { type: 'string', default: 'http://localhost:4185/' },
-    wait: { type: 'string', default: '9000' },
   },
 })
 
@@ -28,16 +28,12 @@ function ico(png) {
 
 const browser = await chromium.launch({ executablePath })
 
-const og = await browser.newContext({ viewport: { width: 1200, height: 630 }, colorScheme: 'light', deviceScaleFactor: 1 })
+const og = await browser.newContext({ viewport: { width: 1200, height: 630 }, colorScheme: 'light', deviceScaleFactor: 1, javaScriptEnabled: false })
 const page = await og.newPage()
-await page.goto(values.url)
-await page.waitForSelector('html.live')
-await page.addStyleTag({
-  content:
-    'html { font-size: 28px } :root { --read: 58vh } main > section { max-width: none } .contact, .flow, main > section + section, .side, .colophon { visibility: hidden }',
-})
-await page.evaluate(() => dispatchEvent(new Event('resize')))
-await page.waitForTimeout(Number(values.wait))
+await page.goto(values.url, { waitUntil: 'networkidle' })
+const style =
+  '<style>html { font-size: 32px } .still--wide { display: none } .still--og { top: 14px } .page { display: block } main { padding: 482px 64px 0 } main > section { max-width: none } .contact, .flow, main > section + section, .side, .colophon { display: none }</style>'
+await page.evaluate((html) => document.querySelector('.pond').insertAdjacentHTML('beforeend', html), style + still('og', 1200, 450, 440, 1))
 await writeFile(`${root}public/og.png`, await page.screenshot())
 await og.close()
 

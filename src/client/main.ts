@@ -11,7 +11,7 @@ const name = document.querySelector<HTMLElement>('#name')!
 const canvas = document.querySelector<HTMLCanvasElement>('.pond canvas')!
 const reduced = matchMedia('(prefers-reduced-motion: reduce)')
 const dark = matchMedia('(prefers-color-scheme: dark)')
-const wide = matchMedia('(min-width: 900px)')
+const wide = matchMedia('(min-width: 768px)')
 const coarse = matchMedia('(hover: none)')
 
 function startClock() {
@@ -33,7 +33,7 @@ function startClock() {
 }
 
 function spyOnSections() {
-  const links = new Map([...document.querySelectorAll<HTMLAnchorElement>('.side nav a:not(.top)')].map((a) => [a.hash.slice(1), a]))
+  const links = new Map([...document.querySelectorAll<HTMLAnchorElement>('.side nav a')].map((a) => [a.hash.slice(1), a]))
   let current: HTMLAnchorElement | undefined
   const observer = new IntersectionObserver(
     (entries) => {
@@ -74,11 +74,15 @@ function bootPond() {
   const visible: Block[] = []
   let frame = 0
   let last = 0
+  let width = canvas.clientWidth
+  let height = canvas.clientHeight
+
+  const origin = () => (reduced.matches ? 0 : scrollY)
 
   function layout() {
     surface.still()
-    const width = innerWidth
-    const height = innerHeight
+    width = canvas.clientWidth
+    height = canvas.clientHeight
     const length = Math.round(clamp(Math.min(width * 0.16, height * 0.3), 140, 240))
     const { fontSize, cellW, cellH } = cells(length)
     water!.resize(width, height, fontSize)
@@ -88,27 +92,27 @@ function bootPond() {
   }
 
   function openWater(): Rect | null {
-    const top = name.getBoundingClientRect().top - 16
-    return top > innerHeight * 0.25 ? { x: 0, y: 0, w: innerWidth, h: top } : null
+    const top = name.getBoundingClientRect().top + scrollY - origin() - 16
+    return top > height * 0.25 ? { x: 0, y: 0, w: width, h: top } : null
   }
 
   function steer(now: number) {
     const open = openWater()
-    const whole = { x: 0, y: 0, w: innerWidth, h: innerHeight }
+    const whole = { x: 0, y: 0, w: width, h: height }
     if (!wide.matches) return pond.steer(open ?? whole, null)
     const { left, right } = column()
     const away = reading.engaged(now) || reading.idle(now)
-    const text = { x: left - 28, y: Math.max(0, (open?.h ?? 0) - 8), w: right - left + 56, h: innerHeight * 2 }
-    const margin = { x: 0, y: 0, w: left, h: innerHeight }
+    const text = { x: left - 28, y: Math.max(0, (open?.h ?? 0) - 8), w: right - left + 56, h: height * 2 }
+    const margin = { x: 0, y: 0, w: left, h: height }
     pond.steer(open ?? (away ? margin : whole), away ? text : null)
   }
 
   function paint() {
     visible.length = 0
-    const top = scrollY
+    const top = origin()
     for (const b of blocks) {
       const y = b.fixed ? b.y : b.y - top
-      if (y + b.h < -40 || y > innerHeight + 40) continue
+      if (y + b.h < -40 || y > height + 40) continue
       visible.push({ x: b.x, y, w: b.w, h: b.h })
     }
     water!.draw(pond.paint(), visible)
@@ -119,7 +123,7 @@ function bootPond() {
     last = now
     steer(now)
     pond.step(dt)
-    surface.part(pond.fish(), reading.strength(now), coarse.matches)
+    surface.part(pond.fish(), reading.strength(now), coarse.matches, now)
     paint()
     frame = requestAnimationFrame(tick)
   }

@@ -1,4 +1,6 @@
 import type { Grid } from '../koi/grid.ts'
+import { boxDistance } from '../koi/math.ts'
+import { SWELL } from './surface.ts'
 
 export type Block = { x: number; y: number; w: number; h: number }
 
@@ -10,7 +12,7 @@ export type Water = {
 
 const INKS = 8
 const LEVELS = 3
-const FEATHER = 18
+const FEATHER = 40
 const LIGHT_FLOOR = 0.86
 const DARK_CEILING = 0.028
 
@@ -83,16 +85,15 @@ export function createWater(canvas: HTMLCanvasElement): Water | null {
     ctx!.font = `${fontSize}px 'Koi Mono', ui-monospace, monospace`
     ctx!.textAlign = 'center'
     ctx!.textBaseline = 'middle'
-    pad = Math.ceil(fontSize * 0.6) + 2
+    pad = Math.ceil(fontSize * 0.6) + 2 + SWELL
   }
 
   function depth(x: number, y: number, blocks: readonly Block[]) {
     let best = Infinity
     for (const b of blocks) {
-      const dx = Math.max(b.x - pad - x, 0, x - b.x - b.w - pad)
-      const dy = Math.max(b.y - pad - y, 0, y - b.y - b.h - pad)
-      if (!dx && !dy) return LEVELS - 1
-      best = Math.min(best, Math.hypot(dx, dy))
+      const d = boxDistance(b, x, y, pad)
+      if (!d) return LEVELS - 1
+      best = Math.min(best, d)
     }
     return best < FEATHER ? 1 : 0
   }

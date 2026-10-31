@@ -10,14 +10,16 @@ const FILLER =
 const escape = (s: string) => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 
 function words(text: string) {
-  return text.replace(/[ \t\r\n]+/g, ' ').replace(/[^ ]+/g, (w) => `<span class="w">${escape(w)}</span>`)
+  return text
+    .replace(/[ \t\r\n]+/g, ' ')
+    .replace(/[^ ]+/g, (w) => w.split(/(?<=-)(?=.)/).map((part) => `<span class="w">${escape(part)}</span>`).join('<wbr>'))
 }
 
 function rich(text: string) {
   let html = ''
   let last = 0
   for (const m of text.matchAll(/\[([^\]]+)\]\(([^)\s]+)\)/g)) {
-    html += `${words(text.slice(last, m.index))}<a href="${escape(m[2])}">${words(m[1])}</a>`
+    html += `${words(text.slice(last, m.index))}<a href="${escape(m[2])}">${escape(m[1])}</a>`
     last = m.index + m[0].length
   }
   return (html + words(text.slice(last))).trim()
@@ -31,7 +33,7 @@ function prose(p: Prose, offset = 0) {
 }
 
 function link(name: string, href?: string) {
-  return href ? `<a href="${escape(href)}">${words(name)}</a>` : words(name)
+  return href ? `<a href="${escape(href)}">${escape(name)}</a>` : words(name)
 }
 
 export function commit() {
@@ -84,7 +86,7 @@ function head() {
   ].join('\n    ')
 }
 
-function still(name: string, width: number, height: number, length: number, share: number) {
+export function still(name: string, width: number, height: number, length: number, share: number) {
   const { fontSize, cellW, cellH } = cells(length)
   const pond = createPond()
   pond.setLayout({ width, height, length, cellW, cellH })
@@ -142,7 +144,7 @@ function body(sha: string) {
     '</main>',
     '<aside class="side">',
     `<p class="clock" data-zone="${profile.timeZone}"><span>${escape(profile.city)}</span> <span class="time"></span></p>`,
-    `<nav aria-label="Sections">${nav}<a class="top" href="#intro">Top</a></nav>`,
+    `<nav aria-label="Sections">${nav}</nav>`,
     '</aside>',
     `<footer class="colophon"><span>${escape(profile.name)}</span> <a class="sha" href="${profile.repo}/commit/${sha}" title="The commit this page was built from">${sha}</a></footer>`,
     '</div>',

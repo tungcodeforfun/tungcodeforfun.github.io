@@ -6,7 +6,7 @@ const { values } = parseArgs({
   options: {
     url: { type: 'string', default: 'http://localhost:4187/' },
     out: { type: 'string', default: 'tour' },
-    only: { type: 'string', default: 'shots,nojs,parting,video,frames' },
+    only: { type: 'string', default: 'shots,nojs,ripple,video,frames' },
     wait: { type: 'string', default: '6000' },
   },
 })
@@ -18,6 +18,8 @@ await mkdir(out, { recursive: true })
 const browser = await chromium.launch({ executablePath })
 const sizes = [
   ['1440', { width: 1440, height: 900 }, 1],
+  ['820', { width: 820, height: 1180 }, 2],
+  ['768', { width: 768, height: 1024 }, 2],
   ['390', { width: 390, height: 844 }, 3],
 ]
 
@@ -51,8 +53,9 @@ async function shots() {
       await page.goto(values.url)
       await page.waitForSelector('html.live')
       await page.waitForTimeout(1500)
-      await page.screenshot({ path: `${out}/editorial-${label}-${scheme}-reduced.png` })
-      console.log(`shot ${label} ${scheme} reduced motion`)
+      await page.evaluate(() => scrollTo({ top: innerHeight * 0.6, behavior: 'instant' }))
+      await page.screenshot({ path: `${out}/editorial-${label}-${scheme}-reduced-scrolled.png` })
+      console.log(`shot ${label} ${scheme} reduced motion, scrolled`)
       await ctx.close()
     }
   }
@@ -64,62 +67,50 @@ async function nojs() {
       const ctx = await context(viewport, scale, { colorScheme: scheme, javaScriptEnabled: false })
       const page = await ctx.newPage()
       await page.goto(values.url, { waitUntil: 'networkidle' })
-      await page.screenshot({ path: `${out}/editorial-${label}-${scheme}-nojs.png` })
-      console.log(`no-js ${label} ${scheme}`)
+      await page.evaluate(() => scrollTo({ top: innerHeight * 0.6, behavior: 'instant' }))
+      await page.screenshot({ path: `${out}/editorial-${label}-${scheme}-nojs-scrolled.png` })
+      console.log(`no-js ${label} ${scheme}, scrolled`)
       await ctx.close()
     }
   }
 }
 
-async function parting() {
-  for (const [label, viewport, scale] of sizes) {
-    const ctx = await context(viewport, scale, { colorScheme: 'light' })
-    const page = await ctx.newPage()
-    await page.goto(values.url)
-    await page.waitForSelector('html.live')
-    await page.evaluate(() => scrollTo({ top: document.querySelector('#intro .flow').offsetTop - 60, behavior: 'instant' }))
-    const target = await page.evaluate(() => {
-      const r = document.querySelector('#intro .flow p:nth-child(2)').getBoundingClientRect()
-      return { x: r.left + r.width / 2, y: r.top - 8 }
-    })
-    let best = { shift: 0, at: null }
-    for (let attempt = 0; attempt < 6 && best.shift < 1.6; attempt++) {
-      if (scale === 1) {
-        await page.mouse.click(target.x, target.y)
-        await page.mouse.move(viewport.width - 60, 80)
-      } else await page.touchscreen.tap(target.x, target.y)
-      for (let i = 0; i < 40; i++) {
-        await page.waitForTimeout(100)
-        const now = await page.evaluate(() => {
-          let shift = 0
-          let at = null
-          for (const w of document.querySelectorAll('.w')) {
-            if (!w.style.translate) continue
-            const [x, y = 0] = w.style.translate.split(' ').map(parseFloat)
-            const d = Math.hypot(x, y)
-            if (d > shift) {
-              shift = d
-              const r = w.getBoundingClientRect()
-              at = { x: r.left + r.width / 2, y: r.top + r.height / 2 }
-            }
-          }
-          return { shift, at }
-        })
-        if (now.shift > best.shift) {
-          best = now
-          await page.screenshot({ path: `${out}/editorial-${label}-parting.png` })
-          const w = Math.min(viewport.width, 360)
-          const h = 200
-          const x = Math.max(0, Math.min(viewport.width - w, now.at.x - w / 2))
-          const y = Math.max(0, Math.min(viewport.height - h, now.at.y - h / 2))
-          await page.screenshot({ path: `${out}/editorial-${label}-parting-zoom.png`, clip: { x, y, width: w, height: h }, scale: 'device' })
-        }
-        if (best.shift >= 2) break
-      }
-    }
-    console.log(`parting ${label}: words displaced up to ${best.shift.toFixed(2)} px in the saved frame`)
-    await ctx.close()
+async function ripple() {
+  const ctx = await context({ width: 1440, height: 900 }, 2, { colorScheme: 'light', isMobile: false, hasTouch: false })
+  const page = await ctx.newPage()
+  await page.goto(values.url)
+  await page.waitForSelector('html.live')
+  await page.evaluate(() => scrollTo({ top: innerHeight * 0.75, behavior: 'instant' }))
+  await page.mouse.move(80, 450)
+  await page.waitForTimeout(2500)
+  const lifted = () =>
+    page.evaluate(() => [...document.querySelectorAll('main .w')].map((w) => [w, Math.abs(parseFloat(w.style.translate.split(' ')[1] || 0))]).filter(([, y]) => y > 3).map(([w]) => w.getBoundingClientRect()))
+  let clip = null
+  for (let i = 0; i < 240 && !clip; i++) {
+    await page.waitForTimeout(100)
+    const rects = await lifted()
+    if (rects.length < 6) continue
+    const r = rects[Math.floor(rects.length / 2)]
+    clip = { x: Math.max(0, r.left - 220), y: Math.max(0, r.top - 80), width: 480, height: 180 }
   }
+  if (!clip) throw new Error('no ripple within 24 s')
+  const frames = []
+  for (let i = 0; i < 8; i++) {
+    const start = Date.now()
+    frames.push((await page.screenshot({ clip })).toString('base64'))
+    await page.waitForTimeout(Math.max(0, 120 - (Date.now() - start)))
+  }
+  await ctx.close()
+  const sheet = await context({ width: 4 * 486 + 14, height: 400 }, 1)
+  const board = await sheet.newPage()
+  await board.setContent(
+    `<body style="margin:0;padding:8px;background:#888;font:12px sans-serif;display:grid;grid-template-columns:repeat(4,480px);gap:6px">${frames
+      .map((png, i) => `<figure style="margin:0;background:#fff"><img style="width:100%;display:block" src="data:image/png;base64,${png}"><figcaption style="padding:2px 4px">${i * 120} ms, 2x</figcaption></figure>`)
+      .join('')}</body>`,
+  )
+  await board.screenshot({ path: `${out}/ripple-strip-2x.png`, fullPage: true })
+  await sheet.close()
+  console.log(`ripple strip ${out}/ripple-strip-2x.png`)
 }
 
 async function video() {
@@ -128,24 +119,23 @@ async function video() {
   await page.goto(values.url)
   await page.waitForSelector('html.live')
   await page.mouse.move(1380, 80)
-  await page.waitForTimeout(3500)
+  await page.waitForTimeout(2500)
   await page.mouse.wheel(0, 520)
   await page.waitForTimeout(900)
+  await page.mouse.move(80, 450, { steps: 12 })
+  await page.waitForTimeout(6500)
   const target = await page.evaluate(() => {
     const r = document.querySelector('#intro .flow p:nth-child(2)').getBoundingClientRect()
-    return { x: r.left + r.width / 2, y: r.top - 8 }
+    return { x: r.left + r.width / 2, y: r.top + 40 }
   })
-  await page.mouse.click(target.x, target.y)
-  await page.mouse.move(1380, 300, { steps: 12 })
-  await page.waitForTimeout(4500)
-  await page.mouse.move(target.x, target.y + 120, { steps: 20 })
-  await page.waitForTimeout(3000)
-  await page.mouse.move(1380, 300, { steps: 20 })
+  await page.mouse.move(target.x, target.y, { steps: 20 })
+  await page.waitForTimeout(2500)
+  await page.mouse.move(80, 450, { steps: 20 })
   await page.waitForTimeout(2600)
   const file = await page.video().path()
   await ctx.close()
-  await rename(file, `${out}/editorial.webm`)
-  console.log(`video ${out}/editorial.webm`)
+  await rename(file, `${out}/ripple.webm`)
+  console.log(`video ${out}/ripple.webm`)
 }
 
 function quantile(list, q) {
@@ -154,7 +144,7 @@ function quantile(list, q) {
 }
 
 async function frames() {
-  for (const [label, viewport, scale] of sizes) {
+  for (const [label, viewport, scale] of sizes.filter(([label]) => label === '1440' || label === '390')) {
     const ctx = await context(viewport, scale, { colorScheme: 'light' })
     await ctx.addInitScript(() => {
       const raf = window.requestAnimationFrame.bind(window)
@@ -179,7 +169,7 @@ async function frames() {
     const gaps = stamps.slice(1).map((t, i) => t - stamps[i])
     const fmt = (n) => n.toFixed(1)
     console.log(
-      `frames ${label}: ${stamps.length} in 10 s, interval p50 ${fmt(quantile(gaps, 0.5))} ms p95 ${fmt(quantile(gaps, 0.95))} ms, callback work p50 ${quantile(work, 0.5).toFixed(2)} ms p95 ${quantile(work, 0.95).toFixed(2)} ms`,
+      `frames ${label}: ${stamps.length} in 10 s, interval p50 ${fmt(quantile(gaps, 0.5))} ms p95 ${fmt(quantile(gaps, 0.95))} ms, ${gaps.filter((g) => g > 25).length} > 25 ms, callback work p50 ${quantile(work, 0.5).toFixed(2)} ms p95 ${quantile(work, 0.95).toFixed(2)} ms`,
     )
     const hidden = await page.evaluate(async () => {
       Object.defineProperty(document, 'hidden', { configurable: true, get: () => true })
@@ -195,7 +185,7 @@ async function frames() {
 
 if (parts.has('shots')) await shots()
 if (parts.has('nojs')) await nojs()
-if (parts.has('parting')) await parting()
+if (parts.has('ripple')) await ripple()
 if (parts.has('video')) await video()
 if (parts.has('frames')) await frames()
 await browser.close()
