@@ -10,7 +10,7 @@ const FILLER =
 const escape = (s: string) => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 
 function words(text: string) {
-  return text.replace(/\s+/g, ' ').replace(/[^ ]+/g, (w) => `<span class="w">${escape(w)}</span>`)
+  return text.replace(/[ \t\r\n]+/g, ' ').replace(/[^ ]+/g, (w) => `<span class="w">${escape(w)}</span>`)
 }
 
 function rich(text: string) {

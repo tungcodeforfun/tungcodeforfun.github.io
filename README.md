@@ -8,13 +8,15 @@ One quiet page in three zones: the build's commit on the left, a narrow text col
 
 All copy lives in `src/content.ts`. Nothing else needs to change.
 
-- **Prose** (the four intro paragraphs, each project's one-liner, the year summary and each year's story) is an entry with a `text` field. While `text` is empty, the page shows a grey placeholder of the suggested length (`words`) with a black label saying what goes there. Write your words between the quotes and the placeholder disappears:
+- **Prose** (the four intro paragraphs, each project's one-liner, the year summary and each year's story) is an entry with a `text` field. Every entry currently holds draft copy. Replace the words between the quotes to rewrite it; set `text` to `''` and the page shows a grey placeholder of the suggested length (`words`) with a black label saying what goes there:
 
   ```ts
   { key: 'intro.hello', label: 'Hello', words: 40, text: 'Your sentence here.' },
   ```
 
   Links inside prose use Markdown style: `'I build [Pullfolio](https://pullfolio.app) in the evenings.'`
+
+  `\u00a0` is a non-breaking space; it keeps a number on the same line as its unit (`3,500+\u00a0locations`).
 - **Add a log row**: one line in `log`, newest first, date as `MM YYYY`; `href` is optional.
 
   ```ts
